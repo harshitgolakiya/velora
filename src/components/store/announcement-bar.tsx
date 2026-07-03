@@ -1,0 +1,65 @@
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { LanguageSwitcher } from "@/components/store/language-switcher";
+import { enabledSorted, localText, type GlobalContent } from "@/lib/global-content";
+import { localeFromPathname } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+
+export function AnnouncementBar({
+  isOverlay,
+  globalContent,
+}: {
+  isOverlay: boolean;
+  globalContent: GlobalContent;
+}) {
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const messages = globalContent.announcementEnabled
+    ? enabledSorted(globalContent.announcements).map((item) => localText(item.message, locale))
+    : [];
+  const [index, setIndex] = useState(0);
+  const visibleIndex = messages.length ? index % messages.length : 0;
+
+  useEffect(() => {
+    if (messages.length <= 1) return;
+    const interval = setInterval(() => {
+      setIndex((current) => (current + 1) % messages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
+  return (
+    <div
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 hidden h-8 border-b px-4 text-[10px] font-medium uppercase tracking-[0.2em] transition-colors md:block",
+        !messages.length && "md:hidden",
+        isOverlay
+          ? "border-white/15 bg-black/15 text-white"
+          : "border-[var(--border)] bg-[var(--background)] text-[var(--accent)]",
+      )}
+    >
+      <div className="mx-auto grid h-full w-full max-w-[1440px] grid-cols-[96px_1fr_96px] items-center">
+        <span aria-hidden="true" />
+        <div className="relative h-full overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={`${locale}-${messages[visibleIndex]}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 flex items-center justify-center text-center"
+              aria-live="polite"
+            >
+              {messages[visibleIndex]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+        <LanguageSwitcher className="justify-self-end" />
+      </div>
+    </div>
+  );
+}

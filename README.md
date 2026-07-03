@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Velora
 
-## Getting Started
+Premium UAE-focused activewear ecommerce built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, Zustand, Prisma, NextAuth, Stripe-ready checkout, and Resend-ready email templates.
 
-First, run the development server:
+## What Is Included
+
+- Home, shop, collection, product detail, cart, checkout, account, admin, support, policy, FAQ, fabric guide, and order tracking pages.
+- Product filtering, sorting, quick add, wishlist, persistent cart, cart drawer, free-shipping progress, newsletter modal, responsive mobile UX, skeleton loading, and SEO metadata.
+- Prisma PostgreSQL schema covering users, admin roles, products, variants, images, categories, collections, carts, wishlist, orders, addresses, coupons, reviews, newsletter, content, payments, and shipments.
+- Admin dashboard surface for revenue, orders, products, stock, content, media, coupons, customers, and role-based operations.
+- API foundations for NextAuth credentials, checkout, newsletter, and Stripe webhook verification.
+- Core production requirements are tracked in `PROJECT_REQUIREMENTS.md`.
+
+## Setup
 
 ```bash
+npm install
+copy .env.example .env
+npm run prisma:generate
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set `DATABASE_URL` in `.env`, then run:
 
-## Learn More
+```bash
+npm run prisma:migrate
+npm run prisma:seed
+```
 
-To learn more about Next.js, take a look at the following resources:
+Demo admin:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Email: `admin@velora.ae`
+- Password: `VeloraAdmin123!`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Payments
 
-## Deploy on Vercel
+The checkout endpoint is Stripe-ready and can be adapted to Tap or PayTabs. Add:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_SITE_URL=
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then update checkout line items to use real product prices from Prisma before production launch.
+
+## CMS And Analytics
+
+The storefront is prepared for Sanity, Shopify headless, or Strapi through `src/lib/cms.ts`. Set `CMS_PROVIDER` in `.env` and replace the local adapter with the selected provider query layer.
+
+Analytics scripts are opt-in through environment variables:
+
+```bash
+NEXT_PUBLIC_GA_ID=
+NEXT_PUBLIC_META_PIXEL_ID=
+NEXT_PUBLIC_TIKTOK_PIXEL_ID=
+```
+
+The production event plan should track product views, search, wishlist, add to cart, checkout start, purchase, coupon use, and newsletter signup.
+
+## Performance Requirements
+
+- Keep Lighthouse scores at 90+.
+- Use `next/image` with local or CDN image assets.
+- Serve static images with immutable cache headers.
+- Keep client components limited to UI interactions.
+- Run `npm run build` before deployment and measure the production build with Lighthouse.
+
+## Deployment To Vercel
+
+1. Create a PostgreSQL database.
+2. Add all `.env.example` variables in Vercel project settings.
+3. Run `prisma migrate deploy` during deployment or from CI.
+4. Configure Stripe webhook URL at `/api/webhooks/stripe`.
+5. Set `NEXT_PUBLIC_SITE_URL` and `NEXTAUTH_URL` to the production domain.
+
+## Notes
+
+The storefront currently uses a local demo catalog for speed and visual completeness. Prisma models and seed data are included so the next step is replacing catalog reads with database-backed server queries and completing admin CRUD forms.

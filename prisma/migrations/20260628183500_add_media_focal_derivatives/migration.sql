@@ -1,0 +1,4 @@
+ALTER TABLE "MediaAsset" ADD COLUMN "originalUrl" TEXT;
+ALTER TABLE "MediaAsset" ADD COLUMN "derivativeManifest" TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE "MediaAsset" ADD COLUMN "focalPointX" REAL NOT NULL DEFAULT 0.5;
+ALTER TABLE "MediaAsset" ADD COLUMN "focalPointY" REAL NOT NULL DEFAULT 0.5;
