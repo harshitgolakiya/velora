@@ -24,6 +24,13 @@
 /build
 /storage/return-evidence/
 
+# database
+*.db
+*.sqlite
+*.sqlite3
+dev.db
+prisma/dev.db
+
 # misc
 .DS_Store
 *.pem
@@ -34,9 +41,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 *.log
+*.err.log
+.dev-server.*
+*-dev.log
+*-dev.err.log
 
 # env files (can opt-in for committing if needed)
 .env*
+.env.local
+.env.*.local
 !.env.example
 
 # vercel
@@ -44,4 +57,18 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+tsconfig.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# build cache
+.turbo/
+
+# prisma
+.prisma/
