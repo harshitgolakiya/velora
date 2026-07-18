@@ -386,7 +386,7 @@ export function ShopControls({
 
       {filtered.length ? (
         <>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4 2xl:grid-cols-5">
+          <div className="storefront-stagger grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4 2xl:grid-cols-5">
             {visibleProducts.map((product, index) => (
               <ProductCard
                 key={product.id}

@@ -165,6 +165,7 @@ export function ProductGallery({
           </>
         ) : (
           <Image
+            key={`${activeMedia?.url ?? "fallback"}-${activeIndex}`}
             src={activeMedia?.url ?? product.images[0]}
             alt={activeMedia?.altText ?? `${product.name}${selectedColor ? ` in ${selectedColor}` : ""}`}
             fill
@@ -172,11 +173,12 @@ export function ProductGallery({
             quality={72}
             decoding="sync"
             className={
-              shouldEnlargePackshot
+              "gallery-image-enter " +
+              (shouldEnlargePackshot
                 ? isAccessoryPackshot
                   ? "object-cover"
                   : "object-contain scale-[1.08]"
-                : "object-contain"
+                : "object-contain")
             }
             style={{ objectPosition: focalObjectPosition(activeMedia) }}
             priority
