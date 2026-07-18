@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 function statusClass(complete: boolean) {
   return complete
-    ? "border-[var(--accent)] bg-[var(--accent)] text-stone-950"
+    ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
     : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)]";
 }
 

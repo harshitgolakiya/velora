@@ -107,4 +107,28 @@ describe("cart recovery state", () => {
     expect(useStore.getState().cartSyncStatus).toBe("synced");
     expect(useStore.getState().cart[0]?.quantity).toBe(3);
   });
+
+  it("starts a fresh cart session after a completed checkout without dropping local cart lines", () => {
+    useStore.setState({
+      cart: [{ product, variantId: "variant-1", color: "Black", size: "S", quantity: 1 }],
+      cartSessionKey: "completed-session",
+      cartExpiresAt: "2026-06-15T10:30:00.000Z",
+      cartReservationError: "CART_ALREADY_COMPLETED",
+      cartSyncStatus: "error",
+      cartRecoveryNotice: "restored",
+    });
+
+    useStore.getState().startNewCartSession("fresh-session");
+
+    expect(useStore.getState()).toMatchObject({
+      cartSessionKey: "fresh-session",
+      cartExpiresAt: undefined,
+      cartReservationError: undefined,
+      cartSyncStatus: "idle",
+      cartRecoveryNotice: undefined,
+    });
+    expect(useStore.getState().cart).toEqual([
+      { product, variantId: "variant-1", color: "Black", size: "S", quantity: 1 },
+    ]);
+  });
 });

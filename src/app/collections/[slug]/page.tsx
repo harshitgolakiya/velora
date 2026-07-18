@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { PageHeader } from "@/components/store/page-header";
 import { ShopControls } from "@/components/store/shop-controls";
+import { compactProductsForList } from "@/lib/catalog-performance";
 import { getCmsCategories, getCmsCategoryDetails, getCmsCollection, getCmsCollections, getCmsProducts } from "@/lib/cms";
 import { absoluteUrl, collectionJsonLd, localizedAlternates } from "@/lib/seo";
 
@@ -58,7 +59,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
         <Breadcrumbs items={[{ label: "Shop", href: "/shop" }, { label: collection.name }]} />
         <ShopControls
           collection={slug}
-          products={products}
+          products={compactProductsForList(products)}
           categories={categories}
           categoryDetails={categoryDetails}
           collections={collections}

@@ -746,6 +746,7 @@ export function ProductEditForm({
             </span>
             <div className="grid gap-3 lg:grid-cols-[1fr_260px]">
               <input
+                aria-label="Comma-separated size options"
                 value={sizeInput}
                 onChange={(event) => setSizeInput(event.target.value)}
                 className={inputClass}
@@ -753,6 +754,7 @@ export function ProductEditForm({
               />
               <div className="flex gap-2">
                 <input
+                  aria-label="Custom size"
                   value={customSize}
                   onChange={(event) => setCustomSize(event.target.value)}
                   onKeyDown={(event) => {
@@ -1049,6 +1051,7 @@ export function ProductEditForm({
                             type="button"
                             disabled={index === 0}
                             onClick={() => moveGalleryItem(color.id, item.id, -1)}
+                            aria-label={`Move ${item.name} left`}
                             className="h-8 border border-[var(--border)] px-2 text-[10px] font-semibold uppercase tracking-[0.08em] hover:bg-[var(--hover)] disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             <ArrowLeft className="mx-auto size-3" />
@@ -1057,6 +1060,7 @@ export function ProductEditForm({
                             type="button"
                             disabled={index === color.gallery.length - 1}
                             onClick={() => moveGalleryItem(color.id, item.id, 1)}
+                            aria-label={`Move ${item.name} right`}
                             className="h-8 border border-[var(--border)] px-2 text-[10px] font-semibold uppercase tracking-[0.08em] hover:bg-[var(--hover)] disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             <ArrowRight className="mx-auto size-3" />
@@ -1100,6 +1104,7 @@ export function ProductEditForm({
                               <td className="py-2 pr-3 font-semibold">{size}</td>
                               <td className="py-2 pr-3">
                                 <input
+                                  aria-label={`${color.name || `Color ${colorIndex + 1}`} ${size} SKU`}
                                   value={color.skuBySize[size] ?? ""}
                                   onChange={(event) =>
                                     patchColor(color.id, {
@@ -1112,6 +1117,7 @@ export function ProductEditForm({
                               </td>
                               <td className="py-2 pr-3">
                                 <input
+                                  aria-label={`${color.name || `Color ${colorIndex + 1}`} ${size} stock`}
                                   type="number"
                                   min="0"
                                   value={color.stockBySize[size] ?? 0}

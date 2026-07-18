@@ -3,10 +3,14 @@ import { z } from "zod";
 import { findValidAccountToken } from "@/lib/account-tokens";
 import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({ token: z.string().min(20).max(200) });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "This verification link is invalid." }, { status: 400 });
   if (!checkAuthRateLimit(`verify-email:${parsed.data.token}`, { limit: 8, windowMs: 60 * 60 * 1000 }).allowed) {

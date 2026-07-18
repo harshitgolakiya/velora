@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { getDbCategories, getDbCategory, getDbCategoryDetails, getDbCollection, getDbCollections, getDbHomepageSections, getDbProduct, getDbProducts } from "./catalog-db";
+import { getDbCategories, getDbCategory, getDbCategoryDetails, getDbCollection, getDbCollections, getDbHomepageSections, getDbProduct, getDbProducts, getDbRecommendationProducts } from "./catalog-db";
 import type { Locale } from "./i18n";
 import { filterPublicProducts } from "./public-catalog";
 
@@ -22,6 +22,10 @@ export async function getCmsProducts(locale?: Locale) {
   }
 
   return filterPublicProducts(await getDbProducts(await resolveLocale(locale)));
+}
+
+export async function getCmsRecommendationProducts(locale?: Locale, limit = 12) {
+  return filterPublicProducts(await getDbRecommendationProducts(await resolveLocale(locale), limit));
 }
 
 export async function getCmsProduct(slug: string, locale?: Locale) {

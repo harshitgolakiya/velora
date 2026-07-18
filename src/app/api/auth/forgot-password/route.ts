@@ -4,12 +4,16 @@ import { accountActionUrl, issueAccountToken } from "@/lib/account-tokens";
 import { sendPasswordResetEmail } from "@/lib/account-security-email";
 import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 import { localeFromRequest } from "@/lib/transactional-email";
 
 const schema = z.object({ email: z.email().transform((value) => value.toLowerCase().trim()) });
 const genericResponse = { message: "If an account exists, a password reset link has been sent." };
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json(genericResponse);

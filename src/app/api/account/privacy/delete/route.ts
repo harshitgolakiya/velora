@@ -6,6 +6,7 @@ import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { syncMarketingUnsubscriber } from "@/lib/marketing-sync";
 import { prisma } from "@/lib/prisma";
 import { appendPrivacyAuditLog, privacyRetentionDate } from "@/lib/privacy-requests";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   password: z.string().min(1).max(128),
@@ -15,6 +16,8 @@ const schema = z.object({
 export async function POST(request: Request) {
   const session = await requireCustomerSession();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const csrf = requireSameOriginRequest(request);
+  if (csrf) return csrf;
   if (!checkAuthRateLimit(`delete-account:${session.user.id}`, { limit: 3, windowMs: 60 * 60 * 1000 }).allowed) {
     return NextResponse.json({ message: "Too many deletion attempts. Try again later." }, { status: 429 });
   }

@@ -7,6 +7,7 @@ import { sendVerificationEmail } from "@/lib/account-security-email";
 import { localeFromRequest } from "@/lib/transactional-email";
 import { passwordSchema } from "@/lib/password-policy";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -15,6 +16,9 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const clientKey = forwardedFor || request.headers.get("x-real-ip") || "unknown";

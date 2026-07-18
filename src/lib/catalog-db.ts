@@ -24,9 +24,18 @@ const productInclude = {
   tags: true,
   reviews: {
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      status: true,
+      rating: true,
+      title: true,
+      body: true,
+      createdAt: true,
+      verifiedPurchase: true,
+      adminResponse: true,
+      respondedAt: true,
       user: { select: { name: true } },
-      media: { orderBy: { createdAt: "asc" } },
+      media: { orderBy: { createdAt: "asc" }, select: { id: true, status: true, altText: true } },
     },
   },
   images: { orderBy: { position: "asc" } },
@@ -66,7 +75,7 @@ const fallbackHomepageSections: StorefrontHomepageSection[] = [
     status: "PUBLISHED",
     title: "Sculpted essentials",
     subtitle: "New drop",
-    body: "Minimal activewear, engineered support, soft compression, and a fast AED checkout.",
+    body: "Minimal activewear, engineered support, soft compression, and a secure checkout.",
     ctaLabel: "Shop now",
     ctaHref: "/shop",
     imageUrl: "/images/velora/hero-sculpted-essentials.jpg",
@@ -309,9 +318,35 @@ export async function getDbProducts(locale: Locale = "en"): Promise<Product[]> {
   }
 }
 
+export async function getDbRecommendationProducts(locale: Locale = "en", limit = 12): Promise<Product[]> {
+  try {
+    await Promise.all([publishDueScheduledProducts(), publishDueScheduledCollections()]);
+    const rows = await prisma.product.findMany({
+      where: { status: ProductStatus.PUBLISHED },
+      orderBy: [{ bestSeller: "desc" }, { newArrival: "desc" }, { createdAt: "desc" }],
+      take: Math.max(4, limit),
+      include: productInclude,
+    });
+    const mediaMetadata = await getMediaMetadataForRows(rows);
+    return rows.length ? rows.map((row) => mapProduct(row, mediaMetadata, locale)) : fallbackProducts.slice(0, limit);
+  } catch {
+    return fallbackProducts.slice(0, limit);
+  }
+}
+
 export async function getDbProduct(slug: string, locale: Locale = "en"): Promise<Product | undefined> {
-  const products = await getDbProducts(locale);
-  return products.find((product) => product.slug === slug);
+  try {
+    await Promise.all([publishDueScheduledProducts(), publishDueScheduledCollections()]);
+    const row = await prisma.product.findFirst({
+      where: { slug, status: ProductStatus.PUBLISHED },
+      include: productInclude,
+    });
+    if (!row) return fallbackProducts.find((product) => product.slug === slug);
+    const mediaMetadata = await getMediaMetadataForRows([row]);
+    return mapProduct(row, mediaMetadata, locale);
+  } catch {
+    return fallbackProducts.find((product) => product.slug === slug);
+  }
 }
 
 export async function getDbProductPreview(id: string): Promise<Product | undefined> {

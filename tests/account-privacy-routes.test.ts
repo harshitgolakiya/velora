@@ -113,6 +113,7 @@ describe("account privacy routes", () => {
 
     const response = await POST(new Request("https://velora.test/api/account/privacy/delete", {
       method: "POST",
+      headers: { origin: "https://velora.test" },
       body: JSON.stringify({ password: "VeloraCustomer123!", confirmation: "DELETE" }),
     }));
     const body = await response.json();

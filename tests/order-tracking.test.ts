@@ -15,7 +15,7 @@ import { POST } from "@/app/api/orders/track/route";
 function request(body: unknown) {
   return new Request("http://localhost/api/orders/track", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Origin": "http://localhost" },
     body: JSON.stringify(body),
   });
 }
@@ -65,5 +65,16 @@ describe("order tracking", () => {
     expect(await response.json()).toEqual({
       message: "No order matched those details",
     });
+  });
+
+  it("rejects cross-site lookups before querying orders", async () => {
+    const response = await POST(new Request("http://localhost/api/orders/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Origin": "https://attacker.test" },
+      body: JSON.stringify({ orderNumber: "VL-1001", email: "customer@example.com" }),
+    }));
+
+    expect(response.status).toBe(403);
+    expect(findFirst).not.toHaveBeenCalled();
   });
 });

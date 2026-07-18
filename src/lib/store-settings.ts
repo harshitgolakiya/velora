@@ -94,7 +94,7 @@ export const defaultCheckoutSettings: CheckoutSettings = {
       id: "tabby",
       enabled: false,
       label: "Tabby",
-      description: "Split eligible UAE orders into installments with Tabby.",
+      description: "Split eligible orders into installments with Tabby.",
       sortOrder: 3,
     },
   ],
@@ -114,7 +114,7 @@ export const defaultCheckoutSettings: CheckoutSettings = {
       methods: [
         {
           id: "standard",
-          label: "Standard UAE delivery",
+          label: "Standard delivery",
           estimate: "2-4 business days",
           price: 25,
           freeOver: 300,
@@ -122,7 +122,7 @@ export const defaultCheckoutSettings: CheckoutSettings = {
         },
         {
           id: "express",
-          label: "Express UAE delivery",
+          label: "Express delivery",
           estimate: "Next business day in major cities",
           price: 40,
           freeOver: null,

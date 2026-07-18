@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { SearchResultLink } from "@/components/store/search-result-link";
 import { ShopControls } from "@/components/store/shop-controls";
+import { compactProductsForList } from "@/lib/catalog-performance";
 import { getCmsCategories, getCmsCollections, getCmsProducts } from "@/lib/cms";
 import { localizedAlternates } from "@/lib/seo";
 import { recordSearchEvent } from "@/lib/search-analytics";
@@ -96,7 +97,7 @@ export default async function SearchPage({
       ) : null}
 
       {results.products.length ? (
-        <ShopControls products={results.products} categories={categories} collections={collections} preserveParams={["q"]} />
+        <ShopControls products={compactProductsForList(results.products)} categories={categories} collections={collections} preserveParams={["q"]} />
       ) : (
         <section className="border-y border-[var(--border)] py-20 text-center">
           <h2 className="text-3xl font-medium">No products found</h2>

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { syncMarketingSubscriber, syncMarketingUnsubscriber } from "@/lib/marketing-sync";
 import { parseNewsletterPreferences, verifyNewsletterToken } from "@/lib/newsletter-consent";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const updateSchema = z.object({
   token: z.string().min(20),
@@ -31,6 +32,9 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = updateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "Check your communication preferences." }, { status: 400 });
   const verified = verifyNewsletterToken(parsed.data.token);

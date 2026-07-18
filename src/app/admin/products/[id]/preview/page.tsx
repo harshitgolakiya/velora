@@ -32,7 +32,7 @@ export default async function AdminProductPreviewPage({ params }: { params: Prom
     .slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="mx-auto flex h-14 max-w-360 items-center gap-3 px-4 sm:px-6 lg:px-8">
           <Link
@@ -42,9 +42,9 @@ export default async function AdminProductPreviewPage({ params }: { params: Prom
             <ArrowLeft className="size-4" />
             Edit product
           </Link>
-          <span className="hidden text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)] sm:inline">
+          <h1 className="hidden text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)] sm:inline">
             Admin preview
-          </span>
+          </h1>
           <div className="ml-auto flex items-center gap-2">
             <Link
               href={`/product/${product.slug}`}
@@ -82,6 +82,6 @@ export default async function AdminProductPreviewPage({ params }: { params: Prom
           </div>
         ) : null}
       </section>
-    </main>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -11,9 +11,6 @@ import {
   Pause,
   Play,
   Share2,
-  X,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 import type { Product } from "@/lib/catalog";
 import {
@@ -24,6 +21,10 @@ import {
   sourceResolutionLabel,
   type GalleryPresentationMedia,
 } from "@/lib/product-gallery-presentation";
+
+const ProductGalleryViewer = dynamic(() => import("./product-gallery-viewer").then((mod) => mod.ProductGalleryViewer), {
+  ssr: false,
+});
 
 export function ProductGallery({
   product,
@@ -46,9 +47,30 @@ export function ProductGallery({
   const activeIndex = active < media.length ? active : 0;
   const activeMedia = media[activeIndex] ?? media[0];
   const activeImageWidth = activeMedia?.type === "IMAGE" ? activeMedia.width : undefined;
+  const activeImageRatio =
+    activeMedia?.type === "IMAGE" && activeMedia.width && activeMedia.height
+      ? activeMedia.width / activeMedia.height
+      : undefined;
+  const shouldEnlargePackshot = activeImageRatio !== undefined && activeImageRatio < 0.72;
+  const isAccessoryPackshot = product.category.toLowerCase().includes("tumbler");
   const canSourceZoom = canZoomSource(activeMedia);
   const viewerWidth = galleryViewerWidth(activeMedia, zoomed);
   const resolutionLabel = sourceResolutionLabel(activeMedia);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        setZoomed(false);
+        setActive((index) => (index - 1 + media.length) % media.length);
+      }
+      if (event.key === "ArrowRight") {
+        setZoomed(false);
+        setActive((index) => (index + 1) % media.length);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [media.length]);
 
   const previous = () => {
     setZoomed(false);
@@ -59,15 +81,6 @@ export function ProductGallery({
     setZoomed(false);
     setActive((index) => (index + 1) % media.length);
   };
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") previous();
-      if (event.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  });
 
   async function shareProduct() {
     const shareData = { title: product.name, url: window.location.href };
@@ -104,7 +117,7 @@ export function ProductGallery({
             type="button"
             onClick={previous}
             aria-label="Previous media"
-            className="absolute left-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border border-white/65 bg-white/88 text-stone-950 shadow-sm backdrop-blur transition hover:bg-white motion-reduce:transition-none"
+            className="storefront-action storefront-light-control absolute left-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -112,7 +125,7 @@ export function ProductGallery({
             type="button"
             onClick={next}
             aria-label="Next media"
-            className="absolute right-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border border-white/65 bg-white/88 text-stone-950 shadow-sm backdrop-blur transition hover:bg-white motion-reduce:transition-none"
+            className="storefront-action storefront-light-control absolute right-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
           >
             <ChevronRight className="size-5" />
           </button>
@@ -124,7 +137,7 @@ export function ProductGallery({
   return (
     <div className="min-w-0">
       <div
-        className="relative aspect-square overflow-hidden bg-[var(--card)]"
+        className="storefront-product-media relative aspect-[4/3] overflow-hidden sm:aspect-square"
         onTouchStart={(event) => {
           touchStartX.current = event.touches[0].clientX;
         }}
@@ -144,7 +157,7 @@ export function ProductGallery({
             <button
               type="button"
               onClick={toggleVideo}
-              className="absolute left-1/2 top-1/2 z-10 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center border border-white/65 bg-white/90 text-stone-950 shadow"
+              className="storefront-action storefront-light-control absolute left-1/2 top-1/2 z-10 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center border shadow"
               aria-label={playing ? "Pause video" : "Play video"}
             >
               {playing ? <Pause className="size-5 fill-current" /> : <Play className="ml-0.5 size-5 fill-current" />}
@@ -156,10 +169,18 @@ export function ProductGallery({
             alt={activeMedia?.altText ?? `${product.name}${selectedColor ? ` in ${selectedColor}` : ""}`}
             fill
             sizes="(min-width: 1440px) 735px, (min-width: 1024px) calc(55vw - 48px), 100vw"
-            quality={92}
-            className="object-contain"
+            quality={72}
+            decoding="sync"
+            className={
+              shouldEnlargePackshot
+                ? isAccessoryPackshot
+                  ? "object-cover"
+                  : "object-contain scale-[1.08]"
+                : "object-contain"
+            }
             style={{ objectPosition: focalObjectPosition(activeMedia) }}
             priority
+            fetchPriority="high"
             loading="eager"
           />
         )}
@@ -170,8 +191,8 @@ export function ProductGallery({
           <button
             type="button"
             onClick={shareProduct}
-            aria-label={copied ? "Product link copied" : "Share product"}
-            className="grid size-10 place-items-center border border-white/65 bg-white/88 text-stone-950 shadow-sm backdrop-blur transition hover:bg-white motion-reduce:transition-none"
+            aria-label={copied ? `Product link copied for ${product.name}` : `Share ${product.name}`}
+            className="storefront-action storefront-light-control grid size-10 place-items-center border shadow-sm transition motion-reduce:transition-none"
           >
             {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
           </button>
@@ -179,8 +200,8 @@ export function ProductGallery({
             <button
               type="button"
               onClick={() => setViewerOpen(true)}
-              aria-label="Open full-screen image"
-              className="grid size-10 place-items-center border border-white/65 bg-white/88 text-stone-950 shadow-sm backdrop-blur transition hover:bg-white motion-reduce:transition-none"
+              aria-label={`Open media gallery for ${product.name}`}
+              className="storefront-action storefront-light-control grid size-10 place-items-center border shadow-sm transition motion-reduce:transition-none"
             >
               <Expand className="size-4" />
             </button>
@@ -195,7 +216,7 @@ export function ProductGallery({
                 key={`${item.url}-${index}`}
                 onClick={() => setActive(index)}
                 aria-label={`View media ${index + 1}`}
-                className={`h-1.5 bg-white shadow transition-all motion-reduce:transition-none ${
+                className={`h-1.5 bg-[#fff] shadow transition-all motion-reduce:transition-none ${
                   index === activeIndex ? "w-6 opacity-100" : "w-1.5 opacity-55"
                 }`}
               />
@@ -213,7 +234,7 @@ export function ProductGallery({
               onClick={() => setActive(index)}
               aria-label={`View ${item.type === "VIDEO" ? "video" : "image"} ${index + 1}`}
               aria-current={index === activeIndex}
-              className={`relative aspect-square w-18 shrink-0 overflow-hidden border bg-[var(--card)] transition ${
+              className={`storefront-product-media relative aspect-square w-18 shrink-0 overflow-hidden border transition ${
                 index === activeIndex ? "border-[var(--foreground)]" : "border-[var(--border)] opacity-65 hover:opacity-100"
               }`}
             >
@@ -240,67 +261,25 @@ export function ProductGallery({
         </div>
       ) : null}
 
-      <Dialog.Root open={viewerOpen} onOpenChange={(open) => {
-        setViewerOpen(open);
-        if (!open) setZoomed(false);
-      }}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/82 backdrop-blur-sm" />
-          <Dialog.Content className="fixed inset-0 z-[101] overflow-auto bg-[var(--background)]/96">
-            <Dialog.Title className="sr-only">{product.name} full-screen image</Dialog.Title>
-            <Dialog.Description className="sr-only">
-              Use the arrow controls or keyboard arrow keys to browse product images.
-            </Dialog.Description>
-            <div className="fixed end-4 top-4 z-[103] flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (canSourceZoom) setZoomed((value) => !value);
-              }}
-              aria-label={canSourceZoom ? (zoomed ? "Zoom out" : "Zoom in") : "Source image is not large enough to zoom"}
-              disabled={!canSourceZoom}
-              className="grid size-11 place-items-center border border-white/65 bg-white text-stone-950 shadow disabled:cursor-not-allowed disabled:opacity-45"
-            >
-              {zoomed ? <ZoomOut className="size-5" /> : <ZoomIn className="size-5" />}
-            </button>
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  aria-label="Close full-screen image"
-                  className="grid size-11 place-items-center border border-white/65 bg-white text-stone-950 shadow"
-                >
-                  <X className="size-5" />
-                </button>
-              </Dialog.Close>
-            </div>
-            <div
-              className={`relative mx-auto min-h-screen transition-[width] duration-300 motion-reduce:transition-none ${
-                zoomed && canSourceZoom ? "cursor-zoom-out" : canSourceZoom ? "cursor-zoom-in" : "cursor-default"
-              }`}
-              style={{ width: viewerWidth }}
-              onClick={() => {
-                if (canSourceZoom) setZoomed((value) => !value);
-              }}
-            >
-              <Image
-                src={activeMedia?.url ?? product.images[0]}
-                alt={activeMedia?.altText ?? `${product.name} full-screen`}
-                fill
-                sizes={activeImageWidth ? `${activeImageWidth}px` : zoomed ? "150vw" : "100vw"}
-                quality={92}
-                className="object-contain"
-                style={{ objectPosition: focalObjectPosition(activeMedia) }}
-              />
-              {controls}
-            </div>
-            {resolutionLabel && !canSourceZoom ? (
-              <p className="fixed bottom-4 left-1/2 z-[103] -translate-x-1/2 bg-white px-4 py-2 text-center text-xs font-medium text-stone-950 shadow">
-                {resolutionLabel}
-              </p>
-            ) : null}
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {viewerOpen ? (
+        <ProductGalleryViewer
+          productName={product.name}
+          open={viewerOpen}
+          onOpenChange={(open) => {
+            setViewerOpen(open);
+            if (!open) setZoomed(false);
+          }}
+          activeMedia={activeMedia}
+          activeImageWidth={activeImageWidth}
+          canSourceZoom={canSourceZoom}
+          viewerWidth={viewerWidth}
+          zoomed={zoomed}
+          setZoomed={setZoomed}
+          resolutionLabel={resolutionLabel}
+          previous={previous}
+          next={next}
+        />
+      ) : null}
     </div>
   );
 }

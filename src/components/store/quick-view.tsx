@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Eye, X } from "lucide-react";
 import type { Product } from "@/lib/catalog";
+import { focalObjectPosition, resolveProductGalleryMedia } from "@/lib/product-gallery-presentation";
 import { splitProductCopy } from "@/lib/product-copy";
 import { useStore } from "@/lib/store";
 import { formatAed } from "@/lib/utils";
@@ -20,13 +21,33 @@ const fallbackColorHex: Record<string, string> = {
   Cream: "#f5edd8",
 };
 
-export function QuickView({ product }: { product: Product }) {
-  const [open, setOpen] = useState(false);
+export function QuickView({
+  product,
+  defaultOpen = false,
+  open,
+  onOpenChange,
+  showTrigger = true,
+}: {
+  product: Product;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const isControlled = open !== undefined;
+  const currentOpen = isControlled ? open : uncontrolledOpen;
   const [color, setColor] = useState(product.colors[0] ?? "");
   const [size, setSize] = useState(product.sizes[0] ?? "");
   const [added, setAdded] = useState(false);
   const addToCart = useStore((state) => state.addToCart);
   const copy = splitProductCopy(product.description);
+  const selectedMedia = useMemo(
+    () => resolveProductGalleryMedia(product, color).find((item) => item.type === "IMAGE"),
+    [color, product],
+  );
+  const imageRatio = selectedMedia?.width && selectedMedia.height ? selectedMedia.width / selectedMedia.height : undefined;
+  const imageFit = imageRatio && imageRatio < 0.72 ? "object-contain" : "object-cover";
 
   const selectedVariant = useMemo(
     () => product.variants?.find((variant) => variant.color.name === color && variant.size.name === size),
@@ -42,11 +63,15 @@ export function QuickView({ product }: { product: Product }) {
     if (outOfStock) return;
     addToCart(product, { size, color, quantity: 1 });
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 2000);
+    window.setTimeout(() => {
+      handleOpenChange(false);
+      setAdded(false);
+    }, 650);
   }
 
   function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen);
+    if (!isControlled) setUncontrolledOpen(nextOpen);
+    onOpenChange?.(nextOpen);
     if (nextOpen) {
       setColor(product.colors[0] ?? "");
       setSize(product.sizes[0] ?? "");
@@ -55,34 +80,38 @@ export function QuickView({ product }: { product: Product }) {
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Trigger asChild>
-        <button
-          type="button"
-          aria-label={`Quick view ${product.name}`}
-          className="absolute end-3 top-16 grid size-11 place-items-center border border-white/70 bg-white/92 text-stone-950 shadow-sm transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 motion-reduce:transition-none"
-        >
-          <Eye className="size-5" />
-        </button>
-      </Dialog.Trigger>
+    <Dialog.Root open={currentOpen} onOpenChange={handleOpenChange}>
+      {showTrigger ? (
+        <Dialog.Trigger asChild>
+          <button
+            type="button"
+            aria-label={`Quick view ${product.name}`}
+            className="storefront-action storefront-light-control absolute end-2.5 top-[3.25rem] grid size-9 place-items-center border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 sm:end-3 sm:top-14 sm:size-10 motion-reduce:transition-none"
+          >
+            <Eye className="size-4.5" />
+          </button>
+        </Dialog.Trigger>
+      ) : null}
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] shadow-2xl">
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/55 backdrop-blur-sm" />
+        <Dialog.Content className="storefront-modal fixed left-1/2 top-1/2 z-[110] max-h-[90vh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] shadow-2xl">
           <div className="flex items-start justify-between border-b border-[var(--border)] p-5">
             <Dialog.Title className="font-serif text-2xl">{product.name}</Dialog.Title>
-            <Dialog.Close aria-label="Close quick view" className="grid size-10 place-items-center border border-transparent transition hover:border-[var(--border)] hover:bg-[var(--hover)] motion-reduce:transition-none">
+            <Dialog.Close aria-label="Close quick view" className="storefront-action grid size-10 place-items-center border border-transparent transition hover:border-[var(--border)] hover:bg-[var(--hover)] motion-reduce:transition-none">
               <X className="size-5" />
             </Dialog.Close>
           </div>
           <Dialog.Description className="sr-only">Quick view of {product.name}</Dialog.Description>
           <div className="grid gap-6 p-5 sm:grid-cols-2">
-            <div className="relative aspect-[3/4] overflow-hidden bg-[var(--card)]">
+            <div className="storefront-product-media relative aspect-[3/4] overflow-hidden">
               <Image
-                src={product.images[0]}
+                src={selectedMedia?.url ?? product.images[0]}
                 alt={product.name}
                 fill
+                priority
                 sizes="(min-width: 640px) 50vw, 100vw"
-                className="object-cover"
+                className={imageFit}
+                style={{ objectPosition: focalObjectPosition(selectedMedia) }}
               />
             </div>
             <div className="space-y-5">
@@ -114,7 +143,7 @@ export function QuickView({ product }: { product: Product }) {
                           aria-pressed={selected}
                           title={name}
                           style={{ backgroundColor: hex }}
-                          className={`size-7 border-2 transition motion-reduce:transition-none ${
+                          className={`storefront-action size-8 border-2 transition motion-reduce:transition-none ${
                             selected
                               ? "border-[var(--foreground)] ring-2 ring-[var(--foreground)] ring-offset-2 ring-offset-[var(--background)]"
                               : "border-[var(--surface)] shadow-sm hover:scale-105"
@@ -136,7 +165,7 @@ export function QuickView({ product }: { product: Product }) {
                         key={name}
                         onClick={() => setSize(name)}
                         aria-pressed={size === name}
-                        className={`h-10 min-w-11 border px-3 text-sm font-medium transition-colors motion-reduce:transition-none ${
+                        className={`storefront-action h-10 min-w-11 border px-3 text-sm font-medium transition-colors motion-reduce:transition-none ${
                           size === name
                             ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
                             : "border-[var(--border)] hover:border-[var(--foreground)]"
@@ -154,7 +183,7 @@ export function QuickView({ product }: { product: Product }) {
                   type="button"
                   onClick={handleAdd}
                   disabled={outOfStock}
-                  className="h-11 w-full border border-[var(--foreground)] bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+                  className="storefront-action h-11 w-full border border-[var(--foreground)] bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
                 >
                   {outOfStock ? "Out of stock" : added ? "Added to bag" : "Add to bag"}
                 </button>

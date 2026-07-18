@@ -5,10 +5,14 @@ import { findValidAccountToken } from "@/lib/account-tokens";
 import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { passwordSchema } from "@/lib/password-policy";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({ token: z.string().min(20).max(200), password: passwordSchema });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "Check the password requirements." }, { status: 400 });
   if (!checkAuthRateLimit(`reset-password:${parsed.data.token}`, { limit: 5, windowMs: 60 * 60 * 1000 }).allowed) {

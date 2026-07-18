@@ -17,6 +17,7 @@ import { attributeAutomationConversions } from "@/lib/email-delivery";
 import { localizedPath } from "@/lib/i18n";
 import { localeFromRequest } from "@/lib/transactional-email";
 import { recordSearchConversionEvent } from "@/lib/search-analytics";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const checkoutSchema = z.object({
   sessionKey: z.string().trim().min(12),
@@ -65,6 +66,9 @@ async function createOrderNumber() {
 }
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const parsed = checkoutSchema.safeParse(await request.json());
   if (!parsed.success) {

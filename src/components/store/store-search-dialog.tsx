@@ -55,9 +55,11 @@ function Highlight({ text, query }: { text: string; query: string }) {
 export function StoreSearchDialog({
   open,
   onOpenChange,
+  showTrigger = true,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  showTrigger?: boolean;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -159,27 +161,29 @@ export function StoreSearchDialog({
   }
 
   return (
-      <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
+      {showTrigger ? (
         <Dialog.Trigger asChild>
-        <button type="button" aria-label="Search" className="grid size-11 place-items-center">
-          <Search className="size-5" />
-        </button>
-      </Dialog.Trigger>
+          <button type="button" aria-label="Search" className="grid size-11 place-items-center">
+            <Search className="size-5" />
+          </button>
+        </Dialog.Trigger>
+      ) : null}
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm" />
         <Dialog.Content
           onOpenAutoFocus={(event) => {
             event.preventDefault();
             loadRecentSearches();
             inputRef.current?.focus();
           }}
-          className="fixed inset-x-0 top-0 z-50 mx-auto max-h-dvh w-full overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] shadow-2xl outline-none sm:inset-x-5 sm:top-16 sm:max-w-4xl"
+          className="storefront-top-sheet fixed inset-x-0 top-0 z-[110] mx-auto flex max-h-dvh w-full flex-col overflow-hidden bg-[var(--surface)] text-[var(--foreground)] shadow-2xl outline-none sm:inset-x-5 sm:top-16 sm:max-h-[calc(100dvh-5rem)] sm:max-w-3xl"
         >
           <Dialog.Title className="sr-only">Search products and collections</Dialog.Title>
           <Dialog.Description className="sr-only">
             Search products, categories, collections, colors, tags, and product codes.
           </Dialog.Description>
-          <form onSubmit={submit} className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-4 sm:px-6">
+          <form onSubmit={submit} className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3 sm:px-5">
             <Search className="size-5 shrink-0 text-[var(--muted)]" />
             <input
               ref={inputRef}
@@ -204,18 +208,18 @@ export function StoreSearchDialog({
               aria-activedescendant={activeIndex >= 0 ? `search-product-${results.products[activeIndex]?.id}` : undefined}
               autoComplete="off"
               placeholder="Search products, colors, categories..."
-              className="h-12 min-w-0 flex-1 bg-transparent text-lg outline-none sm:text-xl"
+              className="h-11 min-w-0 flex-1 bg-transparent text-base outline-none sm:text-lg"
             />
-            {loading ? <span className="text-xs uppercase tracking-widest text-[var(--muted)]">Searching</span> : null}
+            {loading && query.trim() ? <span className="text-xs uppercase tracking-widest text-[var(--muted)]">Searching</span> : null}
             <Dialog.Close asChild>
-              <button type="button" aria-label="Close search" className="grid size-10 shrink-0 place-items-center">
+              <button type="button" aria-label="Close search" className="storefront-action grid size-10 shrink-0 place-items-center">
                 <X className="size-5" />
               </button>
             </Dialog.Close>
           </form>
 
-          <div className="grid min-h-80 sm:grid-cols-[220px_1fr]">
-            <aside className="border-b border-[var(--border)] p-5 sm:border-b-0 sm:border-r">
+          <div className="grid min-h-72 flex-1 overflow-y-auto sm:grid-cols-[200px_minmax(0,1fr)]">
+            <aside className="border-b border-[var(--border)] p-4 sm:border-b-0 sm:border-r sm:pb-5">
               {recent.length ? (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Recent</p>
@@ -225,7 +229,7 @@ export function StoreSearchDialog({
                         type="button"
                         key={term}
                         onClick={() => updateQuery(term)}
-                        className="flex min-h-10 items-center gap-2 text-start text-sm hover:text-[var(--accent)]"
+                        className="storefront-action flex min-h-10 items-center gap-2 text-start text-sm hover:text-[var(--accent)]"
                       >
                         <Clock3 className="size-3.5" />
                         {term}
@@ -252,7 +256,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
+                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
                         >
                           {category}
                         </Link>
@@ -279,7 +283,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
+                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
                         >
                           {collection.name}
                         </Link>
@@ -306,7 +310,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="block rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent)]"
+                          className="storefront-action block rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent)]"
                         >
                           <span className="block font-medium">{page.title}</span>
                           <span className="mt-0.5 block text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
@@ -320,7 +324,7 @@ export function StoreSearchDialog({
               ) : null}
             </aside>
 
-            <div className="p-5 sm:p-6">
+            <div className="p-4 sm:p-5">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
                   {query.trim() ? "Products" : "Popular now"}
@@ -351,16 +355,16 @@ export function StoreSearchDialog({
                           position: index,
                         });
                       }}
-                      className={`grid grid-cols-[72px_1fr_auto] items-center gap-3 border-b border-[var(--border)] py-3 outline-none ${
+                    className={`storefront-action grid grid-cols-[64px_1fr_auto] items-center gap-3 border-b border-[var(--border)] py-2.5 outline-none ${
                         activeIndex === index ? "bg-[var(--hover)]" : ""
                       }`}
                     >
-                      <div className="relative aspect-square overflow-hidden bg-[var(--card)]">
+                      <div className="storefront-product-media relative aspect-square overflow-hidden">
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
-                          sizes="72px"
+                          sizes="64px"
                           quality={85}
                           priority={index === 0}
                           className="object-cover"

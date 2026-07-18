@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Poppins } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
-import { Analytics } from "@/components/store/analytics";
-import { GlobalRouteProgress } from "@/components/global-route-progress";
+import { DeferredRootEffects } from "@/components/store/deferred-root-effects";
 import { getPublishedGlobalContent } from "@/lib/global-content-store";
 import { dirForLocale, type Locale } from "@/lib/i18n";
 import { localizedAlternates, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
@@ -13,8 +12,20 @@ const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["400", "600"],
 });
+
+const themeInitScript = `
+(() => {
+  try {
+    const savedTheme = window.localStorage.getItem("velora-theme");
+    const preferredTheme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.dataset.theme = preferredTheme;
+  } catch {
+    document.documentElement.dataset.theme = "light";
+  }
+})();
+`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://velora.ae"),
@@ -54,12 +65,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={locale} dir={dirForLocale(locale)} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${poppins.variable} antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationJsonLd(), websiteJsonLd()]) }}
         />
-        <Analytics />
-        <GlobalRouteProgress />
+        <DeferredRootEffects />
         <AppShell globalContent={globalContent}>{children}</AppShell>
       </body>
     </html>

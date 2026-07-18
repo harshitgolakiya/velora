@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireCustomerSession } from "@/lib/account-data";
 import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   reason: z.enum(["SPAM", "OFFENSIVE", "PRIVACY", "MISLEADING", "OTHER"]),
@@ -10,6 +11,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) return NextResponse.json({ message: "Sign in to report a review." }, { status: 401 });
   const { id } = await params;

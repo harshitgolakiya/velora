@@ -26,7 +26,7 @@ export const searchablePages: SearchablePage[] = [
     title: "Shipping",
     href: "/shipping",
     category: "Support",
-    excerpt: "UAE delivery timings, shipping fees, free delivery threshold, and order dispatch details.",
+    excerpt: "Delivery timings, shipping fees, free delivery threshold, and order dispatch details.",
     keywords: ["delivery", "shipping", "uae", "express", "standard", "courier"],
   },
   {

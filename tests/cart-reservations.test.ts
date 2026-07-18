@@ -178,5 +178,8 @@ describe("cart reservation stock math", () => {
       providerRef: `pi_test_${suffix}`,
       status: "paid",
     });
+    await expect(
+      syncCartReservations(sessionKey, [{ variantId, quantity: 1 }]),
+    ).rejects.toThrow("CART_ALREADY_COMPLETED");
   });
 });

@@ -9,7 +9,7 @@ const page = {
   contentType: "GUIDE",
   status: "PUBLISHED",
   locale: "en",
-  blocks: [{ id: "hero-1", type: "HERO", heading: "UAE delivery", ctaLabel: "Track order", ctaHref: "/track-order" }],
+  blocks: [{ id: "hero-1", type: "HERO", heading: "Delivery", ctaLabel: "Track order", ctaHref: "/track-order" }],
 };
 
 describe("structured content CMS", () => {
@@ -19,7 +19,11 @@ describe("structured content CMS", () => {
 
   it("rejects HTML markup and unsafe links", () => {
     expect(pageContentInputSchema.safeParse({ ...page, blocks: [{ id: "text", type: "TEXT", heading: "Unsafe", body: "<script>alert(1)</script>" }] }).success).toBe(false);
+    expect(pageContentInputSchema.safeParse({ ...page, blocks: [{ id: "text", type: "TEXT", heading: "Unsafe", body: "Click <img src=x onerror=alert(1)> now" }] }).success).toBe(false);
     expect(pageContentInputSchema.safeParse({ ...page, blocks: [{ id: "hero", type: "HERO", heading: "Unsafe", ctaHref: "javascript:alert(1)" }] }).success).toBe(false);
+    expect(pageContentInputSchema.safeParse({ ...page, blocks: [{ id: "hero", type: "HERO", heading: "Unsafe", ctaHref: "http://example.com" }] }).success).toBe(false);
+    expect(pageContentInputSchema.safeParse({ ...page, blocks: [{ id: "hero", type: "HERO", heading: "Unsafe", imageUrl: "data:image/svg+xml,<svg onload=alert(1)>" }] }).success).toBe(false);
+    expect(pageContentInputSchema.safeParse({ ...page, socialImage: "ftp://example.com/image.jpg" }).success).toBe(false);
   });
 
   it("requires a schedule date and safely handles invalid stored blocks", () => {

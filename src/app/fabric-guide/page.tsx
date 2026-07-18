@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { ContentBlockRenderer } from "@/components/store/content-block-renderer";
-import { getPublishedPageContent } from "@/lib/content-cms";
-import { localizedAlternates } from "@/lib/seo";
+import { getPageContentMetadata, getPublishedPageContent } from "@/lib/content-cms";
 
-export const metadata: Metadata = { alternates: localizedAlternates("/fabric-guide") };
+export function generateMetadata(): Promise<Metadata> {
+  return getPageContentMetadata({
+    slug: "fabric-guide",
+    path: "/fabric-guide",
+    title: "Fabric and Fit Guide",
+    description: "Compare support, handfeel, and climate performance.",
+  });
+}
 
 export default async function FabricGuidePage() {
   const page = await getPublishedPageContent("fabric-guide");

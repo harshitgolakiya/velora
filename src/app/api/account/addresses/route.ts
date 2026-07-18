@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { normalizeUaePhone, requireCustomerSession } from "@/lib/account-data";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const addressSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -17,6 +18,8 @@ const addressSchema = z.object({
 export async function POST(request: Request) {
   const session = await requireCustomerSession();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const csrf = requireSameOriginRequest(request);
+  if (csrf) return csrf;
 
   const body = await request.json().catch(() => null);
   const parsed = addressSchema.safeParse(body);

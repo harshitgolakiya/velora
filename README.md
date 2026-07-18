@@ -1,6 +1,6 @@
 # Velora
 
-Premium UAE-focused activewear ecommerce built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, Zustand, Prisma, NextAuth, Stripe-ready checkout, and Resend-ready email templates.
+Premium international activewear ecommerce built with Next.js App Router, TypeScript, Tailwind CSS, Zustand, Prisma, NextAuth, Stripe-ready checkout, and Resend-ready email templates.
 
 ## What Is Included
 

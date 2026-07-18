@@ -3,7 +3,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Minus, Plus, X, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,125 +10,10 @@ import { cartSubtotal, useStore, type CartLine } from "@/lib/store";
 import {
   getCartLineAvailability,
   getCartLineImage,
-  isCartReservationExpired,
   type CartRecommendation,
 } from "@/lib/cart-ui";
-import { cartCopy, localeFromPathname } from "@/lib/i18n";
 import { formatAed } from "@/lib/utils";
-
-function useCartCopy() {
-  const pathname = usePathname();
-  return cartCopy[localeFromPathname(pathname)];
-}
-
-export function ReservationTimer({
-  onExpiredChange,
-}: {
-  onExpiredChange?: (expired: boolean) => void;
-}) {
-  const copy = useCartCopy();
-  const expiresAt = useStore((state) => state.cartExpiresAt);
-  const [timeLeft, setTimeLeft] = useState<string | null>(null);
-  const [expired, setExpired] = useState(false);
-
-  useEffect(() => {
-    if (!expiresAt) {
-      const timer = window.setTimeout(() => {
-        setTimeLeft(null);
-        setExpired(false);
-        onExpiredChange?.(false);
-      }, 0);
-      return () => window.clearTimeout(timer);
-    }
-
-    const updateTimer = () => {
-      const isExpired = isCartReservationExpired(expiresAt);
-      if (isExpired) {
-        setTimeLeft(null);
-        setExpired(true);
-        onExpiredChange?.(true);
-      } else {
-        const diff = new Date(expiresAt).getTime() - Date.now();
-        const mins = Math.floor(diff / 60_000);
-        const secs = Math.floor((diff % 60_000) / 1000);
-        setTimeLeft(`${mins}:${secs.toString().padStart(2, "0")}`);
-        setExpired(false);
-        onExpiredChange?.(false);
-      }
-    };
-
-    const initialTimer = window.setTimeout(updateTimer, 0);
-    const interval = window.setInterval(updateTimer, 1000);
-    return () => {
-      window.clearTimeout(initialTimer);
-      window.clearInterval(interval);
-    };
-  }, [expiresAt, onExpiredChange]);
-
-  if (!expiresAt) return null;
-
-  return (
-    <div
-      role={expired ? "alert" : "status"}
-      className={`border-b px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition-colors motion-reduce:transition-none ${
-        expired
-          ? "bg-red-500/10 text-red-600 border-red-500/20"
-          : "bg-[var(--hover)] text-[var(--accent)] border-[var(--border)]"
-      }`}
-    >
-      {expired
-        ? copy.reservationExpired
-        : `${copy.inventoryReserved} • ${timeLeft}`}
-    </div>
-  );
-}
-
-export function CartRecoveryBanner() {
-  const copy = useCartCopy();
-  const reservationError = useStore((state) => state.cartReservationError);
-  const cartSyncStatus = useStore((state) => state.cartSyncStatus);
-  const cartRecoveryNotice = useStore((state) => state.cartRecoveryNotice);
-
-  if (!reservationError && cartSyncStatus !== "syncing" && cartRecoveryNotice !== "restored") return null;
-
-  if (reservationError) {
-    const isNetworkError = reservationError === "NETWORK_UNAVAILABLE";
-    return (
-      <div
-        role="alert"
-        className={`border-b px-5 py-3 text-xs ${
-          isNetworkError
-            ? "border-amber-500/20 bg-amber-500/10 text-amber-700"
-            : "border-red-500/20 bg-red-500/10 text-red-600"
-        }`}
-      >
-        <p className="font-semibold">{isNetworkError ? copy.networkUnavailable : reservationError}</p>
-        <p className="mt-1">{isNetworkError ? copy.cartSavedLocally : copy.refreshAvailability}</p>
-        <button
-          type="button"
-          onClick={() => window.dispatchEvent(new Event("velora:retry-cart"))}
-          className="mt-2 font-semibold underline"
-        >
-          {copy.retryInventoryCheck}
-        </button>
-      </div>
-    );
-  }
-
-  if (cartSyncStatus === "syncing") {
-    return (
-      <div role="status" className="border-b border-[var(--border)] bg-[var(--hover)] px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-        {copy.checkingInventory}
-      </div>
-    );
-  }
-
-  return (
-    <div role="status" className="border-b border-emerald-500/20 bg-emerald-500/10 px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-emerald-700">
-      {copy.cartRecovered}
-    </div>
-  );
-}
+import { CartRecoveryBanner, ReservationTimer, useCartCopy } from "./cart-status";
 
 function CartItemRow({ line }: { line: CartLine }) {
   const copy = useCartCopy();
@@ -244,7 +128,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                   key={c}
                   onClick={() => handleVariantChange(line.size, c)}
                   style={{ backgroundColor: product.colorHex?.[c] ?? "#888888" }}
-                  className={`size-5 border-2 transition hover:scale-105 motion-reduce:transition-none ${
+                  className={`storefront-action size-6 border-2 transition hover:scale-105 motion-reduce:transition-none ${
                     line.color === c ? "border-[var(--foreground)] ring-1 ring-[var(--foreground)]" : "border-white shadow-sm"
                   }`}
                   title={c}
@@ -396,7 +280,7 @@ function CartRecommendations({ onAdd }: { onAdd?: () => void }) {
   if (loading || !products.length) return null;
 
   return (
-    <div className="border-t border-[var(--border)] bg-[var(--card)] px-5 py-4">
+    <div className="border-t border-[var(--border)] bg-[var(--card)] py-4">
       <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--muted)]">{copy.completeTheLook}</p>
       <div className="space-y-3">
         {products.slice(0, 3).map((prod) => (
@@ -445,15 +329,15 @@ export function CartDrawer() {
   return (
     <Dialog.Root open={cartOpen} onOpenChange={setCartOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm transition-opacity motion-reduce:transition-none" />
-        <Dialog.Content className="fixed end-0 top-0 z-50 flex h-dvh w-full max-w-md flex-col bg-[var(--surface)] text-[var(--foreground)] shadow-2xl focus-visible:outline-none">
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/55 backdrop-blur-sm motion-reduce:transition-none" />
+        <Dialog.Content className="storefront-drawer-right fixed end-0 top-0 z-[110] flex h-dvh w-full max-w-md flex-col bg-[var(--surface)] text-[var(--foreground)] shadow-2xl focus-visible:outline-none">
           <Dialog.Description className="sr-only">
             {copy.reviewCartDescription}
           </Dialog.Description>
 
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
             <Dialog.Title className="font-serif text-2xl">{copy.yourBag}</Dialog.Title>
-            <Dialog.Close className="grid size-9 place-items-center border border-transparent transition hover:border-[var(--border)] hover:bg-[var(--hover)] focus-visible:outline-none motion-reduce:transition-none">
+            <Dialog.Close className="storefront-action grid size-10 place-items-center border border-[var(--border)] bg-[var(--hover)] transition hover:border-[var(--foreground)] focus-visible:outline-none motion-reduce:transition-none">
               <X className="size-5" />
             </Dialog.Close>
           </div>
@@ -461,24 +345,26 @@ export function CartDrawer() {
           <ReservationTimer onExpiredChange={setReservationExpired} />
           <CartRecoveryBanner />
 
-          <div className="border-b border-[var(--border)] px-5 py-4">
-            <div className="flex justify-between text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-              <span>
-                {isFreeShippingUnlocked
-                  ? copy.freeUaeShippingUnlocked
-                  : `${formatAed(300 - subtotal)} ${copy.toFreeUaeShipping}`}
-              </span>
-              <span>{Math.round(progress)}%</span>
+          {cart.length > 0 ? (
+            <div className="border-b border-[var(--border)] px-5 py-4">
+              <div className="flex justify-between text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+                <span>
+                  {isFreeShippingUnlocked
+                    ? copy.freeUaeShippingUnlocked
+                    : `${formatAed(300 - subtotal)} ${copy.toFreeUaeShipping}`}
+                </span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <div className="mt-3 h-1.5 overflow-hidden bg-[var(--card)]">
+                <div
+                  className="h-full bg-[var(--accent)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
-            <div className="mt-3 h-1.5 overflow-hidden bg-[var(--card)]">
-              <div
-                className="h-full bg-[var(--accent)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
+          ) : null}
 
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="max-h-[min(48dvh,26rem)] overflow-y-auto px-5 py-5">
             {lastRemovedLine && (
               <div role="status" className="mb-4 flex items-center justify-between border border-[var(--border)] bg-[var(--hover)] px-4 py-2 text-xs">
                 <span className="text-[var(--foreground)] font-medium">
@@ -486,7 +372,7 @@ export function CartDrawer() {
                 </span>
                 <button
                   onClick={undoRemove}
-                  className="font-bold text-[var(--accent)] underline hover:text-[var(--foreground)] transition flex items-center gap-1"
+                  className="storefront-action flex items-center gap-1 font-bold text-[var(--accent)] underline transition hover:text-[var(--foreground)]"
                 >
                   <RotateCcw className="size-3" />
                   {copy.undo}
@@ -495,24 +381,22 @@ export function CartDrawer() {
             )}
 
             {cart.length === 0 ? (
-              <div className="grid h-full place-items-center text-center">
-                <div className="max-w-xs px-4">
-                  <p className="font-serif text-2xl">{copy.yourBagEmpty}</p>
+              <div className="flex min-h-full flex-col gap-8 pt-8 text-start">
+                <div className="max-w-sm">
+                  <p className="font-serif text-3xl">{copy.yourBagEmpty}</p>
                   <p className="mt-2 text-sm text-[var(--muted)]">
                     {copy.emptyBagBody}
                   </p>
                   <Dialog.Close asChild>
                     <Link
                       href="/shop"
-                      className="mt-6 inline-flex h-11 items-center border border-[var(--foreground)] bg-[var(--foreground)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
+                      className="storefront-action mt-6 inline-flex h-11 items-center border border-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
                     >
                       {copy.shopVelora}
                     </Link>
                   </Dialog.Close>
-                  <div className="mt-8 text-start">
-                    <CartRecommendations onAdd={() => setCartOpen(false)} />
-                  </div>
                 </div>
+                <CartRecommendations onAdd={() => setCartOpen(false)} />
               </div>
             ) : (
               <div className="flex flex-col space-y-5">

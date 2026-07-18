@@ -99,6 +99,7 @@ async function postCheckout(payload = checkoutPayload()) {
   const { POST } = await import("@/app/api/checkout/route");
   return POST(new Request("https://velora.test/api/checkout", {
     method: "POST",
+    headers: { "Origin": "https://velora.test" },
     body: JSON.stringify(payload),
   }));
 }
@@ -152,6 +153,20 @@ describe("checkout route payment flow guards", () => {
     expect(response.status).toBe(400);
     expect(body.code).toBe("PAYMENT_METHOD_UNAVAILABLE");
     expect(mocks.cartFindUnique).not.toHaveBeenCalled();
+  });
+
+  it("rejects cross-site checkout attempts before cart lookup", async () => {
+    const { POST } = await import("@/app/api/checkout/route");
+
+    const response = await POST(new Request("https://velora.test/api/checkout", {
+      method: "POST",
+      headers: { "Origin": "https://attacker.test" },
+      body: JSON.stringify(checkoutPayload()),
+    }));
+
+    expect(response.status).toBe(403);
+    expect(mocks.cartFindUnique).not.toHaveBeenCalled();
+    expect(mocks.isPaymentMethodEnabled).not.toHaveBeenCalled();
   });
 
   it("reuses a completed Stripe checkout instead of creating a duplicate order", async () => {

@@ -3,6 +3,7 @@ import { ProductStatus } from "@prisma/client";
 import { z } from "zod";
 import { requireCustomerSession } from "@/lib/account-data";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const wishlistSchema = z.object({
   slugs: z.array(z.string().trim().min(1).max(180)).max(200).default([]),
@@ -62,6 +63,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session?.user.id) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { PageHeader } from "@/components/store/page-header";
 import { ShopControls } from "@/components/store/shop-controls";
+import { compactProductsForList } from "@/lib/catalog-performance";
 import { getCmsCategories, getCmsCategoryDetails, getCmsCollections, getCmsProducts } from "@/lib/cms";
 import { localizedAlternates } from "@/lib/seo";
 
@@ -27,7 +28,7 @@ export default async function ShopPage() {
   ]);
 
   return (
-    <section className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-[1440px] px-4 pb-12 pt-9 sm:px-6 sm:pt-10 lg:px-8">
       <Breadcrumbs items={[{ label: "Shop" }]} />
       <PageHeader
         eyebrow="Shop"
@@ -35,7 +36,7 @@ export default async function ShopPage() {
         description="Explore the current collection by category, size, color, material, and availability."
       />
       <Suspense fallback={<div className="py-20 text-center text-[var(--muted)]">Loading products...</div>}>
-        <ShopControls products={products} categories={categories} categoryDetails={categoryDetails} collections={collections} />
+        <ShopControls products={compactProductsForList(products)} categories={categories} categoryDetails={categoryDetails} collections={collections} />
       </Suspense>
     </section>
   );

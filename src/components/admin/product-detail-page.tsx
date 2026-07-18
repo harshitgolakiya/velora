@@ -33,7 +33,7 @@ export function ProductDetailPage({
   const qualityWarnings = getCatalogQualityWarnings(product, mediaAssets);
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="mx-auto w-full max-w-[1440px] px-5 py-6 lg:px-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <Link
@@ -97,7 +97,7 @@ export function ProductDetailPage({
           <ProductAuditHistory product={product} auditLogs={auditLogs} />
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

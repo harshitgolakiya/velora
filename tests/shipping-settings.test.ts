@@ -10,7 +10,7 @@ describe("shipping settings", () => {
         methodId: "standard",
         subtotal: 120,
       }),
-    ).toMatchObject({ label: "Standard UAE delivery", total: 25 });
+    ).toMatchObject({ label: "Standard delivery", total: 25 });
 
     expect(
       getShippingQuote(defaultCheckoutSettings, {
@@ -18,7 +18,7 @@ describe("shipping settings", () => {
         methodId: "express",
         subtotal: 500,
       }),
-    ).toMatchObject({ label: "Express UAE delivery", total: 40 });
+    ).toMatchObject({ label: "Express delivery", total: 40 });
   });
 
   it("applies free shipping thresholds and free-shipping coupons", () => {

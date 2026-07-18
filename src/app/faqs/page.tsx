@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { FaqContent } from "@/components/store/faq-content";
-import { getPublishedPageContent } from "@/lib/content-cms";
-import { faqJsonLd, localizedAlternates } from "@/lib/seo";
+import { getPageContentMetadata, getPublishedPageContent } from "@/lib/content-cms";
+import { faqJsonLd } from "@/lib/seo";
 
-export const metadata: Metadata = { alternates: localizedAlternates("/faqs") };
+export function generateMetadata(): Promise<Metadata> {
+  return getPageContentMetadata({
+    slug: "faqs",
+    path: "/faqs",
+    title: "Frequently Asked Questions",
+    description: "Answers about shopping, delivery, returns, and fit.",
+  });
+}
 
 const faqs = [
-  ["Do you ship across the UAE?", "Yes. UAE shipping is free above AED 300 and tracked from dispatch."],
+  ["Where do you deliver?", "Available delivery options are shown at checkout, with tracked shipping from dispatch and complimentary standard delivery above AED 300 where eligible."],
   ["Can I checkout as a guest?", "Yes. Guest checkout is supported, with account creation optional after purchase."],
   ["Do you support Arabic?", "The layout and data model are prepared for Arabic RTL content and hreflang setup."],
   ["How do returns work?", "Unworn full-price pieces can be returned within 14 days with original tags."],

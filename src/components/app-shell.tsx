@@ -3,14 +3,13 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check, LockKeyhole } from "lucide-react";
-import { CartDrawer } from "@/components/store/cart-drawer";
 import { CartReservationSync } from "@/components/store/cart-reservation-sync";
+import { DeferredStorefrontEffects } from "@/components/store/deferred-storefront-effects";
 import { Footer } from "@/components/store/footer";
 import { Header } from "@/components/store/header";
 import { LocaleDocument } from "@/components/store/locale-document";
-import { NewsletterModal } from "@/components/store/newsletter-modal";
 import { PageTransition } from "@/components/store/page-transition";
-import { localeFromPathname, localizedPath, shellCopy, stripLocale } from "@/lib/i18n";
+import { localeFromPathname, localizedPath, shellCopy, stripLocale } from "@/lib/i18n-shell";
 import type { GlobalContent } from "@/lib/global-content";
 
 export function AppShell({
@@ -27,6 +26,7 @@ export function AppShell({
   const localize = (path: string) => localizedPath(path, locale);
   const showNewsletterModal = basePath === "/" || ["/shop", "/collections/", "/product/", "/search"].some((path) => basePath === path || basePath.startsWith(path));
   const shellHasAnnouncement = globalContent.announcementEnabled && globalContent.announcements.some((item) => item.enabled);
+  const syncCartImmediately = basePath === "/cart";
   const isAdmin =
     basePath === "/admin" ||
     basePath.startsWith("/admin/") ||
@@ -112,9 +112,8 @@ export function AppShell({
     <>
       <Header globalContent={globalContent} />
       <LocaleDocument />
-      <CartReservationSync />
-      <CartDrawer />
-      {showNewsletterModal ? <NewsletterModal /> : null}
+      {syncCartImmediately ? <CartReservationSync /> : null}
+      <DeferredStorefrontEffects showNewsletterModal={showNewsletterModal} syncCart={!syncCartImmediately} />
       <main className={basePath === "/" ? "min-h-dvh" : `min-h-dvh pt-16 ${shellHasAnnouncement ? "md:pt-24" : "md:pt-[72px]"}`}>
         <PageTransition>{children}</PageTransition>
       </main>

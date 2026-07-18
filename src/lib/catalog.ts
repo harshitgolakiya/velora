@@ -270,7 +270,7 @@ export const products: Product[] = [
       "/images/velora/terra-bottle-1.jpg",
       "/images/velora/terra-bottle-2.jpg",
     ],
-    description: "A powder-coated stainless bottle that keeps drinks cold through long UAE training days.",
+    description: "A powder-coated stainless bottle that keeps drinks cold through long warm-weather training days.",
     fabric: "BPA-free 18/8 stainless steel with double-wall insulation.",
     care: "Hand wash only. Do not freeze or microwave.",
   },
@@ -279,11 +279,11 @@ export const products: Product[] = [
 export const policyPages = {
   shipping: {
     title: "Shipping",
-    body: "Free UAE shipping above AED 300. Dubai and Abu Dhabi orders usually arrive within 1-2 business days. GCC delivery is supported through tracked courier partners.",
+    body: "Complimentary standard delivery above AED 300 where eligible. Delivery estimates and available courier options are confirmed at checkout.",
   },
   returns: {
     title: "Returns + Exchanges",
-    body: "Full-price pieces can be returned within 14 days when unworn, unwashed, and tagged. Exchanges are free within the UAE, subject to stock availability.",
+    body: "Full-price pieces can be returned within 14 days when unworn, unwashed, and tagged. Exchange options are shown by order and subject to stock availability.",
   },
   privacy: {
     title: "Privacy Policy",

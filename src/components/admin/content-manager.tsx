@@ -38,15 +38,15 @@ export function ContentManager({ pages }: { pages: PageRow[] }) {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="flex h-14 items-center gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-5">
         <button type="button" onClick={() => router.push("/admin#content")} aria-label="Back to admin" className="grid size-9 place-items-center"><ArrowLeft className="size-4" /></button>
-        <span className="text-xs font-semibold uppercase tracking-[0.16em]">Content manager</span>
+        <h1 className="text-xs font-semibold uppercase tracking-[0.16em]">Content manager</h1>
       </header>
       <div className="mx-auto max-w-360 px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
           <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
-            <h1 className="text-lg font-semibold">Create content</h1>
+            <h2 className="text-lg font-semibold">Create content</h2>
             <form onSubmit={createPage} className="mt-5 space-y-4">
               <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.1em]">Title<input name="title" required minLength={2} className="h-11 border border-[var(--border)] bg-[var(--background)] px-3 text-sm font-normal normal-case tracking-normal" /></label>
               <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.1em]">Slug<input name="slug" required minLength={2} placeholder="shipping-guide" className="h-11 border border-[var(--border)] bg-[var(--background)] px-3 text-sm font-normal normal-case tracking-normal" /></label>
@@ -70,6 +70,6 @@ export function ContentManager({ pages }: { pages: PageRow[] }) {
           </section>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

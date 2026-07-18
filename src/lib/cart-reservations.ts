@@ -205,7 +205,7 @@ export async function syncCartReservations(
       include: { items: true },
     });
     if (existing?.status === CartStatus.COMPLETED) {
-      throw new Error("This cart has already been completed.");
+      throw new Error("CART_ALREADY_COMPLETED");
     }
 
     const variants = normalized.length

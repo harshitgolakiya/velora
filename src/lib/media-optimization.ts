@@ -47,7 +47,7 @@ export function getMediaOptimizationMetadata(bytes: Buffer, mimeType: string): M
 
   const notes: string[] = [];
   if (mimeType === "image/png" || mimeType === "image/jpeg") {
-    notes.push("Serve AVIF/WebP derivatives from the CDN for production traffic.");
+    notes.push("Generate AVIF/WebP responsive derivatives for production traffic.");
   }
   if (bytes.byteLength > 700_000) {
     notes.push("Large source file. Generate compressed responsive derivatives before launch.");

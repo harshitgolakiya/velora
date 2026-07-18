@@ -5,8 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { deleteReturnEvidence, MAX_RETURN_EVIDENCE_FILES, storeReturnEvidence } from "@/lib/return-evidence-storage";
 import { sendReturnAdminActivityNotification } from "@/lib/return-notifications";
 import { scanReturnEvidence } from "@/lib/return-malware-scan";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 export async function POST(request: Request, { params }: { params: Promise<{ orderNumber: string }> }) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   const { orderNumber } = await params;

@@ -4,20 +4,40 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { consentStorageKey } from "@/lib/consent-preferences";
 
-export function NewsletterModal() {
+export function NewsletterModal({ initialDelayMs = 8000 }: { initialDelayMs?: number }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    const seen = window.localStorage.getItem("velora-newsletter");
-    if (!seen) {
-      const timer = window.setTimeout(() => setOpen(true), 8000);
-      return () => window.clearTimeout(timer);
-    }
-  }, []);
+    let timer: number | undefined;
+
+    const schedule = () => {
+      window.clearTimeout(timer);
+      const seen = window.localStorage.getItem("velora-newsletter");
+      const hasPrivacyChoice = window.localStorage.getItem(consentStorageKey);
+      if (seen || !hasPrivacyChoice) return;
+
+      timer = window.setTimeout(() => {
+        if (!window.localStorage.getItem("velora-newsletter") && window.localStorage.getItem(consentStorageKey)) {
+          setOpen(true);
+        }
+      }, initialDelayMs);
+    };
+
+    schedule();
+    window.addEventListener("velora:consent", schedule);
+    window.addEventListener("storage", schedule);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("velora:consent", schedule);
+      window.removeEventListener("storage", schedule);
+    };
+  }, [initialDelayMs]);
 
   const dismiss = () => {
     window.localStorage.setItem("velora-newsletter", "dismissed");
@@ -51,9 +71,9 @@ export function NewsletterModal() {
   return (
     <Dialog.Root open={open} onOpenChange={(nextOpen) => (nextOpen ? setOpen(true) : dismiss())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm" />
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] shadow-2xl outline-none sm:grid-cols-[0.85fr_1.15fr]"
+          className="storefront-modal fixed left-1/2 top-1/2 z-[110] grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] shadow-2xl outline-none sm:grid-cols-[0.85fr_1.15fr]"
           onEscapeKeyDown={dismiss}
         >
           <Dialog.Title className="sr-only">Join the Velora newsletter</Dialog.Title>
@@ -66,7 +86,7 @@ export function NewsletterModal() {
           <div className="flex flex-col justify-center p-7 sm:p-10">
             <Dialog.Close
               aria-label="Close newsletter"
-              className="absolute end-4 top-4 grid size-10 place-items-center border border-[var(--border)] hover:bg-[var(--hover)]"
+              className="storefront-action absolute end-4 top-4 grid size-10 place-items-center border border-[var(--border)] hover:bg-[var(--hover)]"
             >
               <X className="size-5" />
             </Dialog.Close>
@@ -90,9 +110,10 @@ export function NewsletterModal() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email address"
+                    suppressHydrationWarning
                     className="h-12 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm outline-none"
                   />
-                  <button type="submit" disabled={status === "loading"} className="text-xs font-semibold uppercase tracking-[0.14em] disabled:opacity-50">
+                  <button type="submit" disabled={status === "loading"} className="storefront-action text-xs font-semibold uppercase tracking-[0.14em] disabled:opacity-50">
                     {status === "loading" ? "Joining..." : "Join"}
                   </button>
                 </div>

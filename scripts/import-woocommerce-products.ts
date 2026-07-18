@@ -5,6 +5,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { MediaType, ProductStatus } from "@prisma/client";
 import { prisma } from "../src/lib/prisma";
+import { suggestCollectionSlugsForProduct } from "../src/lib/collection-assignment";
 import { normalizeCatalogAttribute, uniqueCatalogAttributes } from "../src/lib/catalog-attributes";
 import { slugify } from "../src/lib/utils";
 
@@ -254,6 +255,15 @@ async function main() {
     const description = decodeHtml(parent.Description || parent["Short description"]) || `${parent.Name} from the latest collection.`;
     const parentImages = splitList(parent.Images).map((url) => localImages.get(url)).filter(Boolean) as string[];
     const tags = uniqueCatalogAttributes(splitList(parent.Tags));
+    const collectionSlugs = suggestCollectionSlugsForProduct({
+      title: parent.Name.trim(),
+      categoryName,
+      tags,
+    });
+    const collections = await prisma.collection.findMany({
+      where: { slug: { in: collectionSlugs } },
+      select: { id: true },
+    });
 
     const product = await prisma.product.create({
       data: {
@@ -273,6 +283,7 @@ async function main() {
         status: parent.Published === "1" ? ProductStatus.PUBLISHED : ProductStatus.DRAFT,
         publishedAt: parent.Published === "1" ? new Date() : null,
         categoryId,
+        collections: collections.length ? { connect: collections.map((collection) => ({ id: collection.id })) } : undefined,
         images: {
           create: parentImages.map((url, position) => ({
             url,

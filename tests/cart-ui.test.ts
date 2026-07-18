@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatCartReservationError,
   getCartLineAvailability,
   getCartLineImage,
   isCartReservationExpired,
@@ -49,6 +50,14 @@ const line: CartLine = {
   quantity: 2,
 };
 
+const reservationCopy = {
+  networkUnavailable: "Connection lost. Your cart is saved locally.",
+  cartAlreadyCompleted: "This cart has already been completed.",
+  reservationExpired: "Reservation expired. Inventory is no longer reserved.",
+  cartSavedLocally: "Reconnect to reserve inventory before checkout.",
+  refreshAvailability: "Refresh availability before checkout.",
+};
+
 describe("cart presentation", () => {
   it("uses the selected color gallery instead of the generic product image", () => {
     expect(getCartLineImage(line)).toBe("/black.jpg");
@@ -70,5 +79,23 @@ describe("cart presentation", () => {
     expect(
       isCartReservationExpired("2026-06-15T10:02:00.000Z", Date.parse("2026-06-15T10:01:00.000Z")),
     ).toBe(false);
+  });
+
+  it("maps reservation error codes to customer-facing recovery labels", () => {
+    expect(formatCartReservationError("NETWORK_UNAVAILABLE", reservationCopy)).toMatchObject({
+      title: reservationCopy.networkUnavailable,
+      detail: reservationCopy.cartSavedLocally,
+      tone: "warning",
+    });
+    expect(formatCartReservationError("CART_ALREADY_COMPLETED", reservationCopy)).toMatchObject({
+      title: reservationCopy.cartAlreadyCompleted,
+      detail: reservationCopy.refreshAvailability,
+      tone: "critical",
+    });
+    expect(formatCartReservationError("OUT_OF_STOCK", reservationCopy)).toMatchObject({
+      title: reservationCopy.reservationExpired,
+      detail: reservationCopy.refreshAvailability,
+      tone: "critical",
+    });
   });
 });

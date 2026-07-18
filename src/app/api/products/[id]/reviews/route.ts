@@ -4,6 +4,7 @@ import { requireCustomerSession } from "@/lib/account-data";
 import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { prisma } from "@/lib/prisma";
 import { canEditReview, getReviewEditableUntil } from "@/lib/review-policy";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   rating: z.number().int().min(1).max(5),
@@ -39,6 +40,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) return NextResponse.json({ message: "Sign in to write a review." }, { status: 401 });
   const { id: productId } = await params;

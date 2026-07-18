@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 import { useState } from "react";
 import type { Product, ProductMedia } from "@/lib/catalog";
 import { getDiscountPercentage, getProductBadges } from "@/lib/product-presentation";
 import { trackSearchClick } from "@/lib/search-click-client";
-import { QuickView } from "./quick-view";
 import { useStore } from "@/lib/store";
 import { cn, formatAed } from "@/lib/utils";
+import { QuickView } from "./quick-view";
 
 const swatchColors: Record<string, string> = {
   Black: "#2C2824",
@@ -47,6 +47,7 @@ export function ProductCard({
   const toggleWishlist = useStore((state) => state.toggleWishlist);
   const liked = wishlist.includes(product.slug);
   const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? "");
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const selectedMedia = product.variantMediaByColor?.[selectedColor] ?? [];
   const selectedImages = selectedMedia.filter((media) => media.type === "IMAGE");
   const primaryMedia = selectedImages.find((media) => !media.isHoverImage);
@@ -58,7 +59,6 @@ export function ProductCard({
     hoverMedia?.url ??
     (product.hoverImage && product.hoverImage !== image ? product.hoverImage : product.images[1]);
   const imageFit = productCardImageFit(primaryMedia);
-  const hoverImageFit = productCardImageFit(hoverMedia ?? primaryMedia);
   const badges = getProductBadges(product);
   const discount = getDiscountPercentage(product);
 
@@ -79,7 +79,7 @@ export function ProductCard({
 
   return (
     <article className={cn("group relative min-w-0", className)}>
-      <div className="relative overflow-hidden bg-[var(--card)]">
+      <div className="storefront-product-media relative overflow-hidden">
         <Link href={`/product/${product.slug}`} className="block" onClick={rememberPosition}>
           <div className="relative aspect-[3/4]">
             <Image
@@ -87,11 +87,13 @@ export function ProductCard({
               alt={`${product.name} in ${selectedColor || "selected color"}`}
               fill
               priority={priority}
+              fetchPriority={priority ? "high" : "low"}
               loading={priority ? "eager" : "lazy"}
+              decoding={priority ? "sync" : "async"}
               sizes={imageSizes}
-              quality={92}
+              quality={priority ? 72 : 84}
               className={cn(
-                "transition duration-700 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.015]",
+                !priority && "transition duration-700 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.015]",
                 imageFit,
               )}
             />
@@ -102,11 +104,12 @@ export function ProductCard({
                 aria-hidden="true"
                 fill
                 loading="lazy"
+                fetchPriority="low"
                 sizes={imageSizes}
-                quality={92}
+                quality={84}
                 className={cn(
                   "pointer-events-none opacity-0 transition duration-500 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100",
-                  hoverImageFit,
+                  imageFit,
                 )}
               />
             ) : null}
@@ -119,7 +122,7 @@ export function ProductCard({
                       "px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]",
                       badge.tone === "sale" && "bg-[#B42318] text-white",
                       badge.tone === "dark" && "bg-stone-950 text-white",
-                      badge.tone === "light" && "bg-white/92 text-stone-950",
+                      badge.tone === "light" && "storefront-light-chip",
                     )}
                   >
                     {badge.label}
@@ -134,13 +137,23 @@ export function ProductCard({
           aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           aria-pressed={liked}
           onClick={() => toggleWishlist(product.slug)}
-          className="absolute end-3 top-3 grid size-11 place-items-center border border-white/65 bg-white/92 text-stone-950 shadow-sm transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 motion-reduce:transition-none"
+          className="storefront-action storefront-light-control absolute end-2.5 top-2.5 grid size-9 place-items-center border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 sm:end-3 sm:top-3 sm:size-10 motion-reduce:transition-none"
         >
-          <Heart className={cn("size-5", liked && "fill-current")} />
+          <Heart className={cn("size-4.5", liked && "fill-current")} />
         </button>
-        <QuickView product={product} />
+        <button
+          type="button"
+          aria-label={`Quick view ${product.name}`}
+          onClick={() => setQuickViewOpen(true)}
+          className="storefront-action storefront-light-control absolute end-2.5 top-[3.25rem] grid size-9 place-items-center border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 sm:end-3 sm:top-14 sm:size-10 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 motion-reduce:transition-none"
+        >
+          <Eye className="size-4.5" />
+        </button>
+        {quickViewOpen ? (
+          <QuickView product={product} open={quickViewOpen} onOpenChange={setQuickViewOpen} showTrigger={false} />
+        ) : null}
       </div>
-      <div className="mt-4 flex min-h-6 items-center justify-between gap-4">
+      <div className="mt-3 flex min-h-6 items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2" role="group" aria-label={`Available colors for ${product.name}`}>
           {product.colors.map((color) => (
             <button
@@ -151,12 +164,10 @@ export function ProductCard({
               title={color}
               onClick={() => setSelectedColor(color)}
               className={cn(
-                "size-4 border p-0.5 outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 motion-reduce:transition-none",
-                selectedColor === color ? "border-[var(--foreground)]" : "border-transparent",
+                "storefront-action storefront-swatch size-[18px] border p-0.5 outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 motion-reduce:transition-none",
               )}
             >
               <span
-                className="block size-full border border-black/10"
                 aria-hidden="true"
                 style={{ backgroundColor: product.colorHex?.[color] ?? swatchColors[color] ?? "#C5A46D" }}
               />
@@ -169,18 +180,18 @@ export function ProductCard({
           </span>
         ) : null}
       </div>
-      <div className="mt-3 flex items-start justify-between gap-4">
+      <div className="mt-2.5 grid gap-2 sm:flex sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <Link
             href={`/product/${product.slug}`}
             onClick={rememberPosition}
-            className="line-clamp-2 text-sm font-medium text-[var(--foreground)] hover:underline sm:text-base"
+            className="line-clamp-2 break-words text-sm font-medium leading-5 text-[var(--foreground)] hover:underline sm:text-base sm:leading-6"
           >
             {product.name}
           </Link>
           <p className="mt-1 truncate text-xs text-[var(--muted)] sm:text-sm">{product.category}</p>
         </div>
-        <div className="shrink-0 text-end text-sm">
+        <div className="shrink-0 text-sm sm:text-end">
           {product.salePrice ? (
             <>
               <p className="font-medium text-[#B42318]">{formatAed(product.salePrice)}</p>

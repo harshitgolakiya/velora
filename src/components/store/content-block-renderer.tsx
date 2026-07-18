@@ -3,13 +3,22 @@ import Link from "next/link";
 import type { ContentBlock } from "@/lib/content-cms";
 
 export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
-  return <div className="space-y-20">{blocks.map((block) => {
+  return <div className="space-y-20">{blocks.map((block, index) => {
     if (block.type === "HERO") return (
-      <section key={block.id} className="relative min-h-[min(72vh,760px)] overflow-hidden bg-[var(--card)]">
-        {block.imageUrl ? <><Image src={block.imageUrl} alt="" fill sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-black/35" /></> : null}
-        <div className={`relative flex min-h-[min(72vh,760px)] max-w-3xl flex-col justify-end p-6 sm:p-10 lg:p-16 ${block.imageUrl ? "text-white" : ""}`}>
+      <section
+        key={block.id}
+        className={`relative overflow-hidden bg-[var(--card)] ${
+          block.imageUrl ? "min-h-[min(72svh,760px)]" : "-mx-4 border-y border-[var(--border)] bg-[var(--surface)] sm:-mx-6 lg:-mx-8"
+        }`}
+      >
+        {block.imageUrl ? <><Image src={block.imageUrl} alt="" fill priority={index === 0} fetchPriority={index === 0 ? "high" : undefined} loading={index === 0 ? "eager" : "lazy"} sizes="100vw" quality={84} className="object-cover" /><div className="absolute inset-0 bg-black/35" /></> : null}
+        <div
+          className={`relative flex max-w-3xl flex-col p-6 sm:p-10 lg:p-16 ${
+            block.imageUrl ? "min-h-[min(72svh,760px)] justify-end text-white" : "justify-center py-16 sm:py-20 lg:py-24"
+          }`}
+        >
           {block.eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.16em]">{block.eyebrow}</p> : null}
-          <h1 className="mt-3 text-4xl font-medium sm:text-6xl">{block.heading}</h1>
+          <h1 className="mt-3 text-4xl font-medium leading-tight sm:text-6xl">{block.heading}</h1>
           {block.body ? <p className="mt-5 max-w-2xl text-base leading-7 opacity-90">{block.body}</p> : null}
           {block.ctaHref && block.ctaLabel ? <Link href={block.ctaHref} className="mt-7 w-fit border-b border-current pb-1 text-sm font-semibold uppercase tracking-[0.1em]">{block.ctaLabel}</Link> : null}
         </div>

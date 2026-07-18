@@ -17,6 +17,13 @@ vi.mock("@/lib/return-notifications", () => ({ sendReturnLifecycleNotification: 
 
 import { DELETE } from "@/app/api/account/orders/[orderNumber]/return-request/route";
 
+function deleteRequest(origin = "http://localhost") {
+  return new Request("http://localhost/api/account/orders/VL-100/return-request", {
+    method: "DELETE",
+    headers: { "Origin": origin },
+  });
+}
+
 describe("customer return cancellation", () => {
   beforeEach(() => {
     transaction.mockReset();
@@ -45,7 +52,7 @@ describe("customer return cancellation", () => {
     };
     transaction.mockImplementation(async (callback) => callback(tx));
 
-    const response = await DELETE(new Request("http://localhost/api/account/orders/VL-100/return-request", { method: "DELETE" }), {
+    const response = await DELETE(deleteRequest(), {
       params: Promise.resolve({ orderNumber: "VL-100" }),
     });
 
@@ -59,10 +66,20 @@ describe("customer return cancellation", () => {
       returnRequest: { findUnique: vi.fn().mockResolvedValue({ id: "return-1", status: "PICKUP_SCHEDULED", resolution: "RETURN", items: [] }) },
     }));
 
-    const response = await DELETE(new Request("http://localhost/api/account/orders/VL-100/return-request", { method: "DELETE" }), {
+    const response = await DELETE(deleteRequest(), {
       params: Promise.resolve({ orderNumber: "VL-100" }),
     });
 
     expect(response.status).toBe(409);
+  });
+
+  it("rejects cross-site cancellation before loading the account order", async () => {
+    const response = await DELETE(deleteRequest("https://attacker.test"), {
+      params: Promise.resolve({ orderNumber: "VL-100" }),
+    });
+
+    expect(response.status).toBe(403);
+    expect(getAuthorizedAccountOrder).not.toHaveBeenCalled();
+    expect(transaction).not.toHaveBeenCalled();
   });
 });

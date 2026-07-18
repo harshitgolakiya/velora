@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Minus, Plus, X, RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cartSubtotal, useStore, type CartLine } from "@/lib/store";
+import { cartSubtotal, useStore, useStoreHydrated, type CartLine } from "@/lib/store";
 import {
   getCartLineAvailability,
   getCartLineImage,
@@ -14,7 +14,7 @@ import {
 } from "@/lib/cart-ui";
 import { cartCopy, localeFromPathname } from "@/lib/i18n";
 import { formatAed } from "@/lib/utils";
-import { CartRecoveryBanner, ReservationTimer } from "@/components/store/cart-drawer";
+import { CartRecoveryBanner, ReservationTimer } from "@/components/store/cart-status";
 
 function useCartCopy() {
   const pathname = usePathname();
@@ -243,6 +243,7 @@ function PageRecommendations() {
 
 export default function CartPage() {
   const copy = useCartCopy();
+  const hydrated = useStoreHydrated();
   const cart = useStore((state) => state.cart);
   const lastRemovedLine = useStore((state) => state.lastRemovedLine);
   const undoRemove = useStore((state) => state.undoRemove);
@@ -275,10 +276,22 @@ export default function CartPage() {
     setCouponInput("");
   };
 
+  const emptyCartPanel = (
+    <div className="border border-dashed border-[var(--border)] bg-[var(--surface)] px-5 py-20 text-center">
+      <p className="font-serif text-3xl">{copy.yourCartEmpty}</p>
+      <Link
+        href="/shop"
+        className="storefront-action mt-6 inline-flex h-11 items-center border border-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
+      >
+        {copy.shopCatalog}
+      </Link>
+    </div>
+  );
+
   return (
     <section className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 sm:flex-row sm:items-baseline sm:justify-between">
-        <h1 className="font-serif text-5xl sm:text-6xl">{copy.cartTitle}</h1>
+        <h1 className="font-serif text-6xl sm:text-7xl">{copy.cartTitle}</h1>
         <div className="w-full max-w-sm sm:w-auto">
           <ReservationTimer onExpiredChange={setReservationExpired} />
         </div>
@@ -302,7 +315,9 @@ export default function CartPage() {
           )}
           <CartRecoveryBanner />
 
-          {cart.length ? (
+          {!hydrated || !cart.length ? (
+            emptyCartPanel
+          ) : (
             <div className="space-y-6 border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6">
               <div className="border-b border-[var(--border)] pb-4">
                 <div className="flex justify-between text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
@@ -327,22 +342,9 @@ export default function CartPage() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="border border-dashed border-[var(--border)] bg-[var(--surface)] py-24 text-center">
-              <p className="font-serif text-3xl">{copy.yourCartEmpty}</p>
-              <p className="mt-2 text-sm text-[var(--muted)] max-w-md mx-auto px-4">
-                {copy.emptyCartBody}
-              </p>
-              <Link
-                href="/shop"
-                className="mt-6 inline-flex h-11 items-center border border-[var(--foreground)] bg-[var(--foreground)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
-              >
-                {copy.shopCatalog}
-              </Link>
-            </div>
           )}
 
-          {cart.length ? (
+          {hydrated && cart.length ? (
             <div className="grid gap-6 sm:grid-cols-2">
               {/* Order Note */}
               <div className="h-fit border border-[var(--border)] bg-[var(--surface)] p-5">
@@ -401,7 +403,7 @@ export default function CartPage() {
           ) : null}
         </div>
 
-        {cart.length ? (
+        {hydrated && cart.length ? (
           <aside className="h-fit border border-[var(--border)] bg-[var(--surface)] p-6">
             <h2 className="font-serif text-3xl">{copy.summary}</h2>
             <div className="mt-6 space-y-3 border-b border-[var(--border)] pb-5 text-sm text-[var(--muted)]">
@@ -449,7 +451,7 @@ export default function CartPage() {
         ) : null}
       </div>
 
-      <PageRecommendations />
+      {hydrated && cart.length ? <PageRecommendations /> : null}
     </section>
   );
 }

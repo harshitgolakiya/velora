@@ -19,9 +19,9 @@ import { usePathname } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { getCartLineImage, isCartReservationExpired } from "@/lib/cart-ui";
-import { checkoutCopy, localeFromPathname } from "@/lib/i18n";
-import { cartSubtotal, useStore } from "@/lib/store";
+import { formatCartReservationError, getCartLineImage, isCartReservationExpired } from "@/lib/cart-ui";
+import { cartCopy, checkoutCopy, localeFromPathname } from "@/lib/i18n";
+import { cartSubtotal, useStore, useStoreHydrated } from "@/lib/store";
 import { formatAed } from "@/lib/utils";
 import { getShippingMethodsForEmirate, getShippingQuote } from "@/lib/shipping-settings";
 import { getEnabledExpressCheckoutWallets, getEnabledPaymentMethods } from "@/lib/payment-method-settings";
@@ -173,8 +173,11 @@ export function CheckoutForm({
   savedAddresses?: SavedAddress[];
 }) {
   const pathname = usePathname();
-  const copy = checkoutCopy[localeFromPathname(pathname)];
+  const locale = localeFromPathname(pathname);
+  const copy = checkoutCopy[locale];
+  const cartLabels = cartCopy[locale];
   const checkoutSchema = useMemo(() => createCheckoutSchema(copy), [copy]);
+  const hydrated = useStoreHydrated();
   const cart = useStore((state) => state.cart);
   const sessionKey = useStore((state) => state.cartSessionKey);
   const reservationError = useStore((state) => state.cartReservationError);
@@ -247,6 +250,9 @@ export function CheckoutForm({
   const total = Math.max(0, payableBeforeGiftCard - appliedGiftCardAmount);
   const reservationExpired = isCartReservationExpired(expiresAt);
   const checkoutBlocked = Boolean(reservationError || reservationExpired);
+  const reservationErrorLabel = reservationError
+    ? formatCartReservationError(reservationError, cartLabels)
+    : null;
   const expressCheckoutDisabled = checkoutBlocked || submitting || form.formState.isSubmitting;
 
   const submitExpressCheckout = () => {
@@ -450,6 +456,15 @@ export function CheckoutForm({
   const inputClass =
     "h-12 w-full border border-[var(--border)] bg-[var(--background)] px-3.5 text-sm outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--muted)] motion-reduce:transition-none";
 
+  if (!hydrated) {
+    return (
+      <div className="mx-auto max-w-xl py-24 text-center" role="status">
+        <PackageCheck className="mx-auto size-10 text-[var(--accent)]" />
+        <h1 className="mt-6 text-3xl font-semibold">Loading checkout</h1>
+      </div>
+    );
+  }
+
   if (!cart.length) {
     return (
       <div className="mx-auto max-w-xl py-24 text-center">
@@ -460,7 +475,7 @@ export function CheckoutForm({
         </p>
         <Link
           href="/shop"
-          className="mt-8 inline-flex h-12 items-center bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)]"
+          className="storefront-action mt-8 inline-flex h-12 items-center border border-[var(--accent)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315]"
         >
           {copy.browseStore}
         </Link>
@@ -503,6 +518,7 @@ export function CheckoutForm({
                 aria-invalid={Boolean(form.formState.errors.email)}
                 aria-describedby={form.formState.errors.email ? "checkout-email-error" : "checkout-email-hint"}
                 placeholder={copy.emailPlaceholder}
+                suppressHydrationWarning
                 className={inputClass}
               />
             </Field>
@@ -747,14 +763,19 @@ export function CheckoutForm({
         {/* Alerts */}
         {checkoutBlocked ? (
           <div
-            className="flex items-start gap-3 border border-red-500/20 bg-red-500/8 p-4 text-sm text-red-600"
+            className={`flex items-start gap-3 border p-4 text-sm ${
+              reservationErrorLabel?.tone === "warning"
+                ? "border-amber-500/25 bg-amber-500/8 text-amber-800"
+                : "border-red-500/20 bg-red-500/8 text-red-600"
+            }`}
             role="alert"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <div>
-              <p>
-                {reservationError ?? copy.reservationExpiredAlert}
-              </p>
+              <p className="font-medium">{reservationErrorLabel?.title ?? copy.reservationExpiredAlert}</p>
+              {reservationErrorLabel?.detail ? (
+                <p className="mt-1">{reservationErrorLabel.detail}</p>
+              ) : null}
               <Link href="/cart" className="mt-2 inline-block font-semibold underline">
                 {copy.returnToCart}
               </Link>

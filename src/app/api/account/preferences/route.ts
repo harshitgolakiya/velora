@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireCustomerSession } from "@/lib/account-data";
 import { syncMarketingSubscriber, syncMarketingUnsubscriber } from "@/lib/marketing-sync";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const preferencesSchema = z.object({
   marketingEmails: z.boolean(),
@@ -13,6 +14,8 @@ const preferencesSchema = z.object({
 export async function PUT(request: Request) {
   const session = await requireCustomerSession();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const csrf = requireSameOriginRequest(request);
+  if (csrf) return csrf;
 
   const parsed = preferencesSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "Check your communication preferences." }, { status: 400 });

@@ -49,3 +49,38 @@ export function isCartReservationExpired(
 ): boolean {
   return Boolean(expiresAt && new Date(expiresAt).getTime() <= now);
 }
+
+export type CartReservationErrorCopy = {
+  networkUnavailable: string;
+  cartAlreadyCompleted: string;
+  reservationExpired: string;
+  cartSavedLocally: string;
+  refreshAvailability: string;
+};
+
+export function formatCartReservationError(
+  error: string,
+  copy: CartReservationErrorCopy,
+) {
+  if (error === "NETWORK_UNAVAILABLE") {
+    return {
+      title: copy.networkUnavailable,
+      detail: copy.cartSavedLocally,
+      tone: "warning" as const,
+    };
+  }
+
+  if (error === "CART_ALREADY_COMPLETED") {
+    return {
+      title: copy.cartAlreadyCompleted,
+      detail: copy.refreshAvailability,
+      tone: "critical" as const,
+    };
+  }
+
+  return {
+    title: copy.reservationExpired,
+    detail: copy.refreshAvailability,
+    tone: "critical" as const,
+  };
+}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCouponEligibleSubtotal } from "@/lib/coupon-eligibility";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   code: z.string().trim().min(1),
@@ -15,6 +16,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json({ message: "Invalid coupon request" }, { status: 400 });

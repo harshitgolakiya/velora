@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import {
   acceptedConsentPreferences,
@@ -100,6 +100,12 @@ export function Analytics() {
   const preferences = useMemo(() => parseConsentPreferences(consentRaw), [consentRaw]);
   const [customizing, setCustomizing] = useState(false);
   const [draft, setDraft] = useState<ConsentPreferences>(() => defaultConsentPreferences());
+  const [showConsentPrompt, setShowConsentPrompt] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setShowConsentPrompt(!preferences), preferences ? 0 : 6000);
+    return () => window.clearTimeout(timeout);
+  }, [preferences]);
 
   const save = (next: ConsentPreferences) => {
     persistConsent(next);
@@ -110,23 +116,26 @@ export function Analytics() {
   return (
     <>
       <AnalyticsScripts preferences={preferences} />
-      {!preferences ? (
-        <div className="fixed inset-x-0 bottom-0 z-[90] border-t border-[var(--border)] bg-[var(--surface)] shadow-[0_-18px_60px_rgba(0,0,0,0.18)]">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-8">
+      {!preferences && showConsentPrompt ? (
+        <div className="storefront-bottom-bar fixed inset-x-0 bottom-0 z-[90] border-t border-[var(--border)] bg-[#151922] shadow-[0_-18px_70px_rgba(0,0,0,0.42)]">
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-5 py-3 md:flex-row md:items-center md:justify-between md:px-8 md:py-4">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">Privacy choices</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              <p className="mt-1.5 text-sm leading-6 text-[var(--muted)] md:hidden">
+                Essential storage stays on. Choose whether to allow optional analytics and marketing.
+              </p>
+              <p className="mt-2 hidden text-sm leading-6 text-[var(--muted)] md:block">
                 We use essential storage for checkout and optional analytics or marketing pixels to improve the store. You can accept all, reject optional tracking, or choose each category.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => { setDraft(preferences ?? defaultConsentPreferences()); setCustomizing(true); }} className="inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em]">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              <button type="button" onClick={() => { setDraft(preferences ?? defaultConsentPreferences()); setCustomizing(true); }} className="storefront-action inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--hover)]">
                 <SlidersHorizontal className="size-4" /> Customize
               </button>
-              <button type="button" onClick={() => save(rejectedConsentPreferences())} className="inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em]">
+              <button type="button" onClick={() => save(rejectedConsentPreferences())} className="storefront-action inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--hover)]">
                 <X className="size-4" /> Reject
               </button>
-              <button type="button" onClick={() => save(acceptedConsentPreferences())} className="inline-flex h-11 items-center gap-2 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315]">
+              <button type="button" onClick={() => save(acceptedConsentPreferences())} className="storefront-action col-span-2 inline-flex h-11 items-center justify-center gap-2 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] hover:bg-[var(--foreground)] hover:text-[var(--background)] sm:col-span-1">
                 <Check className="size-4" /> Accept
               </button>
             </div>
@@ -134,14 +143,14 @@ export function Analytics() {
         </div>
       ) : null}
       {customizing ? (
-        <div className="fixed inset-0 z-[100] bg-black/55 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Privacy preferences">
-          <div className="mx-auto max-w-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-2xl">
+        <div className="storefront-overlay fixed inset-0 z-[100] bg-black/55 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Privacy preferences" data-state="open">
+          <div className="mx-auto max-w-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-2xl [animation:drawer-full-in_0.3s_var(--motion-ease-emphasized)_both]">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">Privacy preferences</p>
                 <h2 className="mt-2 text-2xl font-semibold">Control optional tracking</h2>
               </div>
-              <button type="button" onClick={() => setCustomizing(false)} className="grid size-10 place-items-center border border-[var(--border)]" aria-label="Close privacy preferences">
+              <button type="button" onClick={() => setCustomizing(false)} className="storefront-action grid size-10 place-items-center border border-[var(--border)] hover:bg-[var(--hover)]" aria-label="Close privacy preferences">
                 <X className="size-4" />
               </button>
             </div>
@@ -172,8 +181,8 @@ export function Analytics() {
               ))}
             </div>
             <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <button type="button" onClick={() => save(rejectedConsentPreferences())} className="h-11 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em]">Reject optional</button>
-              <button type="button" onClick={() => save({ ...draft, necessary: true, updatedAt: new Date().toISOString() })} className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315]">Save choices</button>
+              <button type="button" onClick={() => save(rejectedConsentPreferences())} className="storefront-action h-11 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--hover)]">Reject optional</button>
+              <button type="button" onClick={() => save({ ...draft, necessary: true, updatedAt: new Date().toISOString() })} className="storefront-action h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] hover:bg-[var(--foreground)] hover:text-[var(--background)]">Save choices</button>
             </div>
           </div>
         </div>

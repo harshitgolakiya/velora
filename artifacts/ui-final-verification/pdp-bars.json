@@ -1,0 +1,16 @@
+[
+  {
+    "viewport": "desktop",
+    "topBars": 0,
+    "mid": [],
+    "bottom": [],
+    "overflowX": 0
+  },
+  {
+    "viewport": "mobile",
+    "topBars": 0,
+    "mid": [],
+    "bottom": [],
+    "overflowX": 0
+  }
+]

@@ -33,12 +33,12 @@ export function ContactForm({ activeOrders, defaultName = "", defaultEmail = "" 
     <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
       <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <label className="grid gap-2 text-sm font-medium">Name<input name="name" required minLength={2} defaultValue={defaultName} className={fieldClass} /></label>
-      <label className="grid gap-2 text-sm font-medium">Email<input name="email" type="email" required defaultValue={defaultEmail} className={fieldClass} /></label>
+      <label className="grid gap-2 text-sm font-medium">Email<input name="email" type="email" required defaultValue={defaultEmail} suppressHydrationWarning className={fieldClass} /></label>
       <label className="grid gap-2 text-sm font-medium sm:col-span-2">Related order<select value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} className={fieldClass}><option value="">No order selected</option>{activeOrders.map((order) => <option key={order.orderNumber} value={order.orderNumber}>{order.orderNumber} / {order.status}</option>)}</select>{activeOrders.length ? <span className="text-xs font-normal text-[var(--muted)]">Your active orders are listed automatically.</span> : null}</label>
       <label className="grid gap-2 text-sm font-medium sm:col-span-2">Subject<input name="subject" required minLength={4} className={fieldClass} /></label>
       <label className="grid gap-2 text-sm font-medium sm:col-span-2">How can we help?<textarea name="message" required minLength={20} rows={7} className="border border-[var(--border)] bg-[var(--surface)] p-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" /></label>
       {result && !result.ok ? <p role="alert" className="text-sm text-red-500 sm:col-span-2">{result.message}</p> : null}
-      <div className="sm:col-span-2"><button disabled={submitting} className="h-12 bg-[var(--foreground)] px-7 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:opacity-50 motion-reduce:transition-none">{submitting ? "Sending..." : "Send request"}</button></div>
+      <div className="sm:col-span-2"><button disabled={submitting} className="h-12 bg-[var(--foreground)] px-7 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:opacity-50 motion-reduce:transition-none">{submitting ? "Sending..." : "Send request"}</button></div>
     </form>
   </div>;
 }

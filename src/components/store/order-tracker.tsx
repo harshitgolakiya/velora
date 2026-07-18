@@ -62,7 +62,7 @@ function LookupForm({
       </label>
       <label className="grid gap-2 text-sm font-medium">
         {copy.emailAddress}
-        <input name="email" required type="email" defaultValue={customerEmail} className={trackerInputClass} placeholder="you@example.com" />
+        <input name="email" required type="email" defaultValue={customerEmail} suppressHydrationWarning className={trackerInputClass} placeholder="you@example.com" />
       </label>
       {error ? <p role="alert" className="text-sm text-red-500">{error}</p> : null}
       <Button disabled={loading}>
@@ -129,7 +129,7 @@ export function OrderTracker({
                     className={`flex w-full items-center gap-4 px-5 py-4 text-start transition motion-reduce:transition-none ${active ? "bg-[var(--card)]" : "hover:bg-[var(--hover)]"}`}
                     aria-pressed={active}
                   >
-                    <span className={`grid size-10 shrink-0 place-items-center ${active ? "bg-[var(--accent)] text-stone-950" : "bg-[var(--card)] text-[var(--muted)]"}`}>
+                    <span className={`grid size-10 shrink-0 place-items-center ${active ? "bg-[var(--accent)] text-[#111315]" : "bg-[var(--card)] text-[var(--muted)]"}`}>
                       <Package className="size-4" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -172,7 +172,7 @@ export function OrderTracker({
               <h2 className="mt-1 text-2xl font-semibold">{order.orderNumber}</h2>
               <p className="mt-2 text-xs text-[var(--muted)]">{copy.updated} {new Date(order.updatedAt).toLocaleString("en-AE")}</p>
             </div>
-            <span className="bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase text-stone-950">{statusLabel(order.status)}</span>
+            <span className="bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase text-[#111315]">{statusLabel(order.status)}</span>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -199,7 +199,7 @@ export function OrderTracker({
             <ol className="mt-6 border-t border-[var(--border)] pt-5">
               {order.shipmentEvents.map((event, index) => (
                 <li key={event.id} className="grid grid-cols-[24px_minmax(0,1fr)] gap-3 pb-5 last:pb-0">
-                  <span className="mt-1 grid size-5 place-items-center bg-[var(--accent)] text-[10px] font-semibold text-stone-950">{index + 1}</span>
+                  <span className="mt-1 grid size-5 place-items-center bg-[var(--accent)] text-[10px] font-semibold text-[#111315]">{index + 1}</span>
                   <span>
                     <span className="block text-sm font-semibold">{event.message ?? statusLabel(event.status)}</span>
                     <span className="mt-1 block text-xs text-[var(--muted)]">{[event.carrier, event.trackingNo, new Date(event.createdAt).toLocaleString("en-AE")].filter(Boolean).join(" / ")}</span>

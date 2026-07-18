@@ -26,7 +26,7 @@ vi.mock("@/lib/prisma", () => ({
 function request(body?: unknown, headers: HeadersInit = {}) {
   return new Request("https://velora.test/api/account/sessions", {
     method: body ? "DELETE" : "GET",
-    headers,
+    headers: body ? { origin: "https://velora.test", ...headers } : headers,
     body: body ? JSON.stringify(body) : undefined,
   });
 }
@@ -99,5 +99,18 @@ describe("account sessions API", () => {
         revokedReason: "Customer revoked this device",
       }),
     }));
+  });
+
+  it("rejects cross-site session revocation attempts", async () => {
+    const { DELETE } = await import("@/app/api/account/sessions/route");
+
+    const response = await DELETE(request(
+      { sessionToken: "session_other_1234567890" },
+      { origin: "https://attacker.test" },
+    ));
+
+    expect(response.status).toBe(403);
+    expect(mocks.findFirst).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
   });
 });

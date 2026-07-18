@@ -2,7 +2,10 @@ import type { Product, ProductMedia } from "./catalog";
 
 export type GalleryPresentationMedia = Pick<ProductMedia, "type" | "url" | "width" | "height" | "altText" | "focalPointX" | "focalPointY">;
 
-export function resolveProductGalleryMedia(product: Pick<Product, "images" | "variantMediaByColor">, selectedColor?: string) {
+export function resolveProductGalleryMedia(
+  product: Pick<Product, "images" | "variantMediaByColor">,
+  selectedColor?: string,
+): GalleryPresentationMedia[] {
   const colorMedia = selectedColor ? product.variantMediaByColor?.[selectedColor] : undefined;
   if (colorMedia?.length) {
     return colorMedia.map(({ type, url, width, height, altText, focalPointX, focalPointY }) => ({

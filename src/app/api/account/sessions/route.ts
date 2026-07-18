@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireCustomerSession } from "@/lib/account-data";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const revokeSchema = z.object({
   sessionToken: z.string().trim().min(16).max(120),
@@ -73,6 +74,8 @@ export async function GET(request: Request) {
 export async function DELETE(request: Request) {
   const session = await requireCustomerSession();
   if (!session?.user?.id) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const csrf = requireSameOriginRequest(request);
+  if (csrf) return csrf;
 
   const parsed = revokeSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

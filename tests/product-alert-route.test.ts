@@ -31,6 +31,14 @@ const payload = {
   targetPrice: 150,
 };
 
+function request(method: "POST" | "DELETE", body = payload, origin = "http://localhost") {
+  return new Request("http://localhost/api/product-alerts", {
+    method,
+    headers: { "Origin": origin },
+    body: JSON.stringify(body),
+  });
+}
+
 describe("product alert subscriptions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,10 +53,7 @@ describe("product alert subscriptions", () => {
 
   it("deduplicates an active alert", async () => {
     mocks.alertFindFirst.mockResolvedValue({ id: "alert-1", status: "ACTIVE" });
-    const response = await POST(new Request("http://localhost/api/product-alerts", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }));
+    const response = await POST(request("POST"));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ created: false });
@@ -59,10 +64,7 @@ describe("product alert subscriptions", () => {
   it("reactivates an unsubscribed alert", async () => {
     mocks.alertFindFirst.mockResolvedValue({ id: "alert-1", status: "UNSUBSCRIBED" });
     mocks.alertUpdate.mockResolvedValue({ id: "alert-1", type: "PRICE_DROP" });
-    const response = await POST(new Request("http://localhost/api/product-alerts", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }));
+    const response = await POST(request("POST"));
 
     expect(response.status).toBe(201);
     expect(mocks.alertUpdate).toHaveBeenCalledWith(expect.objectContaining({
@@ -74,10 +76,7 @@ describe("product alert subscriptions", () => {
 
   it("unsubscribes the matching active alert", async () => {
     mocks.alertUpdateMany.mockResolvedValue({ count: 1 });
-    const response = await DELETE(new Request("http://localhost/api/product-alerts", {
-      method: "DELETE",
-      body: JSON.stringify(payload),
-    }));
+    const response = await DELETE(request("DELETE"));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ removed: true });
@@ -89,5 +88,13 @@ describe("product alert subscriptions", () => {
       }),
       data: { status: "UNSUBSCRIBED" },
     }));
+  });
+
+  it("rejects cross-site alert mutations before product lookup", async () => {
+    const response = await POST(request("POST", payload, "https://attacker.test"));
+
+    expect(response.status).toBe(403);
+    expect(mocks.productFindFirst).not.toHaveBeenCalled();
+    expect(mocks.alertFindFirst).not.toHaveBeenCalled();
   });
 });

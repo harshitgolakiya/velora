@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
-import { localeFromPathname, localizedPath, shellCopy } from "@/lib/i18n";
+import { localeFromPathname, localizedPath, shellCopy } from "@/lib/i18n-shell";
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const pathname = usePathname();

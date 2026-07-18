@@ -7,6 +7,7 @@ import { evaluateReturnEligibility } from "@/lib/return-policy";
 import { getReturnSettings } from "@/lib/store-settings";
 import { sendReturnLifecycleNotification } from "@/lib/return-notifications";
 import { localeFromRequest } from "@/lib/transactional-email";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const allowedReasons = {
   return: ["Changed my mind", "Fit issue", "Quality not as expected", "Ordered by mistake", "Other"],
@@ -57,6 +58,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ orderNumber: string }> },
 ) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const session = await requireCustomerSession();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -209,6 +213,9 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ orderNumber: string }> },
 ) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) {
@@ -273,6 +280,9 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ orderNumber: string }> },
 ) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) {

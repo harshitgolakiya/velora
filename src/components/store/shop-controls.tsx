@@ -1,7 +1,6 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
 import type { Category, Collection, Product } from "@/lib/catalog";
@@ -9,6 +8,7 @@ import { trackFilterEvent } from "@/lib/filter-analytics-client";
 import { defaultFilterSettings } from "@/lib/filter-settings";
 import { deriveFilterOptions, filterProducts } from "@/lib/product-filters";
 import { ProductCard } from "./product-card";
+import { ShopFilterDrawer } from "./shop-filter-drawer";
 
 type FilterGroup = "sort" | "gender" | "size" | "type" | "style" | "color" | "collection" | "material";
 type FilterKey = Exclude<FilterGroup, "type"> | "category";
@@ -32,6 +32,8 @@ const defaults: Record<FilterKey, string> = {
   collection: "All",
   material: "All",
 };
+
+const initialProductCount = 12;
 
 export function stableSort(products: Product[], sort: string, collection?: string) {
   return [...products].sort((a, b) => {
@@ -74,7 +76,9 @@ export function ShopControls({
   const searchParams = useSearchParams();
   const [activeGroup, setActiveGroup] = useState<FilterGroup | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(20);
+  const [drawerMounted, setDrawerMounted] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(initialProductCount);
+  const drawerUnmountTimer = useRef<number | undefined>(undefined);
 
   const value = (key: FilterKey) => searchParams.get(key) ?? defaults[key];
   const category = value("category");
@@ -117,7 +121,7 @@ export function ShopControls({
   }, []);
 
   function updateFilter(key: FilterKey, nextValue: string) {
-    setVisibleCount(20);
+    setVisibleCount(initialProductCount);
     const params = new URLSearchParams(searchParams.toString());
     const action = nextValue === defaults[key] || (key === "collection" && collection) ? "clear" : "apply";
     if (nextValue === defaults[key] || (key === "collection" && collection)) params.delete(key);
@@ -134,7 +138,7 @@ export function ShopControls({
   }
 
   function reset() {
-    setVisibleCount(20);
+    setVisibleCount(initialProductCount);
     const params = new URLSearchParams();
     for (const key of preserveParams) {
       const preserved = searchParams.get(key);
@@ -152,9 +156,16 @@ export function ShopControls({
     setActiveGroup(null);
   }
 
-  function openDrawer(group: FilterGroup) {
+  function openFilterDrawer(group: FilterGroup) {
+    if (drawerUnmountTimer.current) window.clearTimeout(drawerUnmountTimer.current);
     setActiveGroup(group);
+    setDrawerMounted(true);
     setDrawerOpen(true);
+  }
+
+  function handleDrawerOpenChange(open: boolean) {
+    setDrawerOpen(open);
+    if (!open) drawerUnmountTimer.current = window.setTimeout(() => setDrawerMounted(false), 260);
   }
 
   const activeFilterSettings = useMemo(() => {
@@ -189,8 +200,10 @@ export function ShopControls({
       key={label}
       onClick={onClick}
       aria-pressed={active}
-      className={`min-w-0 border px-4 py-3 text-start text-sm transition motion-reduce:transition-none ${
-        active ? "border-[var(--foreground)] bg-[var(--hover)]" : "border-[var(--border)] hover:bg-[var(--hover)]"
+      className={`storefront-action min-w-0 border px-4 py-3 text-start text-sm transition motion-reduce:transition-none ${
+        active
+          ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
+          : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--foreground)]"
       }`}
     >
       <span className="block break-words">{label}</span>
@@ -247,24 +260,30 @@ export function ShopControls({
       {activeCategoryDescription ? (
         <p className="mb-6 max-w-2xl text-sm leading-6 text-[var(--muted)]">{activeCategoryDescription}</p>
       ) : null}
-      <div className="mb-8 border-y border-[var(--border)] bg-[var(--surface)]">
-        <div className="flex items-center gap-5 px-1 py-4 sm:px-4">
+      <div className="mb-8 border-y border-[var(--border)] bg-[var(--background)]/70">
+        <div className="flex flex-wrap items-center gap-4 px-0 py-3 sm:px-2 lg:gap-5">
           <button
             type="button"
-            onClick={() => openDrawer("sort")}
-            className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] lg:hidden"
+            onClick={() => openFilterDrawer("sort")}
+            className="storefront-action inline-flex h-11 shrink-0 items-center gap-2 border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold uppercase tracking-[0.12em] hover:border-[var(--foreground)] lg:hidden"
           >
             <SlidersHorizontal className="size-4" />
             Filter & sort
             {chips.length ? <span className="grid size-5 place-items-center bg-[var(--foreground)] text-[10px] text-[var(--background)]">{chips.length}</span> : null}
           </button>
-          <div className="hidden min-w-0 flex-1 items-center gap-7 overflow-x-auto lg:flex">
+          <div className="hidden min-w-0 flex-1 items-center gap-2 overflow-x-auto lg:flex">
             {groupLabels.map((group) => (
               <button
                 type="button"
                 key={group.value}
-                onClick={() => openDrawer(group.value)}
-                className="shrink-0 text-sm font-semibold uppercase tracking-[0.12em] transition hover:text-[var(--accent)] motion-reduce:transition-none"
+                data-filter-trigger={group.value}
+                onClick={() => setActiveGroup(activeGroup === group.value ? null : group.value)}
+                aria-expanded={activeGroup === group.value}
+                className={`storefront-action shrink-0 border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition motion-reduce:transition-none ${
+                  activeGroup === group.value
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
+                    : "border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)]"
+                }`}
               >
                 {group.label}
               </button>
@@ -277,10 +296,33 @@ export function ShopControls({
             <button
               type="button"
               onClick={reset}
-              className="hidden shrink-0 text-sm font-semibold uppercase tracking-[0.12em] underline underline-offset-4 hover:text-[var(--accent)] sm:block"
+              className="storefront-action hidden shrink-0 text-xs font-semibold uppercase tracking-[0.12em] underline underline-offset-4 hover:text-[var(--accent)] sm:block"
             >
               Clear
             </button>
+          ) : null}
+          {activeGroup ? (
+            <div
+              className="hidden basis-full border-t border-[var(--border)] px-2 py-5 lg:block"
+              data-filter-panel={activeGroup}
+              aria-label={`${groupLabels.find((group) => group.value === activeGroup)?.label ?? activeGroup} filter options`}
+            >
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+                  {groupLabels.find((group) => group.value === activeGroup)?.label ?? activeGroup}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveGroup(null)}
+                  className="storefront-action text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] hover:text-[var(--foreground)]"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="grid gap-2.5 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+                {panel(activeGroup)}
+              </div>
+            </div>
           ) : null}
         </div>
 
@@ -291,7 +333,7 @@ export function ShopControls({
                 type="button"
                 key={`${chip.key}-${chip.label}`}
                 onClick={() => updateFilter(chip.key, defaults[chip.key])}
-                className="inline-flex max-w-full min-w-0 items-center gap-2 bg-[var(--foreground)] px-3 py-2 text-left text-xs font-semibold text-[var(--background)]"
+                className="storefront-action inline-flex max-w-full min-w-0 items-center gap-2 border border-[var(--foreground)] bg-[var(--foreground)] px-3 py-2 text-left text-xs font-semibold text-[var(--background)]"
               >
                 <span className="min-w-0 break-words">{chip.label}</span>
                 <X className="size-3.5 shrink-0 text-[var(--accent)]" />
@@ -301,74 +343,58 @@ export function ShopControls({
         ) : null}
       </div>
 
-      <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm" />
-          <Dialog.Content className="fixed inset-y-0 end-0 z-50 flex w-full max-w-xl flex-col bg-[var(--surface)] text-[var(--foreground)] shadow-2xl">
-            <Dialog.Title className="sr-only">Filter and sort products</Dialog.Title>
-            <Dialog.Description className="sr-only">
-              Refine the product grid by sort order, category, size, color, collection, style, gender, and material.
-            </Dialog.Description>
-            <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-5">
-              <div>
-                <p className="font-semibold">Filter & sort</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">{filtered.length} matching {filtered.length === 1 ? "product" : "products"}</p>
-              </div>
-              <Dialog.Close asChild>
-                <button type="button" aria-label="Close filters" className="grid size-10 place-items-center">
-                  <X className="size-6" />
+      {drawerMounted ? (
+        <ShopFilterDrawer
+          open={drawerOpen}
+          onOpenChange={handleDrawerOpenChange}
+          matchCount={filtered.length}
+          chips={chips.length ? (
+            <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] px-5 py-4">
+              {chips.map((chip) => (
+                <button
+                  type="button"
+                  key={`drawer-${chip.key}-${chip.label}`}
+                  onClick={() => updateFilter(chip.key, defaults[chip.key])}
+                  className="storefront-action inline-flex max-w-full min-w-0 items-center gap-2 border border-[var(--foreground)] bg-[var(--foreground)] px-3 py-2 text-left text-xs font-semibold text-[var(--background)]"
+                >
+                  <span className="min-w-0 break-words">{chip.label}</span>
+                  <X className="size-3.5 shrink-0 text-[var(--accent)]" />
                 </button>
-              </Dialog.Close>
-            </div>
-            {chips.length ? (
-              <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] px-5 py-4">
-                {chips.map((chip) => (
-                  <button
-                    type="button"
-                    key={`drawer-${chip.key}-${chip.label}`}
-                    onClick={() => updateFilter(chip.key, defaults[chip.key])}
-                    className="inline-flex max-w-full min-w-0 items-center gap-2 bg-[var(--foreground)] px-3 py-2 text-left text-xs font-semibold text-[var(--background)]"
-                  >
-                    <span className="min-w-0 break-words">{chip.label}</span>
-                    <X className="size-3.5 shrink-0 text-[var(--accent)]" />
-                  </button>
-                ))}
-                <button type="button" onClick={reset} className="ms-auto text-xs font-semibold uppercase underline underline-offset-4">
-                  Clear all
-                </button>
-              </div>
-            ) : null}
-            <div className="flex-1 overflow-y-auto">
-              {drawerSections.map((section) => (
-                <div key={section} className="border-b border-[var(--border)]">
-                  <button
-                    type="button"
-                    onClick={() => setActiveGroup(activeGroup === section ? null : section)}
-                    aria-expanded={activeGroup === section}
-                    className="flex w-full items-center justify-between px-5 py-6 text-start text-lg font-semibold capitalize"
-                  >
-                    {groupLabels.find((group) => group.value === section)?.label ?? section}
-                    {activeGroup === section ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
-                  </button>
-                  {activeGroup === section ? <div className="grid gap-3 px-5 pb-6 sm:grid-cols-2">{panel(section)}</div> : null}
-                </div>
               ))}
+              <button type="button" onClick={reset} className="storefront-action ms-auto text-xs font-semibold uppercase underline underline-offset-4">
+                Clear all
+              </button>
             </div>
-            <div className="border-t border-[var(--border)] p-5">
-              <Dialog.Close asChild>
-                <button type="button" className="h-14 w-full bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.16em] text-[var(--background)]">
-                  View {filtered.length} {filtered.length === 1 ? "product" : "products"}
-                </button>
-              </Dialog.Close>
+          ) : null}
+        >
+          {drawerSections.map((section) => (
+            <div key={section} className="border-b border-[var(--border)]">
+              <button
+                type="button"
+                onClick={() => setActiveGroup(activeGroup === section ? null : section)}
+                aria-expanded={activeGroup === section}
+              className="storefront-action flex w-full items-center justify-between px-5 py-5 text-start text-base font-semibold capitalize hover:bg-[var(--hover)]"
+              >
+                {groupLabels.find((group) => group.value === section)?.label ?? section}
+                {activeGroup === section ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+              </button>
+              {activeGroup === section ? <div className="grid gap-3 px-5 pb-6 sm:grid-cols-2">{panel(section)}</div> : null}
             </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+          ))}
+        </ShopFilterDrawer>
+      ) : null}
 
       {filtered.length ? (
         <>
-          <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5">
-            {visibleProducts.map((product, index) => <ProductCard key={product.id} product={product} priority={index < 5} />)}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4 2xl:grid-cols-5">
+            {visibleProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                priority={index === 0}
+                imageSizes="(min-width: 1600px) 280px, (min-width: 1024px) 25vw, (min-width: 640px) 50vw, 50vw"
+              />
+            ))}
           </div>
           {visibleProducts.length < filtered.length ? (
             <div className="mt-14 flex flex-col items-center border-t border-[var(--border)] pt-8">
@@ -377,8 +403,8 @@ export function ShopControls({
               </p>
               <button
                 type="button"
-                onClick={() => setVisibleCount((count) => count + 20)}
-                className="mt-4 min-h-12 border border-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.12em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
+                onClick={() => setVisibleCount((count) => count + initialProductCount)}
+                className="storefront-action mt-4 min-h-12 border border-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.12em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
               >
                 Load more
               </button>
@@ -398,7 +424,7 @@ export function ShopControls({
                   type="button"
                   key={`empty-${chip.key}-${chip.label}`}
                   onClick={() => updateFilter(chip.key, defaults[chip.key])}
-                  className="inline-flex max-w-full min-w-0 items-center gap-2 border border-[var(--border)] px-3 py-2 text-left text-xs font-semibold"
+                  className="storefront-action inline-flex max-w-full min-w-0 items-center gap-2 border border-[var(--border)] px-3 py-2 text-left text-xs font-semibold hover:bg-[var(--hover)]"
                 >
                   <span className="min-w-0 break-words">{chip.label}</span>
                   <X className="size-3.5 shrink-0 text-[var(--accent)]" />
@@ -409,7 +435,7 @@ export function ShopControls({
           <button
             type="button"
             onClick={reset}
-            className="mt-6 bg-[var(--foreground)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)]"
+            className="storefront-action mt-6 bg-[var(--foreground)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#111315]"
           >
             Reset filters
           </button>

@@ -10,7 +10,10 @@ const globalScheduledPublishing = globalThis as unknown as {
   };
 };
 
-export async function publishDueScheduledProducts(now = new Date()) {
+export async function publishDueScheduledProducts(
+  now = new Date(),
+  options: { force?: boolean } = {},
+) {
   if (process.env.NEXT_PHASE === "phase-production-build") {
     return { count: 0 };
   }
@@ -18,7 +21,7 @@ export async function publishDueScheduledProducts(now = new Date()) {
   const state = globalScheduledPublishing.scheduledPublishing ?? { checkedAt: 0 };
   globalScheduledPublishing.scheduledPublishing = state;
   if (state.promise) return state.promise;
-  if (now.getTime() - state.checkedAt < 60_000) return { count: 0 };
+  if (!options.force && now.getTime() - state.checkedAt < 60_000) return { count: 0 };
 
   state.promise = (async () => {
     try {

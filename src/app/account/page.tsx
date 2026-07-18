@@ -112,7 +112,7 @@ export default async function AccountPage() {
           <div className="mt-10 bg-[var(--foreground)] p-6 text-[var(--background)]">
             <p className="text-3xl font-semibold">Order tracking</p>
             <p className="mt-2 text-sm opacity-75">Track by order number and email from the support flow.</p>
-            <Link href="/track-order" className="mt-5 inline-flex h-11 items-center bg-[var(--background)] px-5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--accent)] hover:text-stone-950 motion-reduce:transition-none">Track order</Link>
+            <Link href="/track-order" className="mt-5 inline-flex h-11 items-center bg-[var(--background)] px-5 text-sm font-medium text-[var(--foreground)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none">Track order</Link>
           </div>
         </>
       )}

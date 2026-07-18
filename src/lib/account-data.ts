@@ -5,6 +5,15 @@ import { prisma } from "./prisma";
 export async function requireCustomerSession() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || !session.user.email) return null;
+  if (session.user.sessionId) {
+    const activeSession = await prisma.accountSession.findUnique({
+      where: { sessionToken: session.user.sessionId },
+      select: { userId: true, revokedAt: true },
+    }).catch(() => null);
+    if (!activeSession || activeSession.userId !== session.user.id || activeSession.revokedAt) {
+      return null;
+    }
+  }
   return session;
 }
 

@@ -4,6 +4,7 @@ import { ProductAlertType, ProductStatus } from "@prisma/client";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const alertSchema = z.object({
   type: z.enum(["BACK_IN_STOCK", "PRICE_DROP"]),
@@ -15,6 +16,9 @@ const alertSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = alertSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(
@@ -122,6 +126,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = alertSchema.pick({ type: true, email: true, productId: true, variantId: true }).safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "Check alert details" }, { status: 400 });
   const updated = await prisma.productAlertSubscription.updateMany({

@@ -282,7 +282,7 @@ describe("return request end-to-end reconciliation", () => {
 
     const submitResponse = await submitReturnRequest(new Request("http://localhost/api/account/orders/VL-100/return-request", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Origin": "http://localhost" },
       body: JSON.stringify({
         resolution: "exchange",
         reason: "Fit issue",

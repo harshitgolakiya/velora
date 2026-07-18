@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getGiftCardQuote } from "@/lib/gift-cards";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   code: z.string().trim().min(1),
@@ -8,6 +9,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json({ message: "Invalid gift-card request" }, { status: 400 });

@@ -1,27 +1,33 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
 import { ProductDetail } from "@/components/store/product-detail";
-import { ProductReviews } from "@/components/store/product-reviews";
-import { ProductTabs } from "@/components/store/product-tabs";
-import { RecentlyViewedProducts } from "@/components/store/recently-viewed-products";
-import { RecommendationRail } from "@/components/store/recommendation-rail";
-import { getCmsProduct, getCmsProducts } from "@/lib/cms";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import {
+  DeferredProductReviews,
+  DeferredProductTabs,
+  DeferredRecentlyViewedProducts,
+  DeferredRecommendationRail,
+} from "@/components/store/product-page-deferred";
+import { getCmsProduct, getCmsProducts, getCmsRecommendationProducts } from "@/lib/cms";
+import { compactProductsForList } from "@/lib/catalog-performance";
 import { getProductRecommendations } from "@/lib/product-recommendations";
 import { getRecommendationSettings } from "@/lib/store-settings";
 import { buildReviewStructuredData } from "@/lib/review-presentation";
 import { absoluteUrl, localizedAlternates, primaryImage, productJsonLd } from "@/lib/seo";
 
+const getProductForPage = cache((slug: string) => getCmsProduct(slug));
+const getProductsForStaticParams = cache(() => getCmsProducts("en"));
+const getRecommendationSettingsForPage = cache(() => getRecommendationSettings());
+const getRecommendationProductsForPage = cache((limit: number) => getCmsRecommendationProducts(undefined, limit));
+
 export async function generateStaticParams() {
-  const products = await getCmsProducts("en");
+  const products = await getProductsForStaticParams();
   return products.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = await getCmsProduct(slug);
+  const product = await getProductForPage(slug);
   const title = product?.seoTitle ?? product?.name ?? "Product";
   const description = product?.seoDescription ?? product?.description ?? "Premium Velora activewear product.";
 
@@ -52,24 +58,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [product, products, session, recommendationSettings] = await Promise.all([
-    getCmsProduct(slug),
-    getCmsProducts(),
-    getServerSession(authOptions),
-    getRecommendationSettings(),
+  const [product, recommendationSettings] = await Promise.all([
+    getProductForPage(slug),
+    getRecommendationSettingsForPage(),
   ]);
   if (!product) notFound();
-  const fitPreferences = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { preferredSize: true, fitPreference: true, compressionPreference: true },
-      })
-    : null;
+  const candidateCount = recommendationSettings.enabled
+    ? Math.max(recommendationSettings.maxItems * 3, 12)
+    : 8;
+  const listProducts = compactProductsForList(await getRecommendationProductsForPage(candidateCount));
 
   const related = recommendationSettings.enabled
     ? getProductRecommendations({
         product,
-        products,
+        products: listProducts,
         limit: recommendationSettings.maxItems,
         strategy: recommendationSettings.strategy,
         manualProductIds: recommendationSettings.manualOverrides[product.id] ?? [],
@@ -77,7 +79,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     : [];
 
   return (
-    <section className="mx-auto max-w-360 px-4 py-10 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-360 px-4 pb-32 pt-10 sm:px-6 sm:pb-28 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -96,25 +98,37 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ]}
       />
 
-      <ProductDetail product={product} fitPreferences={fitPreferences ?? undefined} />
+      <ProductDetail product={product} />
 
-      {/* Full-width tabs */}
-      <ProductTabs product={product} />
-      <ProductReviews product={product} />
+      <div data-pdp-lower-content>
+        {/* Full-width tabs */}
+        <DeferredProductTabs product={product} />
+        <DeferredProductReviews product={product} />
 
-      {/* People Also Bought */}
-      {recommendationSettings.enabled ? <div className="mt-20">
-        <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-          Complete the look
-        </p>
-        <h2 className="mt-2 text-center text-4xl font-medium">You may also like</h2>
-        <RecommendationRail
-          sourceProductId={product.id}
-          products={related.length ? related : products.filter((item) => item.id !== product.id).slice(0, recommendationSettings.maxItems)}
-          strategy={recommendationSettings.strategy}
-        />
-      </div> : null}
-      <RecentlyViewedProducts current={product.slug} products={products} />
+        {/* People Also Bought */}
+        <div className="mt-20">
+        {recommendationSettings.enabled ? (
+          <>
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+              Complete the look
+            </p>
+            <h2 className="mt-2 text-center text-4xl font-medium">You may also like</h2>
+            <DeferredRecommendationRail
+              sourceProductId={product.id}
+              products={
+                related.length
+                  ? related
+                  : listProducts
+                      .filter((item) => item.id !== product.id)
+                      .slice(0, recommendationSettings.maxItems)
+              }
+              strategy={recommendationSettings.strategy}
+            />
+          </>
+        ) : null}
+        <DeferredRecentlyViewedProducts current={product.slug} products={listProducts} />
+        </div>
+      </div>
     </section>
   );
 }

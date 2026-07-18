@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product } from "./catalog";
@@ -71,6 +72,7 @@ type StoreState = {
   setWishlistIntent: (slug: string, intent: WishlistIntent) => void;
   setCartOpen: (open: boolean) => void;
   setCartSessionKey: (cartSessionKey: string) => void;
+  startNewCartSession: (cartSessionKey: string) => void;
   setCartReservationError: (cartReservationError?: string) => void;
   setCartSyncStatus: (cartSyncStatus: CartSyncStatus, cartRecoveryNotice?: "restored") => void;
   replaceCart: (payload: {
@@ -276,6 +278,14 @@ export const useStore = create<StoreState>()(
         set((state) => state.wishlist.includes(slug) ? { wishlistIntents: { ...state.wishlistIntents, [slug]: intent } } : state),
       setCartOpen: (cartOpen) => set({ cartOpen }),
       setCartSessionKey: (cartSessionKey) => set({ cartSessionKey }),
+      startNewCartSession: (cartSessionKey) =>
+        set({
+          cartSessionKey,
+          cartExpiresAt: undefined,
+          cartReservationError: undefined,
+          cartSyncStatus: "idle",
+          cartRecoveryNotice: undefined,
+        }),
       setCartReservationError: (cartReservationError) =>
         set({ cartReservationError }),
       setCartSyncStatus: (cartSyncStatus, cartRecoveryNotice) =>
@@ -292,7 +302,7 @@ export const useStore = create<StoreState>()(
           coupon: recalculateCoupon(state.coupon, cart),
           lastRemovedLine: undefined,
         })),
-      clearCart: () => set({ cart: [], coupon: undefined, couponError: undefined, customerNote: "" }),
+      clearCart: () => set({ cart: [], cartSessionKey: "", coupon: undefined, couponError: undefined, customerNote: "", cartExpiresAt: undefined, cartReservationError: undefined }),
       applyCouponCode: async (code) => {
         if (!code.trim()) return;
         const subtotal = cartSubtotal(get().cart);
@@ -393,3 +403,46 @@ export const useStore = create<StoreState>()(
 
 export const cartSubtotal = (cart: CartLine[]) =>
   cart.reduce((total, line) => total + (line.product.salePrice ?? line.product.price) * line.quantity, 0);
+
+export function useStoreHydrated() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const persistApi = useStore.persist;
+    if (!persistApi) {
+      queueMicrotask(() => setHydrated(true));
+      return;
+    }
+
+    let active = true;
+    const markHydrated = () => {
+      queueMicrotask(() => {
+        if (active) setHydrated(true);
+      });
+    };
+
+    if (persistApi.hasHydrated()) {
+      markHydrated();
+      return () => {
+        active = false;
+      };
+    }
+
+    const unsubscribe = persistApi.onFinishHydration(markHydrated);
+    const rehydration = persistApi.rehydrate();
+    if (rehydration instanceof Promise) {
+      void rehydration.finally(markHydrated);
+    } else {
+      queueMicrotask(() => {
+        if (persistApi.hasHydrated()) markHydrated();
+      });
+    }
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, []);
+
+  return hydrated;
+}

@@ -6,11 +6,15 @@ import { requireCustomerSession } from "@/lib/account-data";
 import { syncCartReservations } from "@/lib/cart-reservations";
 import { getCmsProducts } from "@/lib/cms";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ orderNumber: string }> },
 ) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   const userId = session.user.id;

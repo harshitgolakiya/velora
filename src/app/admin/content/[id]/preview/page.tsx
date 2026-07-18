@@ -11,5 +11,5 @@ export default async function AdminContentPreviewPage({ params }: { params: Prom
   const row = await prisma.pageContent.findUnique({ where: { id } });
   if (!row) notFound();
   const page = mapPageContent(row);
-  return <main className="mx-auto max-w-360 px-4 py-8 sm:px-6 lg:px-8"><div className="mb-8 border border-[var(--accent)] bg-[var(--surface)] p-3 text-center text-xs font-semibold uppercase tracking-[0.12em]">Preview · {page.status} · not public</div><ContentBlockRenderer blocks={page.blocks} /></main>;
+  return <div className="mx-auto max-w-360 px-4 py-8 sm:px-6 lg:px-8"><h1 className="mb-8 border border-[var(--accent)] bg-[var(--surface)] p-3 text-center text-xs font-semibold uppercase tracking-[0.12em]">Preview · {page.status} · not public</h1><ContentBlockRenderer blocks={page.blocks} /></div>;
 }

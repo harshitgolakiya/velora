@@ -31,7 +31,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       type="button"
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-      className={`grid size-9 place-items-center border border-current/25 transition hover:bg-current/10 motion-reduce:transition-none ${className}`}
+      className={`storefront-action grid size-9 place-items-center border border-transparent transition hover:bg-current/10 motion-reduce:transition-none ${className}`}
     >
       {mounted && theme === "light" ? <Moon className="size-4" /> : <Sun className="size-4" />}
     </button>

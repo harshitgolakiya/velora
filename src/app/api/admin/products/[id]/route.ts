@@ -84,10 +84,19 @@ export async function PATCH(
           }),
         );
 
-        await tx.productImage.deleteMany({ where: { productId: id } });
-        await tx.productVariant.deleteMany({ where: { productId: id } });
+        const existingVariants = await tx.productVariant.findMany({
+          where: { productId: id },
+          include: { color: true, size: true },
+        });
+        const existingByOption = new Map<string, typeof existingVariants>();
+        for (const variant of existingVariants) {
+          const key = `${variant.colorId}:${variant.sizeId}`;
+          existingByOption.set(key, [...(existingByOption.get(key) ?? []), variant]);
+        }
+
         const productImages = orderProductImages(data.colors, data.primaryImage);
 
+        await tx.productImage.deleteMany({ where: { productId: id } });
         await tx.productImage.createMany({
           data: productImages
             .slice(0, 8)
@@ -99,43 +108,107 @@ export async function PATCH(
             })),
         });
 
-        await Promise.all(
-          data.colors.flatMap((colorInput, colorIndex) =>
-            sizes.map(async (size) => {
-              const mediaUrls = colorInput.images.filter(Boolean);
-              const media = [
-                ...mediaUrls.map((url, sortOrder) => ({
-                  type: MediaType.IMAGE,
-                  url,
-                  sortOrder,
-                  isHoverImage: colorInput.hoverImage ? url === colorInput.hoverImage : sortOrder === 1,
-                })),
-                ...(colorInput.video
-                  ? [
-                      {
-                        type: MediaType.VIDEO,
-                        url: colorInput.video,
-                        sortOrder: mediaUrls.length,
-                        isHoverImage: false,
-                      },
-                    ]
-                  : []),
-              ];
+        const desiredVariants = data.colors.flatMap((colorInput, colorIndex) =>
+          sizes.map((size) => {
+            const color = colors[colorIndex];
+            const key = `${color.id}:${size.id}`;
+            const reusableVariant = existingByOption.get(key)?.shift();
+            const mediaUrls = colorInput.images.filter(Boolean);
+            const media = [
+              ...mediaUrls.map((url, sortOrder) => ({
+                type: MediaType.IMAGE,
+                url,
+                sortOrder,
+                isHoverImage: colorInput.hoverImage ? url === colorInput.hoverImage : sortOrder === 1,
+              })),
+              ...(colorInput.video
+                ? [
+                    {
+                      type: MediaType.VIDEO,
+                      url: colorInput.video,
+                      sortOrder: mediaUrls.length,
+                      isHoverImage: false,
+                    },
+                  ]
+                : []),
+            ];
 
-              return tx.productVariant.create({
+            return {
+              existingId: reusableVariant?.id,
+              colorId: color.id,
+              sizeId: size.id,
+              sku:
+                colorInput.skuBySize[size.name]?.trim() ||
+                `${data.sku}-${size.name}-${colorInput.name}`.toUpperCase().replace(/\s+/g, "-"),
+              stock: colorInput.stockBySize[size.name] ?? 0,
+              media,
+            };
+          }),
+        );
+
+        const reusableVariantIds = new Set(
+          desiredVariants
+            .map((variant) => variant.existingId)
+            .filter(Boolean) as string[],
+        );
+        const obsoleteVariantIds = existingVariants
+          .filter((variant) => !reusableVariantIds.has(variant.id))
+          .map((variant) => variant.id);
+
+        if (obsoleteVariantIds.length) {
+          await tx.variantMedia.deleteMany({ where: { variantId: { in: obsoleteVariantIds } } });
+          await tx.cartItem.deleteMany({ where: { variantId: { in: obsoleteVariantIds } } });
+          await tx.wishlistItem.updateMany({
+            where: { variantId: { in: obsoleteVariantIds } },
+            data: { variantId: null },
+          });
+          await tx.orderItem.updateMany({
+            where: { variantId: { in: obsoleteVariantIds } },
+            data: { variantId: null },
+          });
+          await tx.returnRequestItem.updateMany({
+            where: { requestedVariantId: { in: obsoleteVariantIds } },
+            data: { requestedVariantId: null },
+          });
+          await tx.productAlertSubscription.deleteMany({ where: { variantId: { in: obsoleteVariantIds } } });
+          await tx.inventoryLog.deleteMany({ where: { variantId: { in: obsoleteVariantIds } } });
+          await tx.productVariant.deleteMany({ where: { id: { in: obsoleteVariantIds }, productId: id } });
+        }
+
+        if (reusableVariantIds.size) {
+          await tx.productVariant.updateMany({
+            where: { id: { in: [...reusableVariantIds] } },
+            data: { sku: null },
+          });
+        }
+
+        await Promise.all(
+          desiredVariants.map(async (variant) => {
+            if (variant.existingId) {
+              await tx.variantMedia.deleteMany({ where: { variantId: variant.existingId } });
+              return tx.productVariant.update({
+                where: { id: variant.existingId },
                 data: {
-                  productId: id,
-                  colorId: colors[colorIndex].id,
-                  sizeId: size.id,
-                  sku:
-                    colorInput.skuBySize[size.name]?.trim() ||
-                    `${data.sku}-${size.name}-${colorInput.name}`.toUpperCase().replace(/\s+/g, "-"),
-                  stock: colorInput.stockBySize[size.name] ?? 0,
-                  medias: media.length ? { create: media } : undefined,
+                  colorId: variant.colorId,
+                  sizeId: variant.sizeId,
+                  sku: variant.sku,
+                  stock: variant.stock,
+                  medias: variant.media.length ? { create: variant.media } : undefined,
                 },
               });
-            }),
-          ),
+            }
+
+            return tx.productVariant.create({
+              data: {
+                productId: id,
+                colorId: variant.colorId,
+                sizeId: variant.sizeId,
+                sku: variant.sku,
+                stock: variant.stock,
+                medias: variant.media.length ? { create: variant.media } : undefined,
+              },
+            });
+          }),
         );
       }
 

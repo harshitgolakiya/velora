@@ -1,0 +1,8 @@
+{
+  "failures": [
+    "pdp-interactions: gallery dialog missing",
+    "mobile-filter-fresh-prompts: Invalid or unexpected token",
+    "mobile-filter-fresh-prompts: newsletter visible before consent",
+    "mobile-filter-fresh-prompts: filter drawer missing"
+  ]
+}

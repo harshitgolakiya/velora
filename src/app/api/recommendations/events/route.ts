@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const eventSchema = z.object({
   sourceProductId: z.string().trim().min(1).max(80),
@@ -14,6 +15,9 @@ const eventSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = eventSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success || parsed.data.sourceProductId === parsed.data.recommendedProductId) {
     return NextResponse.json({ message: "Invalid recommendation event" }, { status: 400 });

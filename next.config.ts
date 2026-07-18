@@ -22,7 +22,7 @@ export function buildContentSecurityPolicy({ production = process.env.NODE_ENV =
     ["style-src", ["'self'", "'unsafe-inline'"]],
     ["img-src", ["'self'", "data:", "blob:", "https:"]],
     ["font-src", ["'self'", "data:"]],
-    ["media-src", ["'self'", "blob:"]],
+    ["media-src", ["'self'", "blob:", "https:"]],
     ["connect-src", [
       "'self'",
       "https://api.stripe.com",
@@ -38,6 +38,8 @@ export function buildContentSecurityPolicy({ production = process.env.NODE_ENV =
       "https://www.paypal.com",
       "https://www.sandbox.paypal.com",
       "https://checkout.tabby.ai",
+      "https://iframe.videodelivery.net",
+      "https://*.cloudflarestream.com",
     ]],
   ]);
 
@@ -85,9 +87,12 @@ export function buildSecurityHeaders(options?: SecurityHeaderOptions) {
 }
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
+  productionBrowserSourceMaps: process.env.PRODUCTION_BROWSER_SOURCE_MAPS === "true",
   images: {
     formats: ["image/avif", "image/webp"],
-    qualities: [75, 85, 92],
+    qualities: [72, 75, 84, 85, 92],
+    remotePatterns: [],
   },
   async headers() {
     return [

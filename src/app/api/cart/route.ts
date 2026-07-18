@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { syncCartReservations } from "@/lib/cart-reservations";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const cartSchema = z.object({
   sessionKey: z.string().trim().min(12).max(100),
@@ -15,6 +16,9 @@ const cartSchema = z.object({
 });
 
 export async function PUT(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = cartSchema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json(

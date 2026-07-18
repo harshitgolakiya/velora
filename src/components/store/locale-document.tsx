@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { dirForLocale, localeFromPathname } from "@/lib/i18n";
+import { dirForLocale, localeFromPathname } from "@/lib/i18n-shell";
 
 export function LocaleDocument() {
   const pathname = usePathname();

@@ -4,8 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { scanReturnEvidence } from "@/lib/return-malware-scan";
 import { deleteReviewMedia, MAX_REVIEW_MEDIA_FILES, storeReviewMedia } from "@/lib/review-media-storage";
 import { canEditReview } from "@/lib/review-policy";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const session = await requireCustomerSession();
   if (!session?.user?.id || !session.user.email) return NextResponse.json({ message: "Sign in to upload review images." }, { status: 401 });
   const { id: productId } = await params;

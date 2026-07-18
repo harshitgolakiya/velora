@@ -23,6 +23,8 @@
 # production
 /build
 /storage/return-evidence/
+/.restore-drill/
+/.launch-readiness/
 
 # database
 *.db

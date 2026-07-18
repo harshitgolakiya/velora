@@ -1,8 +1,8 @@
 "use client";
 
-import useEmblaCarousel from "embla-carousel-react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
 import type { Product } from "@/lib/catalog";
 import { ProductCard } from "./product-card";
 
@@ -12,7 +12,7 @@ export function ProductCarousel({
   subtitle,
   ctaHref,
   ctaLabel,
-  priorityCount = 2,
+  priorityCount = 0,
 }: {
   products: Product[];
   title: string;
@@ -21,12 +21,13 @@ export function ProductCarousel({
   ctaLabel: string;
   priorityCount?: number;
 }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    dragFree: false,
-    containScroll: "trimSnaps",
-    skipSnaps: false,
-  });
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  function scrollProducts(direction: -1 | 1) {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    viewport.scrollBy({ left: direction * viewport.clientWidth * 0.9, behavior: "smooth" });
+  }
 
   return (
     <div>
@@ -45,7 +46,7 @@ export function ProductCarousel({
             <button
               type="button"
               aria-label="Previous products"
-              onClick={() => emblaApi?.scrollPrev()}
+              onClick={() => scrollProducts(-1)}
               className="grid size-10 place-items-center bg-[var(--surface)] text-[var(--foreground)] shadow-sm ring-1 ring-[var(--border)] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
             >
               <ChevronLeft className="size-4" />
@@ -53,7 +54,7 @@ export function ProductCarousel({
             <button
               type="button"
               aria-label="Next products"
-              onClick={() => emblaApi?.scrollNext()}
+              onClick={() => scrollProducts(1)}
               className="grid size-10 place-items-center bg-[var(--surface)] text-[var(--foreground)] shadow-sm ring-1 ring-[var(--border)] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
             >
               <ChevronRight className="size-4" />
@@ -61,12 +62,12 @@ export function ProductCarousel({
           </div>
         </div>
       </div>
-      <div ref={emblaRef} className="homepage-product-grid overflow-hidden" data-testid="product-carousel-viewport">
-        <div className="homepage-product-track flex gap-4">
+      <div ref={viewportRef} className="homepage-product-grid overflow-x-auto scroll-smooth" data-testid="product-carousel-viewport">
+        <div className="homepage-product-track flex snap-x snap-mandatory gap-4">
           {products.map((product, index) => (
             <div
               key={product.id}
-              className="homepage-product-slide min-w-0 shrink-0"
+              className="homepage-product-slide min-w-0 shrink-0 snap-start"
               style={{ flex: "0 0 var(--homepage-product-slide-basis)" }}
             >
               <ProductCard

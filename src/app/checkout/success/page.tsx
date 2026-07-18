@@ -168,7 +168,7 @@ export default async function CheckoutSuccessPage({
           </Link>
           <Link
             href="/contact"
-            className="bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 motion-reduce:transition-none"
+            className="bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
           >
             Contact support
           </Link>
@@ -197,7 +197,7 @@ export default async function CheckoutSuccessPage({
         {
           icon: <Truck className="size-5" />,
           title: "Delivery to your door",
-          desc: "2-4 business days for standard UAE delivery. Have cash ready on arrival.",
+          desc: "Standard delivery timing is confirmed at checkout. Have cash ready on arrival.",
         },
         {
           icon: <Star className="size-5" />,
@@ -351,7 +351,7 @@ export default async function CheckoutSuccessPage({
                 {order.shippingAddress.name}<br />
                 {order.shippingAddress.line1}
                 {order.shippingAddress.line2 ? <><br />{order.shippingAddress.line2}</> : null}<br />
-                {order.shippingAddress.city}, United Arab Emirates<br />
+                {order.shippingAddress.city}, {order.shippingAddress.country ?? "United Arab Emirates"}<br />
                 {order.shippingAddress.phone}
               </p>
             </div>
@@ -386,7 +386,7 @@ export default async function CheckoutSuccessPage({
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">Need help with your order?</p>
               <p className="mt-0.5 text-xs text-[var(--muted)]">
-                Our team is available 9 am – 9 pm UAE time, 7 days a week.
+                Our team is available 9 am-9 pm Gulf time, 7 days a week.
               </p>
             </div>
             <Link
@@ -409,7 +409,7 @@ export default async function CheckoutSuccessPage({
           </Link>
           <Link
             href="/shop"
-            className="flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 motion-reduce:transition-none"
+            className="flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
           >
             Continue shopping
             <ArrowRight className="size-4" />

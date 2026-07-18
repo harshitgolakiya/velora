@@ -949,6 +949,8 @@ function ModalShell({
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em]">{title}</p>
           <button
+            type="button"
+            aria-label={`Close ${title}`}
             onClick={onClose}
             className="text-[var(--muted)] transition hover:text-[var(--foreground)]"
           >
@@ -1026,6 +1028,8 @@ function LiveAlertsPanel({ alerts, onClose }: { alerts: AdminAlert[]; onClose: (
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em]">Live alerts</p>
           <button
+            type="button"
+            aria-label="Close live alerts"
             onClick={onClose}
             className="text-[var(--muted)] transition hover:text-[var(--foreground)]"
           >
@@ -2338,6 +2342,8 @@ function OrderReviewPanel({
             <p className="mt-0.5 text-xs text-[var(--muted)]">{order.email}</p>
           </div>
           <button
+            type="button"
+            aria-label="Close order review panel"
             onClick={onClose}
             className="text-[var(--muted)] transition hover:text-[var(--foreground)]"
           >
@@ -3816,12 +3822,17 @@ function HomepageSectionModal({
                       ) : null}
                       {item.mediaType === "CLOUDFLARE_STREAM" ? (
                         <FieldLabel label="Cloudflare Stream ID">
-                          <input
-                            value={item.cloudflareStreamId}
-                            onChange={(event) => updateCategoryMediaItem(index, { cloudflareStreamId: event.target.value })}
-                            className={inputCls}
-                            placeholder="uid from Cloudflare Stream"
-                          />
+                          <div className="space-y-2">
+                            <input
+                              value={item.cloudflareStreamId}
+                              onChange={(event) => updateCategoryMediaItem(index, { cloudflareStreamId: event.target.value })}
+                              className={inputCls}
+                              placeholder="e.g., d4336699b16201be3067a5175a60cfeb"
+                            />
+                            <p className="text-xs text-[var(--muted)]">
+                              Paste just the video ID from Cloudflare Stream. For custom domains, set NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN in .env.local
+                            </p>
+                          </div>
                         </FieldLabel>
                       ) : null}
                     </div>
@@ -6214,6 +6225,9 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
       className="flex w-full"
       style={{ minHeight: "100vh" }}
     >
+      <h1 className="sr-only">
+        Velora admin {sections.find(([key]) => key === active)?.[1] ?? "Overview"}
+      </h1>
       {/* Overlays */}
       {toast ? <Toast message={toast} onDismiss={() => setToast(null)} /> : null}
       {mutationCount > 0 ? (
@@ -6447,6 +6461,8 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
             </span>
           )}
           <button
+            type="button"
+            aria-label={sidebarCollapsed ? "Expand admin sidebar" : "Collapse admin sidebar"}
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="grid size-7 place-items-center rounded text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--foreground)]"
           >
@@ -6512,6 +6528,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 )}
                 <input
                   value={query}
+                  aria-label="Search admin records"
                   onFocus={() => setServerSearchOpen(true)}
                   onChange={(event) => {
                     const value = event.target.value;
@@ -6576,7 +6593,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
               <Bell className="size-3" />
               Alerts
               {alertCount > 0 ? (
-                <span className="grid h-4 min-w-4 place-items-center bg-red-500 px-1 text-[10px] font-bold text-white">
+                <span className="grid h-4 min-w-4 place-items-center bg-[#991b1b] px-1 text-[10px] font-bold text-white">
                   {alertCount > 99 ? "99+" : alertCount}
                 </span>
               ) : null}
@@ -7195,6 +7212,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-[var(--muted)]">From</label>
                   <input
+                    aria-label="Order date from"
                     type="date"
                     value={orderDateFrom}
                     max={orderDateTo || undefined}
@@ -7205,6 +7223,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-[var(--muted)]">To</label>
                   <input
+                    aria-label="Order date to"
                     type="date"
                     value={orderDateTo}
                     min={orderDateFrom || undefined}
@@ -7215,6 +7234,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 <div className="flex items-center gap-2">
                   <label className="text-xs text-[var(--muted)]">Tags</label>
                   <select
+                    aria-label="Order tag filter"
                     value={orderTagFilter}
                     onChange={(e) => setOrderTagFilter(e.target.value)}
                     className="h-8 border border-[var(--border)] bg-[var(--card)] px-3 text-xs outline-none focus:border-[var(--accent)]"
@@ -8551,6 +8571,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 <label className="flex h-11 items-center gap-2 border border-[var(--border)] bg-[var(--card)] px-3">
                   <Search className="size-4 text-[var(--muted)]" />
                   <input
+                    aria-label="Search media assets"
                     value={mediaQuery}
                     onChange={(event) => setMediaQuery(event.target.value)}
                     placeholder="Search filename, folder, tag, mime type..."
@@ -8585,6 +8606,8 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     className="border border-[var(--border)] bg-[var(--card)] p-3 transition hover:shadow-md"
                   >
                     <button
+                      type="button"
+                      aria-label={`Edit media asset ${asset.name}`}
                       onClick={() => setEditingMediaAsset(asset)}
                       className="relative block aspect-square w-full overflow-hidden bg-stone-100 text-left"
                     >
@@ -9807,7 +9830,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                         <div>
                           <p className="text-sm font-semibold">Shipping zone and methods</p>
                           <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
-                            Configure UAE checkout delivery labels, rates, free-delivery threshold, and customer-facing estimates.
+                            Configure checkout delivery labels, rates, free-delivery threshold, and customer-facing estimates.
                           </p>
                         </div>
                         <FieldLabel label="Zone name">
@@ -9828,7 +9851,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                               />
                               Standard delivery
                             </label>
-                            <input name="standardShippingLabel" defaultValue={standard?.label ?? "Standard UAE delivery"} className={inputCls} />
+                            <input name="standardShippingLabel" defaultValue={standard?.label ?? "Standard delivery"} className={inputCls} />
                             <input name="standardShippingEstimate" defaultValue={standard?.estimate ?? "2-4 business days"} className={inputCls} />
                             <div className="grid gap-2 sm:grid-cols-2">
                               <input name="standardShippingPrice" type="number" min="0" step="1" defaultValue={standard?.price ?? 25} className={inputCls} />
@@ -9845,7 +9868,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                               />
                               Express delivery
                             </label>
-                            <input name="expressShippingLabel" defaultValue={express?.label ?? "Express UAE delivery"} className={inputCls} />
+                            <input name="expressShippingLabel" defaultValue={express?.label ?? "Express delivery"} className={inputCls} />
                             <input name="expressShippingEstimate" defaultValue={express?.estimate ?? "Next business day in major cities"} className={inputCls} />
                             <input name="expressShippingPrice" type="number" min="0" step="1" defaultValue={express?.price ?? 40} className={inputCls} />
                           </div>
@@ -9891,7 +9914,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                               Tabby
                             </label>
                             <input name="tabbyLabel" defaultValue={tabby?.label ?? "Tabby"} className={inputCls} />
-                            <textarea name="tabbyDescription" rows={3} defaultValue={tabby?.description ?? "Split eligible UAE orders into installments with Tabby."} className={`${inputCls} h-auto py-3`} />
+                            <textarea name="tabbyDescription" rows={3} defaultValue={tabby?.description ?? "Split eligible orders into installments with Tabby."} className={`${inputCls} h-auto py-3`} />
                             <input name="tabbySortOrder" type="number" min="0" step="1" defaultValue={tabby?.sortOrder ?? 3} className={inputCls} />
                           </div>
                           <div className="grid gap-3 border border-[var(--border)] p-3">

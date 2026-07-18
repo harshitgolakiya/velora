@@ -135,12 +135,12 @@ export function EmailTemplateManager({
   }
 
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="flex h-14 items-center gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-5">
         <button type="button" onClick={() => router.push("/admin#automation")} aria-label="Back to admin" className="grid size-9 place-items-center">
           <ArrowLeft className="size-4" />
         </button>
-        <span className="text-xs font-semibold uppercase tracking-[0.16em]">Email template editor</span>
+        <h1 className="text-xs font-semibold uppercase tracking-[0.16em]">Email template editor</h1>
         <button type="button" onClick={() => router.refresh()} className="ml-auto text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Refresh</button>
       </header>
 
@@ -148,7 +148,7 @@ export function EmailTemplateManager({
         <aside className="space-y-4">
           <section className="border border-[var(--border)] bg-[var(--surface)]">
             <div className="border-b border-[var(--border)] px-4 py-3">
-              <h1 className="text-sm font-semibold uppercase tracking-[0.12em]">Templates</h1>
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em]">Templates</h2>
             </div>
             <div className="divide-y divide-[var(--border)]">
               {rows.map((row) => (
@@ -172,10 +172,10 @@ export function EmailTemplateManager({
 
           <form onSubmit={createLocale} className="space-y-3 border border-[var(--border)] bg-[var(--surface)] p-4">
             <h2 className="text-sm font-semibold uppercase tracking-[0.12em]">Add locale</h2>
-            <select name="type" className="h-11 w-full border border-[var(--border)] bg-[var(--background)] px-3 text-sm">
+            <select name="type" aria-label="Email template type" className="h-11 w-full border border-[var(--border)] bg-[var(--background)] px-3 text-sm">
               {workflowEmailTypes.map((type) => <option key={type} value={type}>{type}</option>)}
             </select>
-            <input name="locale" required minLength={2} maxLength={12} placeholder="ar-AE" className="h-11 w-full border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
+            <input name="locale" aria-label="Locale code" required minLength={2} maxLength={12} placeholder="ar-AE" className="h-11 w-full border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
             <button disabled={busy === "create"} className="h-11 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50">
               Create localized draft
             </button>
@@ -231,7 +231,7 @@ export function EmailTemplateManager({
               <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em]"><Send className="size-4" />Test send</h3>
                 <div className="mt-4 flex gap-2">
-                  <input value={testRecipient} onChange={(event) => setTestRecipient(event.target.value)} className="h-11 min-w-0 flex-1 border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
+                  <input aria-label="Test recipient email" value={testRecipient} onChange={(event) => setTestRecipient(event.target.value)} className="h-11 min-w-0 flex-1 border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
                   <button type="button" onClick={sendTest} disabled={busy === "test"} className="h-11 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#111315] disabled:opacity-50">Send</button>
                 </div>
               </section>
@@ -272,6 +272,6 @@ export function EmailTemplateManager({
           <section className="border border-[var(--border)] bg-[var(--surface)] p-12 text-center text-sm text-[var(--muted)]">No templates found.</section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

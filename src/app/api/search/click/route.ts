@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { requireSameOriginRequest } from "@/lib/request-security";
 import { recordSearchClickEvent } from "@/lib/search-analytics";
 
 const clickSchema = z.object({
@@ -12,6 +13,9 @@ const clickSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const parsed = clickSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid search click payload" }, { status: 400 });

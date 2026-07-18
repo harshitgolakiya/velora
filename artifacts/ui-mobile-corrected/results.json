@@ -1,0 +1,78 @@
+[
+  {
+    "name": "m390-home",
+    "path": "/",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m390-shop",
+    "path": "/shop",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m390-filter",
+    "overflowX": 0,
+    "dialogs": [
+      "Filter and sort productsRefine the product grid by sort order, category, size, color, collection, style, gender, and mat"
+    ]
+  },
+  {
+    "name": "m390-pdp-aura",
+    "path": "/product/aura-compressive-legging",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m390-menu",
+    "overflowX": 0,
+    "dialogs": [
+      "VeloraNewShopBest SellersFit GuideThe StorySearchAccountWishlistCartThemeLangEnglishCategoriesLeggingsSports BrasJacketsTopsPantsAccessories"
+    ]
+  },
+  {
+    "name": "m360-home",
+    "path": "/",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m360-shop",
+    "path": "/shop",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m360-filter",
+    "overflowX": 0,
+    "dialogs": [
+      "Filter and sort productsRefine the product grid by sort order, category, size, color, collection, style, gender, and mat"
+    ]
+  },
+  {
+    "name": "m360-pdp-aura",
+    "path": "/product/aura-compressive-legging",
+    "overflowX": 0,
+    "consentBanner": false,
+    "dialogs": [],
+    "fixedBars": []
+  },
+  {
+    "name": "m360-menu",
+    "overflowX": 0,
+    "dialogs": [
+      "VeloraNewShopBest SellersFit GuideThe StorySearchAccountWishlistCartThemeLangEnglishCategoriesLeggingsSports BrasJacketsTopsPantsAccessories"
+    ]
+  }
+]

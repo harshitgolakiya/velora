@@ -5,7 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Heart, LoaderCircle, Minus, Plus, Ruler, X } from "lucide-react";
 import type { Product } from "@/lib/catalog";
-import { localeFromPathname, productCopy } from "@/lib/i18n";
+import { formatCartReservationError } from "@/lib/cart-ui";
+import { cartCopy, localeFromPathname, productCopy } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { formatAed } from "@/lib/utils";
 import { getVariantAvailability } from "@/lib/variant-availability";
@@ -39,6 +40,7 @@ export function ProductActions({
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
   const copy = productCopy[locale];
+  const cartLabels = cartCopy[locale];
   const [internalSize, setInternalSize] = useState(product.sizes[0]);
   const [internalColor, setInternalColor] = useState(product.colors[0]);
   const [qty, setQty] = useState(1);
@@ -47,12 +49,15 @@ export function ProductActions({
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertLoading, setAlertLoading] = useState(false);
   const [alertState, setAlertState] = useState<"idle" | "success" | "existing" | "error">("idle");
-  const [desktopBar, setDesktopBar] = useState(false);
+  const [stickyBar, setStickyBar] = useState(false);
   const controlsRef = useRef<HTMLDivElement>(null);
   const color = selectedColor ?? internalColor;
   const size = selectedSize ?? internalSize;
   const addToCart = useStore((state) => state.addToCart);
   const reservationError = useStore((state) => state.cartReservationError);
+  const reservationErrorLabel = reservationError
+    ? formatCartReservationError(reservationError, cartLabels)
+    : null;
   const wishlist = useStore((state) => state.wishlist);
   const toggleWishlist = useStore((state) => state.toggleWishlist);
   const inWishlist = wishlist.includes(product.slug);
@@ -85,14 +90,25 @@ export function ProductActions({
   const mobileBarPrice = formatAed(unitPrice * effectiveQty);
 
   useEffect(() => {
-    const controls = controlsRef.current;
-    if (!controls) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setDesktopBar(!entry.isIntersecting),
-      { threshold: 0, rootMargin: "-100px 0px 0px" },
-    );
-    observer.observe(controls);
-    return () => observer.disconnect();
+    const updateStickyBar = () => {
+      const controls = controlsRef.current;
+      if (!controls) return;
+      const rect = controls.getBoundingClientRect();
+      const lowerContent = document.querySelector("[data-pdp-lower-content]");
+      const lowerContentTop = lowerContent?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+      const footer = document.querySelector("footer");
+      const footerTop = footer?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+      const lowerPageIsVisible = Math.min(lowerContentTop, footerTop) < window.innerHeight - 80;
+      setStickyBar(rect.bottom < 120 && !lowerPageIsVisible);
+    };
+
+    updateStickyBar();
+    window.addEventListener("scroll", updateStickyBar, { passive: true });
+    window.addEventListener("resize", updateStickyBar);
+    return () => {
+      window.removeEventListener("scroll", updateStickyBar);
+      window.removeEventListener("resize", updateStickyBar);
+    };
   }, []);
 
   function addSelectedVariant() {
@@ -223,7 +239,7 @@ export function ProductActions({
                 aria-pressed={selected}
                 title={name}
                 style={{ backgroundColor: hex }}
-                className={`size-7 border-2 transition motion-reduce:transition-none ${
+                className={`storefront-action size-8 border-2 transition motion-reduce:transition-none ${
                   selected
                     ? "border-[var(--foreground)] ring-2 ring-[var(--foreground)] ring-offset-2 ring-offset-[var(--background)]"
                     : "border-[var(--surface)] shadow-sm hover:scale-105"
@@ -248,8 +264,8 @@ export function ProductActions({
               </button>
             </Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/55 backdrop-blur-sm" />
-              <Dialog.Content className="fixed inset-y-0 end-0 z-50 w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 text-[var(--foreground)] shadow-2xl">
+              <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/55 backdrop-blur-sm" />
+              <Dialog.Content className="storefront-drawer-right fixed inset-y-0 end-0 z-[110] w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 text-[var(--foreground)] shadow-2xl">
                 <div className="flex items-start justify-between gap-5">
                   <div>
                     <Dialog.Title className="text-2xl font-semibold">
@@ -261,7 +277,7 @@ export function ProductActions({
                   </div>
                   <Dialog.Close
                     aria-label={copy.closeSizeGuide}
-                    className="grid size-10 place-items-center"
+                    className="storefront-action grid size-10 place-items-center hover:bg-[var(--hover)]"
                   >
                     <X className="size-5" />
                   </Dialog.Close>
@@ -313,7 +329,7 @@ export function ProductActions({
                 disabled={disabled}
                 aria-label={`${name}${disabled ? ` ${copy.unavailable}` : ""}`}
                 aria-pressed={effectiveSize === name}
-                className={`relative h-10 min-w-11 border px-3 text-sm font-medium transition-colors ${
+                className={`storefront-action relative h-10 min-w-11 border px-3 text-sm font-medium transition-colors ${
                   effectiveSize === name
                     ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
                     : "border-[var(--border)] hover:border-[var(--foreground)]"
@@ -348,7 +364,7 @@ export function ProductActions({
                       setQty(1);
                       onSizeChange?.(name);
                     }}
-                    className="border border-[var(--foreground)] px-3 py-1.5 text-xs font-semibold transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
+                    className="storefront-action border border-[var(--foreground)] px-3 py-1.5 text-xs font-semibold transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
                   >
                     {name}
                   </button>
@@ -366,7 +382,7 @@ export function ProductActions({
                     key={name}
                     aria-label={`Select ${name} in size ${size}`}
                     onClick={() => selectColor(name, size)}
-                    className="border border-[var(--border)] px-3 py-1.5 text-xs font-semibold transition hover:border-[var(--foreground)] motion-reduce:transition-none"
+                    className="storefront-action border border-[var(--border)] px-3 py-1.5 text-xs font-semibold transition hover:border-[var(--foreground)] motion-reduce:transition-none"
                   >
                     {name}
                   </button>
@@ -385,7 +401,7 @@ export function ProductActions({
               type="button"
               onClick={() => setQty(Math.max(1, effectiveQty - 1))}
               aria-label={copy.decreaseQuantity}
-              className="grid size-11 place-items-center"
+              className="storefront-action grid size-11 place-items-center hover:bg-[var(--hover)]"
             >
               <Minus className="size-4" />
             </button>
@@ -395,7 +411,7 @@ export function ProductActions({
               onClick={() => setQty(effectiveQty + 1)}
               disabled={Number.isFinite(maxSelectableQty) && effectiveQty >= maxSelectableQty}
               aria-label={copy.increaseQuantity}
-              className="grid size-11 place-items-center disabled:opacity-35"
+              className="storefront-action grid size-11 place-items-center hover:bg-[var(--hover)] disabled:opacity-35"
             >
               <Plus className="size-4" />
             </button>
@@ -406,7 +422,7 @@ export function ProductActions({
             onClick={addSelectedVariant}
             disabled={outOfStock || status === "adding"}
             aria-live="polite"
-            className="h-11 flex-1 bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+            className="storefront-action h-11 flex-1 bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
           >
             {status === "adding" ? (
               <span className="inline-flex items-center gap-2">
@@ -426,7 +442,7 @@ export function ProductActions({
             onClick={() => toggleWishlist(product.slug, selectedVariant ? { variantId: selectedVariant.id, color, size: effectiveSize } : { color, size: effectiveSize })}
             aria-label={inWishlist ? copy.removeFromWishlist : copy.addToWishlist}
             aria-pressed={inWishlist}
-            className={`grid size-11 shrink-0 place-items-center border ${
+            className={`storefront-action grid size-11 shrink-0 place-items-center border ${
               inWishlist
                 ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
                 : "border-[var(--border)]"
@@ -454,7 +470,12 @@ export function ProductActions({
           <p className="mt-2 text-xs text-red-600" role="alert">{copy.addToCartError}</p>
         ) : null}
         {reservationError ? (
-          <p className="mt-2 text-xs text-red-600" role="alert">{reservationError}</p>
+          <p
+            className={`mt-2 text-xs ${reservationErrorLabel?.tone === "warning" ? "text-amber-700" : "text-red-600"}`}
+            role="alert"
+          >
+            {reservationErrorLabel?.title}
+          </p>
         ) : null}
 
         <div className="mt-4 grid gap-2 border border-[var(--border)] bg-[var(--surface)] p-3">
@@ -469,13 +490,14 @@ export function ProductActions({
               value={alertEmail}
               onChange={(event) => setAlertEmail(event.target.value)}
               placeholder={copy.emailAddress}
+              suppressHydrationWarning
               className="h-10 border border-[var(--border)] bg-[var(--background)] px-3 text-sm outline-none focus:border-[var(--accent)]"
             />
             <button
               type="button"
               onClick={() => void submitAlert(outOfStock ? "BACK_IN_STOCK" : "PRICE_DROP")}
               disabled={alertLoading || (outOfStock && !selectedVariant?.id)}
-              className="h-10 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] disabled:opacity-45"
+              className="storefront-action h-10 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-45"
             >
               {alertLoading ? copy.saving : outOfStock ? copy.notifyMe : copy.trackPrice}
             </button>
@@ -487,7 +509,7 @@ export function ProductActions({
           type="button"
           onClick={buyNow}
           disabled={outOfStock}
-          className="mt-3 h-11 w-full border border-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40"
+          className="storefront-action mt-3 h-11 w-full border border-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40"
         >
           {copy.buyNow}
         </button>
@@ -504,39 +526,41 @@ export function ProductActions({
         </div>
       </div>
 
-      <div
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[var(--surface)]/96 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 shadow-[0_-10px_30px_rgba(0,0,0,0.14)] backdrop-blur sm:hidden"
-        aria-label="Mobile purchase summary"
-      >
-        <div className="mb-2 flex items-center justify-between gap-4">
+      {stickyBar ? (
+        <div
+          className="storefront-bottom-bar fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[var(--surface)]/96 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 shadow-[0_-10px_30px_rgba(0,0,0,0.14)] backdrop-blur sm:hidden"
+          aria-label="Mobile purchase summary"
+        >
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => controlsRef.current?.scrollIntoView({ block: "start", behavior: "smooth" })}
+              className="storefront-action min-w-0 text-left"
+            >
+              <span className="block truncate text-sm font-semibold">{product.name}</span>
+              <span className="block truncate text-xs text-[var(--muted)]">
+                {color} / {effectiveSize} {effectiveQty > 1 ? `/ Qty ${effectiveQty}` : ""}
+              </span>
+            </button>
+            <span className="shrink-0 text-sm font-semibold">{mobileBarPrice}</span>
+          </div>
           <button
             type="button"
-            onClick={() => controlsRef.current?.scrollIntoView({ block: "start", behavior: "smooth" })}
-            className="min-w-0 text-left"
+            onClick={addSelectedVariant}
+            disabled={outOfStock || status === "adding"}
+            className="storefront-action h-12 w-full bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:opacity-40 motion-reduce:transition-none"
           >
-            <span className="block truncate text-sm font-semibold">{product.name}</span>
-            <span className="block truncate text-xs text-[var(--muted)]">
-              {color} / {effectiveSize} {effectiveQty > 1 ? `/ Qty ${effectiveQty}` : ""}
-            </span>
+            {status === "added"
+              ? copy.addedToBag
+              : outOfStock
+                ? copy.outOfStock
+                : copy.addToBag}
           </button>
-          <span className="shrink-0 text-sm font-semibold">{mobileBarPrice}</span>
         </div>
-        <button
-          type="button"
-          onClick={addSelectedVariant}
-          disabled={outOfStock || status === "adding"}
-          className="h-12 w-full bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:opacity-40 motion-reduce:transition-none"
-        >
-          {status === "added"
-            ? copy.addedToBag
-            : outOfStock
-              ? copy.outOfStock
-              : copy.addToBag}
-        </button>
-      </div>
+      ) : null}
 
-      {desktopBar ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 hidden border-t border-[var(--border)] bg-[var(--surface)]/96 px-6 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur sm:block">
+      {stickyBar ? (
+        <div className="storefront-bottom-bar fixed inset-x-0 bottom-0 z-30 hidden border-t border-[var(--border)] bg-[var(--surface)]/96 px-6 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur sm:block">
           <div className="mx-auto flex max-w-[1440px] items-center gap-5">
             <div className="min-w-0">
               <p className="truncate font-medium">{product.name}</p>
@@ -547,7 +571,7 @@ export function ProductActions({
               type="button"
               onClick={addSelectedVariant}
               disabled={outOfStock || status === "adding"}
-              className="h-11 min-w-48 bg-[var(--foreground)] px-6 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:opacity-40 motion-reduce:transition-none"
+              className="storefront-action h-11 min-w-48 bg-[var(--foreground)] px-6 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:opacity-40 motion-reduce:transition-none"
             >
               {addLabel}
             </button>

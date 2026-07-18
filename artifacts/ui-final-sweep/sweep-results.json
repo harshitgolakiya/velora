@@ -1,0 +1,1184 @@
+[
+  {
+    "name": "desktop-home",
+    "route": "/",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [
+      {
+        "text": "Privacy choicesEssential storage stays on. Choose whether to allow optional analytics and marketing.We use essential sto",
+        "x": 0,
+        "y": 855,
+        "w": 1440,
+        "h": 105,
+        "z": "90"
+      }
+    ],
+    "badText": [
+      {
+        "tag": "DIV",
+        "text": "ccéa Bottle PurpleTumblersAED 95",
+        "box": {
+          "x": 1408,
+          "y": 2480.453125,
+          "w": 324,
+          "h": 532
+        }
+      },
+      {
+        "tag": "ARTICLE",
+        "text": "ccéa Bottle PurpleTumblersAED 95",
+        "box": {
+          "x": 1408,
+          "y": 2480.453125,
+          "w": 324,
+          "h": 532
+        }
+      },
+      {
+        "tag": "A",
+        "text": "ccéa Bottle PurpleTumblersAED 95",
+        "box": {
+          "x": 1408,
+          "y": 2480.453125,
+          "w": 324,
+          "h": 532
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "ccéa Bottle PurpleTumblersAED 95",
+        "box": {
+          "x": 1408,
+          "y": 2964.453125,
+          "w": 324,
+          "h": 48
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "ccéa Bottle PurpleTumblers",
+        "box": {
+          "x": 1408,
+          "y": 2964.453125,
+          "w": 144.40625,
+          "h": 48
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "ccéa Bottle Purple",
+        "box": {
+          "x": 1408,
+          "y": 2964.453125,
+          "w": 144.40625,
+          "h": 24
+        }
+      },
+      {
+        "tag": "P",
+        "text": "Tumblers",
+        "box": {
+          "x": 1408,
+          "y": 2992.453125,
+          "w": 144.40625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "AED 95",
+        "box": {
+          "x": 1684.125,
+          "y": 2964.453125,
+          "w": 47.875,
+          "h": 20
+        }
+      },
+      {
+        "tag": "P",
+        "text": "AED 95",
+        "box": {
+          "x": 1684.125,
+          "y": 2964.453125,
+          "w": 47.875,
+          "h": 20
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "ccéa Bottle GreenTumblersAED 95",
+        "box": {
+          "x": 1748,
+          "y": 2480.453125,
+          "w": 324,
+          "h": 532
+        }
+      }
+    ]
+  },
+  {
+    "name": "desktop-shop",
+    "route": "/shop",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/shop",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-product-aura-compressive-legging",
+    "route": "/product/aura-compressive-legging",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/product/aura-compressive-legging",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-product-cc-a-bottle-blue-8856",
+    "route": "/product/cc-a-bottle-blue-8856",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/product/cc-a-bottle-blue-8856",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-cart",
+    "route": "/cart",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/cart",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-checkout",
+    "route": "/checkout",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/checkout",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-search",
+    "route": "/search",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/search",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-story",
+    "route": "/story",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/story",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-contact",
+    "route": "/contact",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/contact",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-size-guide",
+    "route": "/size-guide",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/size-guide",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-shipping",
+    "route": "/shipping",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/shipping",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "desktop-returns",
+    "route": "/returns",
+    "viewport": "desktop",
+    "ok": true,
+    "url": "/returns",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-home",
+    "route": "/",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [
+      {
+        "text": "Privacy choicesEssential storage stays on. Choose whether to allow optional analytics and marketing.We use essential sto",
+        "x": 0,
+        "y": 641,
+        "w": 390,
+        "h": 203,
+        "z": "90"
+      }
+    ],
+    "badText": [
+      {
+        "tag": "A",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 304.390625,
+          "y": 957,
+          "w": 296.390625,
+          "h": 439.640625
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 304.390625,
+          "y": 1257.640625,
+          "w": 296.390625,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "02",
+        "box": {
+          "x": 320.390625,
+          "y": 1337.640625,
+          "w": 264.390625,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Sports Bras",
+        "box": {
+          "x": 320.390625,
+          "y": 1360.640625,
+          "w": 264.390625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Sports Bras",
+        "box": {
+          "x": 320.390625,
+          "y": 1360.640625,
+          "w": 115.40625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "A",
+        "text": "03Jackets",
+        "box": {
+          "x": 608.78125,
+          "y": 957,
+          "w": 296.390625,
+          "h": 439.640625
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "03Jackets",
+        "box": {
+          "x": 608.78125,
+          "y": 1257.640625,
+          "w": 296.390625,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "03",
+        "box": {
+          "x": 624.78125,
+          "y": 1337.640625,
+          "w": 264.390625,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Jackets",
+        "box": {
+          "x": 624.78125,
+          "y": 1360.640625,
+          "w": 264.390625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Jackets",
+        "box": {
+          "x": 624.78125,
+          "y": 1360.640625,
+          "w": 79.6875,
+          "h": 20
+        }
+      }
+    ]
+  },
+  {
+    "name": "mobile390-shop",
+    "route": "/shop",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/shop",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-product-aura-compressive-legging",
+    "route": "/product/aura-compressive-legging",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/product/aura-compressive-legging",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-product-cc-a-bottle-blue-8856",
+    "route": "/product/cc-a-bottle-blue-8856",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/product/cc-a-bottle-blue-8856",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-cart",
+    "route": "/cart",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/cart",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-checkout",
+    "route": "/checkout",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/checkout",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-search",
+    "route": "/search",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/search",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-story",
+    "route": "/story",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/story",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-contact",
+    "route": "/contact",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/contact",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-size-guide",
+    "route": "/size-guide",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/size-guide",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": [
+      {
+        "tag": "TABLE",
+        "text": "MaterialSupportFeelBest forXSBust 78–82 cmWaist 60–64 cmHip 86–90 cmSBust 83–87 ",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 301
+        }
+      },
+      {
+        "tag": "THEAD",
+        "text": "MaterialSupportFeelBest for",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "MaterialSupportFeelBest for",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TH",
+        "text": "Feel",
+        "box": {
+          "x": 308.59375,
+          "y": 728,
+          "w": 204.40625,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TH",
+        "text": "Best for",
+        "box": {
+          "x": 513,
+          "y": 728,
+          "w": 183,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TBODY",
+        "text": "XSBust 78–82 cmWaist 60–64 cmHip 86–90 cmSBust 83–87 cmWaist 65–69 cmHip 91–95 c",
+        "box": {
+          "x": 16,
+          "y": 768.5,
+          "w": 680,
+          "h": 260
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "XSBust 78–82 cmWaist 60–64 cmHip 86–90 cm",
+        "box": {
+          "x": 16,
+          "y": 768.5,
+          "w": 680,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TD",
+        "text": "Waist 60–64 cm",
+        "box": {
+          "x": 308.59375,
+          "y": 768.5,
+          "w": 204.40625,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TD",
+        "text": "Hip 86–90 cm",
+        "box": {
+          "x": 513,
+          "y": 768.5,
+          "w": 183,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "SBust 83–87 cmWaist 65–69 cmHip 91–95 cm",
+        "box": {
+          "x": 16,
+          "y": 833.5,
+          "w": 680,
+          "h": 65
+        }
+      }
+    ]
+  },
+  {
+    "name": "mobile390-shipping",
+    "route": "/shipping",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/shipping",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile390-returns",
+    "route": "/returns",
+    "viewport": "mobile390",
+    "ok": true,
+    "url": "/returns",
+    "vw": 390,
+    "vh": 844,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-home",
+    "route": "/",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [
+      {
+        "text": "Privacy choicesEssential storage stays on. Choose whether to allow optional analytics and marketing.We use essential sto",
+        "x": 0,
+        "y": 577,
+        "w": 360,
+        "h": 203,
+        "z": "90"
+      }
+    ],
+    "badText": [
+      {
+        "tag": "A",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 281.59375,
+          "y": 893,
+          "w": 273.59375,
+          "h": 405.828125
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 281.59375,
+          "y": 1159.828125,
+          "w": 273.59375,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "02",
+        "box": {
+          "x": 297.59375,
+          "y": 1239.828125,
+          "w": 241.59375,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Sports Bras",
+        "box": {
+          "x": 297.59375,
+          "y": 1262.828125,
+          "w": 241.59375,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Sports Bras",
+        "box": {
+          "x": 297.59375,
+          "y": 1262.828125,
+          "w": 115.40625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "A",
+        "text": "03Jackets",
+        "box": {
+          "x": 563.1875,
+          "y": 893,
+          "w": 273.59375,
+          "h": 405.828125
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "03Jackets",
+        "box": {
+          "x": 563.1875,
+          "y": 1159.828125,
+          "w": 273.59375,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "03",
+        "box": {
+          "x": 579.1875,
+          "y": 1239.828125,
+          "w": 241.59375,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Jackets",
+        "box": {
+          "x": 579.1875,
+          "y": 1262.828125,
+          "w": 241.59375,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Jackets",
+        "box": {
+          "x": 579.1875,
+          "y": 1262.828125,
+          "w": 79.6875,
+          "h": 20
+        }
+      }
+    ]
+  },
+  {
+    "name": "mobile360-shop",
+    "route": "/shop",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/shop",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-product-aura-compressive-legging",
+    "route": "/product/aura-compressive-legging",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/product/aura-compressive-legging",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": [
+      {
+        "tag": "LI",
+        "text": "Aura Compressive Legging",
+        "box": {
+          "x": 190.1875,
+          "y": 104,
+          "w": 179.34375,
+          "h": 16
+        }
+      },
+      {
+        "tag": "SPAN",
+        "text": "Aura Compressive Legging",
+        "box": {
+          "x": 208.1875,
+          "y": 104,
+          "w": 161.34375,
+          "h": 16
+        }
+      }
+    ]
+  },
+  {
+    "name": "mobile360-product-cc-a-bottle-blue-8856",
+    "route": "/product/cc-a-bottle-blue-8856",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/product/cc-a-bottle-blue-8856",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-cart",
+    "route": "/cart",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/cart",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-checkout",
+    "route": "/checkout",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/checkout",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-search",
+    "route": "/search",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/search",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-story",
+    "route": "/story",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/story",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-contact",
+    "route": "/contact",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/contact",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-size-guide",
+    "route": "/size-guide",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/size-guide",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": [
+      {
+        "tag": "TABLE",
+        "text": "MaterialSupportFeelBest forXSBust 78–82 cmWaist 60–64 cmHip 86–90 cmSBust 83–87 ",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 301
+        }
+      },
+      {
+        "tag": "THEAD",
+        "text": "MaterialSupportFeelBest for",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "MaterialSupportFeelBest for",
+        "box": {
+          "x": 16,
+          "y": 728,
+          "w": 680,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TH",
+        "text": "Feel",
+        "box": {
+          "x": 308.59375,
+          "y": 728,
+          "w": 204.40625,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TH",
+        "text": "Best for",
+        "box": {
+          "x": 513,
+          "y": 728,
+          "w": 183,
+          "h": 40.5
+        }
+      },
+      {
+        "tag": "TBODY",
+        "text": "XSBust 78–82 cmWaist 60–64 cmHip 86–90 cmSBust 83–87 cmWaist 65–69 cmHip 91–95 c",
+        "box": {
+          "x": 16,
+          "y": 768.5,
+          "w": 680,
+          "h": 260
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "XSBust 78–82 cmWaist 60–64 cmHip 86–90 cm",
+        "box": {
+          "x": 16,
+          "y": 768.5,
+          "w": 680,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TD",
+        "text": "Waist 60–64 cm",
+        "box": {
+          "x": 308.59375,
+          "y": 768.5,
+          "w": 204.40625,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TD",
+        "text": "Hip 86–90 cm",
+        "box": {
+          "x": 513,
+          "y": 768.5,
+          "w": 183,
+          "h": 65
+        }
+      },
+      {
+        "tag": "TR",
+        "text": "SBust 83–87 cmWaist 65–69 cmHip 91–95 cm",
+        "box": {
+          "x": 16,
+          "y": 833.5,
+          "w": 680,
+          "h": 65
+        }
+      }
+    ]
+  },
+  {
+    "name": "mobile360-shipping",
+    "route": "/shipping",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/shipping",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "mobile360-returns",
+    "route": "/returns",
+    "viewport": "mobile360",
+    "ok": true,
+    "url": "/returns",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "interaction-desktop-search",
+    "url": "/shop",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [
+      {
+        "text": "Search products and collectionsSearch products, categories, collections, colors, tags, and product codes.Popular now",
+        "box": {
+          "x": 336,
+          "y": 64,
+          "w": 768,
+          "h": 357
+        }
+      }
+    ],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "interaction-desktop-quick-view",
+    "url": "/shop",
+    "vw": 1440,
+    "vh": 960,
+    "overflowX": 0,
+    "dialogs": [
+      {
+        "text": "Aura Compressive LeggingQuick view of Aura Compressive LeggingAED 340A sculpting high-rise legging with a clean matte ha",
+        "box": {
+          "x": 336,
+          "y": 184.8359375,
+          "w": 768,
+          "h": 590.328125
+        }
+      }
+    ],
+    "fixedBars": [],
+    "badText": []
+  },
+  {
+    "name": "interaction-mobile-menu-360",
+    "url": "/",
+    "vw": 360,
+    "vh": 780,
+    "overflowX": 0,
+    "dialogs": [
+      {
+        "text": "VeloraNewShopBest SellersFit GuideThe StorySearchAccountWishlistCartThemeLangEnglishCategoriesLeggingsSports BrasJackets",
+        "box": {
+          "x": 0,
+          "y": 0,
+          "w": 360,
+          "h": 780
+        }
+      }
+    ],
+    "fixedBars": [],
+    "badText": [
+      {
+        "tag": "A",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 281.59375,
+          "y": 893,
+          "w": 273.59375,
+          "h": 405.828125
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "02Sports Bras",
+        "box": {
+          "x": 281.59375,
+          "y": 1159.828125,
+          "w": 273.59375,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "02",
+        "box": {
+          "x": 297.59375,
+          "y": 1239.828125,
+          "w": 241.59375,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Sports Bras",
+        "box": {
+          "x": 297.59375,
+          "y": 1262.828125,
+          "w": 241.59375,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Sports Bras",
+        "box": {
+          "x": 297.59375,
+          "y": 1262.828125,
+          "w": 115.40625,
+          "h": 20
+        }
+      },
+      {
+        "tag": "A",
+        "text": "03Jackets",
+        "box": {
+          "x": 563.1875,
+          "y": 893,
+          "w": 273.59375,
+          "h": 405.828125
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "03Jackets",
+        "box": {
+          "x": 563.1875,
+          "y": 1159.828125,
+          "w": 273.59375,
+          "h": 139
+        }
+      },
+      {
+        "tag": "P",
+        "text": "03",
+        "box": {
+          "x": 579.1875,
+          "y": 1239.828125,
+          "w": 241.59375,
+          "h": 15
+        }
+      },
+      {
+        "tag": "DIV",
+        "text": "Jackets",
+        "box": {
+          "x": 579.1875,
+          "y": 1262.828125,
+          "w": 241.59375,
+          "h": 20
+        }
+      },
+      {
+        "tag": "H3",
+        "text": "Jackets",
+        "box": {
+          "x": 579.1875,
+          "y": 1262.828125,
+          "w": 79.6875,
+          "h": 20
+        }
+      }
+    ]
+  }
+]

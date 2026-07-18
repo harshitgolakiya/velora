@@ -8,7 +8,7 @@ import { useState } from "react";
 import { LanguageSwitcher } from "@/components/store/language-switcher";
 import { ThemeToggle } from "@/components/store/theme-toggle";
 import { enabledSorted, localText, type GlobalContent } from "@/lib/global-content";
-import { localeFromPathname, localizedPath, shellCopy } from "@/lib/i18n";
+import { localeFromPathname, localizedPath, shellCopy } from "@/lib/i18n-shell";
 
 export function Footer({ globalContent }: { globalContent: GlobalContent }) {
   const pathname = usePathname();
@@ -45,7 +45,7 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
   };
 
   return (
-    <footer className="bg-stone-950 text-white">
+    <footer className="bg-[#111315] text-white">
       {globalContent.newsletter.enabled ? (
       <div id="newsletter" className="mx-auto max-w-[1440px] border-b border-white/15 px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
         <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-end">
@@ -56,7 +56,7 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
           {status === "success" ? (
             <p className="border-b border-white/45 pb-3 text-base text-white">{feedback}</p>
           ) : (
-            <form className="border-b border-white/45 pb-3" onSubmit={handleSubmit}>
+            <form className="border-b border-white/65 pb-3" onSubmit={handleSubmit}>
               <label htmlFor="footer-email" className="sr-only">{localText(globalContent.newsletter.placeholder, locale)}</label>
               <div className="flex items-center gap-4">
                 <input
@@ -66,7 +66,8 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder={localText(globalContent.newsletter.placeholder, locale)}
-                  className="h-12 min-w-0 flex-1 border-0 bg-transparent text-base text-white outline-none placeholder:text-white/45"
+                  suppressHydrationWarning
+                  className="h-12 min-w-0 flex-1 border-0 bg-transparent text-base text-white outline-none placeholder:text-white/60"
                 />
                 <button
                   type="submit"
@@ -125,7 +126,7 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
           <p>{localText(globalContent.footer.location, locale)}</p>
           <div className="flex items-center gap-5 md:hidden">
             <LanguageSwitcher />
-            <ThemeToggle className="text-white" />
+            <ThemeToggle className="!size-9 text-white" />
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href={localize("/privacy")} className="hover:text-white">{copy.privacy}</Link>

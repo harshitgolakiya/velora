@@ -7,6 +7,7 @@ export function CartReservationSync() {
   const cart = useStore((state) => state.cart);
   const sessionKey = useStore((state) => state.cartSessionKey);
   const setSessionKey = useStore((state) => state.setCartSessionKey);
+  const startNewCartSession = useStore((state) => state.startNewCartSession);
   const setReservationError = useStore(
     (state) => state.setCartReservationError,
   );
@@ -84,17 +85,22 @@ export function CartReservationSync() {
           useStore.getState().setCartExpiresAt(result.cart.expiresAt);
         }
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unable to reserve cart inventory";
+        if (errorMessage === "CART_ALREADY_COMPLETED") {
+          startNewCartSession(crypto.randomUUID());
+          return;
+        }
         setCartSyncStatus("error");
         setReservationError(
           typeof navigator !== "undefined" && navigator.onLine === false
             ? "NETWORK_UNAVAILABLE"
-            : error instanceof Error ? error.message : "Unable to reserve cart inventory",
+            : errorMessage,
         );
       }
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [cart, retryCount, sessionKey, setCartSyncStatus, setReservationError]);
+  }, [cart, retryCount, sessionKey, setCartSyncStatus, setReservationError, startNewCartSession]);
 
   return null;
 }

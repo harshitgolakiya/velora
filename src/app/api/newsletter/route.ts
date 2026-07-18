@@ -5,6 +5,7 @@ import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { syncMarketingSubscriber } from "@/lib/marketing-sync";
 import { createNewsletterToken, defaultNewsletterPreferences } from "@/lib/newsletter-consent";
 import { prisma } from "@/lib/prisma";
+import { requireSameOriginRequest } from "@/lib/request-security";
 
 const schema = z.object({
   email: z.email(),
@@ -14,6 +15,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const form = await request.formData();
   const parsed = schema.safeParse({
     email: form.get("email"),

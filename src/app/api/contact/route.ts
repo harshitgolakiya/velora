@@ -6,6 +6,7 @@ import { checkAuthRateLimit } from "@/lib/auth-rate-limit";
 import { deliverEmail } from "@/lib/email-delivery";
 import { prisma } from "@/lib/prisma";
 import { contactRequestSchema, isContactSubmissionTooFast } from "@/lib/contact-support";
+import { requireSameOriginRequest } from "@/lib/request-security";
 import { escapeEmailHtml, localeFromRequest, normalizeEmailLocale, transactionalEmailShell } from "@/lib/transactional-email";
 
 async function createCaseNumber() {
@@ -17,6 +18,9 @@ async function createCaseNumber() {
 }
 
 export async function POST(request: Request) {
+  const originError = requireSameOriginRequest(request);
+  if (originError) return originError;
+
   const locale = localeFromRequest(request);
   const isArabic = normalizeEmailLocale(locale) === "ar";
   const parsed = contactRequestSchema.safeParse(await request.json().catch(() => null));

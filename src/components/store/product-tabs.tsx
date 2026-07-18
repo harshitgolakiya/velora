@@ -100,7 +100,7 @@ export function ProductTabs({ product }: { product: Product }) {
 
         {active === "Delivery & Returns" ? (
           <ul className="space-y-2">
-            <li>Complimentary UAE delivery on orders over AED 300.</li>
+            <li>Complimentary standard delivery on eligible orders over AED 300.</li>
             <li>Delivery timing and available shipping methods are confirmed at checkout.</li>
             <li>Eligible full-price items may be returned within 14 days in unworn condition with tags attached.</li>
             <li>Final-sale and hygiene-restricted items are not eligible for return.</li>

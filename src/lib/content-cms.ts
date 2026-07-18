@@ -1,6 +1,8 @@
 import "server-only";
 
+import type { Metadata } from "next";
 import { z } from "zod";
+import { localizedAlternates } from "./seo";
 import { prisma } from "./prisma";
 
 const safeText = z.string().trim().max(5000).refine((value) => !/<\/?[a-z][^>]*>/i.test(value), "HTML markup is not allowed");
@@ -81,9 +83,8 @@ export function parseContentBlocks(value: string): ContentBlock[] {
   }
 }
 
-export async function publishDuePageContent() {
-  const now = new Date();
-  await prisma.pageContent.updateMany({
+export async function publishDuePageContent(now = new Date()) {
+  return prisma.pageContent.updateMany({
     where: { status: "SCHEDULED", scheduledAt: { lte: now } },
     data: { status: "PUBLISHED", publishedAt: now, scheduledAt: null },
   });
@@ -94,6 +95,40 @@ export async function getPublishedPageContent(slug: string) {
   return page && isPageContentPublic(page.status, page.scheduledAt)
     ? { ...page, blocks: parseContentBlocks(page.blocks) }
     : null;
+}
+
+export async function getPageContentMetadata({
+  slug,
+  path,
+  title,
+  description,
+}: {
+  slug: string;
+  path: string;
+  title: string;
+  description?: string;
+}): Promise<Metadata> {
+  const page = await getPublishedPageContent(slug);
+  const metadataTitle = page?.seoTitle || page?.title || title;
+  const metadataDescription = page?.seoDescription || page?.summary || description;
+  const images = page?.socialImage ? [page.socialImage] : undefined;
+
+  return {
+    title: metadataTitle,
+    description: metadataDescription,
+    alternates: localizedAlternates(path),
+    openGraph: {
+      title: metadataTitle,
+      description: metadataDescription,
+      images,
+    },
+    twitter: {
+      card: images ? "summary_large_image" : "summary",
+      title: metadataTitle,
+      description: metadataDescription,
+      images,
+    },
+  };
 }
 
 export function isPageContentPublic(status: string, scheduledAt?: Date | null, now = new Date()) {
