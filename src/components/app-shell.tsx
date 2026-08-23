@@ -49,14 +49,14 @@ export function AppShell({
         <LocaleDocument />
         <CartReservationSync />
         <header className="border-b border-[var(--border)] bg-[var(--surface)]">
-          <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="storefront-container flex h-16 items-center justify-between">
             {isSuccess ? (
-              <Link href={localize("/")} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] hover:text-[var(--foreground)]">
+              <Link href={localize("/")} className="storefront-action -ms-2 flex min-h-10 items-center gap-2 px-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] hover:text-[var(--foreground)]">
                 <ArrowLeft className="size-4" />
                 {copy.shop}
               </Link>
             ) : (
-              <Link href={localize("/cart")} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] hover:text-[var(--foreground)]">
+              <Link href={localize("/cart")} className="storefront-action -ms-2 flex min-h-10 items-center gap-2 px-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] hover:text-[var(--foreground)]">
                 <ArrowLeft className="size-4" />
                 {copy.cart}
               </Link>
@@ -72,7 +72,7 @@ export function AppShell({
           </div>
           {/* Step progress bar */}
           <div className="border-t border-[var(--border)] bg-[var(--background)]">
-            <div className="mx-auto flex max-w-[1440px] items-center px-4 sm:px-6 lg:px-8">
+            <div className="storefront-container flex items-center">
               {steps.map((step, i) => (
                 <div key={step.label} className="flex flex-1 items-center">
                   <div className={`flex items-center gap-2 py-2.5 text-xs font-medium transition-colors motion-reduce:transition-none ${

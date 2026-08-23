@@ -33,14 +33,14 @@ export function AnnouncementBar({
   return (
     <div
       className={cn(
-        "fixed inset-x-0 top-0 z-40 hidden h-8 border-b px-4 text-[10px] font-medium uppercase tracking-[0.2em] transition-colors md:block",
+        "fixed inset-x-0 top-0 z-40 hidden h-8 border-b text-[10px] font-medium uppercase tracking-[0.2em] transition-colors md:block",
         !messages.length && "md:hidden",
         isOverlay
           ? "border-white/15 bg-black/15 text-white"
           : "border-[var(--border)] bg-[var(--background)] text-[var(--accent)]",
       )}
     >
-      <div className="mx-auto grid h-full w-full max-w-[1440px] grid-cols-[96px_1fr_96px] items-center">
+      <div className="storefront-container grid h-full grid-cols-[96px_1fr_96px] items-center">
         <span aria-hidden="true" />
         <div className="relative h-full overflow-hidden">
           <span

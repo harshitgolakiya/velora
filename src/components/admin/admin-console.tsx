@@ -997,7 +997,7 @@ function ActionRow({
       <button
         type="submit"
         disabled={submitting}
-        className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:cursor-wait disabled:opacity-70"
+        className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:cursor-wait disabled:opacity-70"
       >
         {submitLabel}
       </button>
@@ -1106,7 +1106,7 @@ function ConfirmModal({
             className={`inline-flex h-10 flex-1 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] transition disabled:cursor-wait disabled:opacity-70 ${
               danger
                 ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-[var(--accent)] text-[#111315]"
+                : "bg-[var(--accent)] text-[#17262D]"
             }`}
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
@@ -1246,7 +1246,7 @@ function CategoryEditorModal({
           <button
             type="submit"
             disabled={submitting}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:cursor-wait disabled:opacity-70"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:cursor-wait disabled:opacity-70"
           >
             {submitting ? "Saving..." : category ? "Save category" : "Create category"}
           </button>
@@ -1677,7 +1677,7 @@ function CollectionEditorModal({
           <button
             type="submit"
             disabled={submitting}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:cursor-wait disabled:opacity-60"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:cursor-wait disabled:opacity-60"
           >
             {submitting ? "Saving..." : collection ? "Save collection" : "Create collection"}
           </button>
@@ -2053,7 +2053,7 @@ function BulkUploadModal({
 
           <button
             onClick={onClose}
-            className="mt-5 h-11 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315]"
+            className="mt-5 h-11 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D]"
           >
             Done
           </button>
@@ -2108,7 +2108,7 @@ function BulkUploadModal({
             <button
               type="submit"
               disabled={!file || uploading}
-              className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-40"
+              className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-40"
             >
               {uploading ? "Importing…" : "Import products"}
             </button>
@@ -2191,7 +2191,7 @@ function SchedulePublishModal({
           <button
             type="submit"
             disabled={submitting || productIds.length === 0}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? "Scheduling..." : "Schedule"}
           </button>
@@ -2493,7 +2493,7 @@ function OrderReviewPanel({
           <button
             onClick={saveOrder}
             disabled={submitting}
-            className="h-11 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-60"
+            className="h-11 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-60"
           >
             {submitting ? "Saving..." : "Save order"}
           </button>
@@ -2712,7 +2712,7 @@ function AddCouponModal({
           <button
             type="submit"
             disabled={submitting}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-60"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-60"
           >
             {submitting ? "Saving..." : coupon ? "Save coupon" : "Create coupon"}
           </button>
@@ -2793,7 +2793,7 @@ function IssueGiftCardModal({
           <button
             type="submit"
             disabled={submitting}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-60"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-60"
           >
             {submitting ? "Issuing..." : "Issue gift card"}
           </button>
@@ -3053,7 +3053,7 @@ function CustomerProfilePanel({
         </div>
         <div className="flex-1 space-y-4 overflow-y-auto p-5">
           <div className="flex items-center gap-4">
-            <div className="grid size-14 shrink-0 place-items-center bg-[var(--accent)] text-base font-bold text-[#111315]">
+            <div className="grid size-14 shrink-0 place-items-center bg-[var(--accent)] text-base font-bold text-[#17262D]">
               {initials}
             </div>
             <div>
@@ -3271,7 +3271,7 @@ function CustomerProfilePanel({
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="h-10 rounded bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-50"
+                    className="h-10 rounded bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-50"
                   >
                     {isSaving ? "Saving…" : "Save customer"}
                   </button>
@@ -3332,7 +3332,7 @@ function CustomerProfilePanel({
                   type="button"
                   disabled={isMerging}
                   onClick={handleMergeGuestOrders}
-                  className="h-10 rounded bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-50"
+                  className="h-10 rounded bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-50"
                 >
                   {isMerging ? "Merging..." : "Merge guest orders"}
                 </button>
@@ -3359,7 +3359,7 @@ function CustomerProfilePanel({
                   return (
                     <div key={order.id} className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className="grid h-9 w-9 place-items-center rounded-full bg-[var(--accent)] text-xs font-semibold text-[#111315]">
+                        <div className="grid h-9 w-9 place-items-center rounded-full bg-[var(--accent)] text-xs font-semibold text-[#17262D]">
                           {customer.orders.length - index}
                         </div>
                         {index < customer.orders.length - 1 ? (
@@ -3434,7 +3434,7 @@ function CustomerProfilePanel({
         <div className="grid gap-3 border-t border-[var(--border)] p-5">
           <a
             href={`mailto:${customer.email}`}
-            className="grid h-11 place-items-center bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315]"
+            className="grid h-11 place-items-center bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D]"
           >
             Email customer
           </a>
@@ -3717,7 +3717,7 @@ function HomepageSectionModal({
             <Panel title="Category media grid">
               <div className="space-y-4">
                 <p className="text-xs leading-5 text-[var(--muted)]">
-                  Used by the homepage category video/image row. Add Cloudflare Stream IDs for hosted video, or choose local media from the library.
+                  Used by the homepage category video/image row. Paste HTTPS .mp4/.webm links, add Cloudflare Stream IDs, or choose media from the library.
                 </p>
                 {categoryMediaItems.map((item, index) => (
                   <div key={item.id} className="border border-[var(--border)] bg-[var(--card)] p-3">
@@ -3761,7 +3761,7 @@ function HomepageSectionModal({
                           className={inputCls}
                         >
                           <option value="IMAGE">Image</option>
-                          <option value="VIDEO">Uploaded video</option>
+                          <option value="VIDEO">Direct video URL</option>
                           <option value="CLOUDFLARE_STREAM">Cloudflare Stream</option>
                         </select>
                       </FieldLabel>
@@ -3802,13 +3802,13 @@ function HomepageSectionModal({
                         </FieldLabel>
                       ) : null}
                       {item.mediaType === "VIDEO" ? (
-                        <FieldLabel label="Video file">
+                        <FieldLabel label="Video URL">
                           <div className="flex gap-2">
                             <input
                               value={item.videoUrl}
                               onChange={(event) => updateCategoryMediaItem(index, { videoUrl: event.target.value })}
                               className={inputCls}
-                              placeholder="/uploads/..."
+                              placeholder="https://pub-...r2.dev/Core-Legging-black.mp4"
                             />
                             <button
                               type="button"
@@ -4007,7 +4007,7 @@ function HomepageSectionModal({
         <div className="mt-5 flex gap-3">
           <button
             disabled={submitting}
-            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:cursor-wait disabled:opacity-70"
+            className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:cursor-wait disabled:opacity-70"
           >
             {submitting ? "Saving..." : isEdit ? "Save section" : "Create draft"}
           </button>
@@ -4149,7 +4149,7 @@ function MediaAssetModal({
           <div className="flex gap-3 pt-2">
             <button
               disabled={submitting}
-              className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-60"
+              className="h-11 flex-1 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-60"
             >
               {submitting ? "Saving..." : "Save media"}
             </button>
@@ -4247,7 +4247,7 @@ function AdminUserModal({
         </FieldLabel>
         <button
           disabled={submitting}
-          className="h-11 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#111315] disabled:opacity-60"
+          className="h-11 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.14em] text-[#17262D] disabled:opacity-60"
         >
           {submitting ? "Saving..." : isEdit ? "Save user" : "Create user"}
         </button>
@@ -4308,7 +4308,7 @@ function GenerateDescModal({ onClose }: { onClose: () => void }) {
           <button
             type="submit"
             disabled={loading}
-            className="h-10 shrink-0 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-50"
+            className="h-10 shrink-0 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-50"
           >
             {loading ? "Writing…" : "Generate"}
           </button>
@@ -4678,7 +4678,7 @@ function ReturnRequestPanel({
               <input value={externalReference} onChange={(event) => setExternalReference(event.target.value)} placeholder="Warehouse or carrier reference" className={inputCls} />
             </label>
             {error ? <p role="alert" className="mt-3 text-xs text-red-500">{error}</p> : null}
-            <button type="submit" disabled={saving || !allowed.length} className="mt-5 h-11 w-full bg-[var(--accent)] text-sm font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-40">
+            <button type="submit" disabled={saving || !allowed.length} className="mt-5 h-11 w-full bg-[var(--accent)] text-sm font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-40">
               {saving ? "Updating..." : allowed.length ? "Apply update" : "Request closed"}
             </button>
             {request.returnShipment?.pickupStart ? (
@@ -6588,7 +6588,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
             </div>
             <button
               onClick={() => setAlertsOpen(true)}
-              className="inline-flex h-8 items-center gap-1.5 bg-[var(--accent)] px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#111315]"
+              className="inline-flex h-8 items-center gap-1.5 bg-[var(--accent)] px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#17262D]"
             >
               <Bell className="size-3" />
               Alerts
@@ -6877,7 +6877,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                           </div>
                         </div>
                       ) : null}
-                      <div className="flex justify-end"><button type="submit" className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315]">Save moderation</button></div>
+                      <div className="flex justify-end"><button type="submit" className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D]">Save moderation</button></div>
                     </form>
                   </Panel>
                 );
@@ -7198,7 +7198,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     onClick={() => setOrderFilter(s)}
                     className={`h-8 border px-3 text-xs font-semibold uppercase tracking-[0.1em] transition ${
                       orderFilter === s
-                        ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
                         : "border-[var(--border)] hover:bg-[var(--hover)]"
                     }`}
                   >
@@ -7350,7 +7350,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                         }
                       }}
                       disabled={bulkUpdating}
-                      className="mt-6 h-9 rounded-xl bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-50"
+                      className="mt-6 h-9 rounded-xl bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-50"
                     >
                       {bulkUpdating ? "Updating..." : "Apply bulk update"}
                     </button>
@@ -7473,7 +7473,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     <FieldLabel label="Customer policy summary">
                       <textarea name="policySummary" rows={5} defaultValue={returnSettings.policySummary} className={`${inputCls} h-auto py-3`} />
                     </FieldLabel>
-                    <button type="submit" disabled={savingReturnSettings} className="h-11 w-full bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50">
+                    <button type="submit" disabled={savingReturnSettings} className="h-11 w-full bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-50">
                       {savingReturnSettings ? "Saving..." : "Save return policy"}
                     </button>
                   </div>
@@ -8345,7 +8345,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                   canWriteSecurity ? (
                     <button
                       onClick={() => setEditingAdminUser("new")}
-                      className="inline-flex items-center gap-2 bg-[var(--accent)] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#111315]"
+                      className="inline-flex items-center gap-2 bg-[var(--accent)] px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#17262D]"
                     >
                       <Plus className="size-3.5" />
                       Add admin user
@@ -8699,7 +8699,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     setAutomationEvents(result.events ?? []);
                     showToast(`${result.sent} processed, ${result.retried ?? 0} retried, ${result.skipped} duplicates skipped`);
                   }}
-                    className="h-10 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315]"
+                    className="h-10 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D]"
                   >
                     Run due workflows
                   </button>
@@ -8749,7 +8749,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                           setProcessingProductAlerts(false);
                         }
                       }}
-                      className="h-10 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50"
+                      className="h-10 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-50"
                     >
                       {processingProductAlerts ? "Processing" : "Run product alerts"}
                     </button>
@@ -8877,7 +8877,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                 </p>
                 <button
                   onClick={() => setGenerateDescOpen(true)}
-                  className="mt-5 h-10 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.12em] text-[#111315]"
+                  className="mt-5 h-10 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D]"
                 >
                   Open generator
                 </button>
@@ -9216,7 +9216,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     <h2 className="text-xl font-semibold">Structured page manager</h2>
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">Create and manage editorial, FAQ, guide, policy, support, and legal pages with typed blocks, preview, publication scheduling, version history, and rollback.</p>
                   </div>
-                  <button type="button" onClick={() => router.push("/admin/content")} className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315]">Open content manager</button>
+                  <button type="button" onClick={() => router.push("/admin/content")} className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D]">Open content manager</button>
                 </div>
               </Panel>
 
@@ -9258,7 +9258,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                     <button
                       type="submit"
                       disabled={!translationOwnerId || savingTranslation || loadingTranslation}
-                      className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50"
+                      className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-50"
                     >
                       {savingTranslation ? "Saving" : "Save"}
                     </button>
@@ -9381,7 +9381,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
 
           {active === "support" ? (
             <Panel title="Customer support">
-              <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center"><div><h2 className="text-xl font-semibold">Support case queue</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">Review contact requests, linked orders, priorities, ownership, and internal resolution notes.</p></div><button type="button" onClick={() => router.push("/admin/support")} className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315]">Open support queue</button></div>
+              <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center"><div><h2 className="text-xl font-semibold">Support case queue</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">Review contact requests, linked orders, priorities, ownership, and internal resolution notes.</p></div><button type="button" onClick={() => router.push("/admin/support")} className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D]">Open support queue</button></div>
             </Panel>
           ) : null}
 
@@ -9415,7 +9415,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                           type="button"
                           disabled={savingGlobalContent !== null}
                           onClick={() => saveGlobalContentSettings("publish")}
-                          className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-60"
+                          className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-60"
                         >
                           {savingGlobalContent === "publish" ? "Publishing" : "Publish"}
                         </button>
@@ -9728,7 +9728,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                       <button
                         type="submit"
                         disabled={savingRecommendationSettings}
-                        className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-60"
+                        className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-60"
                       >
                         {savingRecommendationSettings ? "Saving" : "Save recommendation settings"}
                       </button>
@@ -9795,7 +9795,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                         <button
                           type="submit"
                           disabled={savingSearchMerchandisingSettings}
-                          className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-60"
+                          className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-60"
                         >
                           {savingSearchMerchandisingSettings ? "Saving" : "Save search merchandising"}
                         </button>
@@ -9990,7 +9990,7 @@ export function AdminConsole({ access, catalog }: { access: AdminAccess; catalog
                   <button
                     type="submit"
                     disabled={savingCheckoutSettings}
-                    className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:opacity-60"
+                    className="h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:opacity-60"
                   >
                     {savingCheckoutSettings ? "Saving" : "Save checkout settings"}
                   </button>

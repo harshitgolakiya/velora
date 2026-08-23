@@ -56,27 +56,27 @@ export function AccountTokenAction({ mode, token }: { mode: "verify" | "reset"; 
   }
 
   return (
-    <div className="mx-auto max-w-lg border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Account security</p>
-      <h1 className="mt-3 text-3xl font-semibold">{mode === "verify" ? "Email verification" : "Choose a new password"}</h1>
+    <div className="storefront-framed mx-auto max-w-lg p-5 sm:p-6">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Account security</p>
+      <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">{mode === "verify" ? "Email verification" : "Choose a new password"}</h1>
       {mode === "reset" && status !== "success" ? (
-        <form onSubmit={resetPassword} className="mt-7 grid gap-4">
+        <form onSubmit={resetPassword} className="mt-6 grid gap-4">
           <label className="grid gap-2 text-sm font-medium">
             New password
-            <input required name="password" type="password" autoComplete="new-password" className="h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none focus:border-[var(--accent)]" />
+            <input required name="password" type="password" autoComplete="new-password" className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
           <label className="grid gap-2 text-sm font-medium">
             Confirm new password
-            <input required name="confirmation" type="password" autoComplete="new-password" className="h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none focus:border-[var(--accent)]" />
+            <input required name="confirmation" type="password" autoComplete="new-password" className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
           <p className="text-xs leading-5 text-[var(--muted)]">Use 12+ characters with uppercase, lowercase, number, and symbol.</p>
-          <button disabled={status === "loading"} className="h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.14em] text-[var(--background)] disabled:opacity-60">
+          <button disabled={status === "loading"} className="storefront-action h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">
             {status === "loading" ? "Updating" : "Update password"}
           </button>
         </form>
       ) : null}
       {message ? <p role="status" className={`mt-6 text-sm leading-6 ${status === "error" ? "text-red-600" : "text-[var(--muted)]"}`}>{message}</p> : null}
-      {status === "success" ? <Link href="/account" className="mt-6 inline-flex h-11 items-center bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)]">Go to sign in</Link> : null}
+      {status === "success" ? <Link href="/account" className="storefront-action mt-6 inline-flex h-11 items-center bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none">Go to sign in</Link> : null}
     </div>
   );
 }

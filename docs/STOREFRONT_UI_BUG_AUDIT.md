@@ -17,7 +17,7 @@ Evidence captured in:
 
 ## Current Implementation Status
 
-Updated: 2026-07-18
+Updated: 2026-07-24
 
 Verified storefront fixes:
 - Homepage hero now uses the first viewport height, and hero/spotlight content share the same layout rail.
@@ -58,6 +58,46 @@ Verified storefront fixes:
 - Product card action controls are smaller on dense grids, with secondary quick view hidden until hover/focus on desktop and still available on touch layouts.
 - Shop filters now render as a lighter control strip with branded selected states, and the mobile filter drawer uses accent-filled selected/submit states instead of stark white dark-mode panels.
 - Non-image shop/page headers have tighter first-viewport spacing so the product grid starts sooner without feeling like an admin table.
+- Direct hosted `.mp4`/`.webm` product video URLs are accepted for product media, including Cloudflare R2-style URLs, so product cards and PDP galleries can preview motion without an upload-only path.
+- Product quick view/quick add has been removed from customer-facing product cards; cards now use a simpler product-link plus bare wishlist heart interaction.
+- Homepage product rails now use Embla for drag/swipe behavior, and PDP galleries use Framer Motion drag/swipe so horizontal movement feels intentional rather than manually snapped.
+- Header utility icons have a tighter shared rhythm, no negative edge margins, and cart/wishlist counts are round badges anchored to the icon instead of floating away from the bag.
+- Mobile menu density was tightened at 390px, with smaller primary nav rows and cleaner cart/wishlist badge anchoring inside shortcut tiles.
+- Desktop and mobile filter panels, cart variant editing, cart notes, and PDP transient messages now use a shared soft expansion animation instead of abruptly appearing.
+- PDP size-guide close controls and drawer surfaces now share the stronger storefront icon-button affordance.
+- Gallery pagination dots are rounded and slightly clearer on bright media backgrounds.
+- Header-triggered search, menu, and cart surfaces now broadcast a storefront surface-open event so shop filter panels and drawers collapse before another overlay opens; this prevents stacked filter/search UI.
+- Store search is modal again, so focus and background interaction are owned by the search sheet while it is open.
+- Mobile filter drawer header/footer controls were tightened after the visual sweep, with a stronger close target and less oversized submit bar.
+- Empty cart page now uses a full-width compact action panel instead of a large half-width dashed block that left a fake missing summary column.
+- Search results page was compacted so result products are visible sooner on desktop and mobile; related destination chips and the search heading no longer consume most of the first viewport.
+- Text-only CMS hero blocks and the contact page handoff into support content were tightened so support shortcuts appear in the first desktop viewport.
+- Checkout empty/loading states now use compact centered panels instead of oversized blank vertical slabs.
+- Filled checkout summary now uses round quantity badges, mobile coupon/gift-card controls stack cleanly, and the desktop/mobile filled checkout path was verified from the real product add-to-bag flow.
+- Account, reset-password, verify-email, and track-order storefront pages now use tighter responsive headings, denser card/form spacing, smoother hover/focus affordances, and rounded status/count markers.
+- Order tracking's secondary lookup details panel now expands smoothly instead of snapping open.
+- Cart drawer item controls, coupon entry, order-note entry, empty-bag recommendations, and remove buttons now use stronger shared storefront affordances and spacing.
+- Footer newsletter contrast was strengthened, desktop/mobile footer typography was tightened, and viewport screenshots verify the footer no longer reads as low-contrast in dark mode.
+- Newsletter modal mobile typography was reduced and the modal panel now renders on an explicit solid surface so hero imagery cannot bleed through the content.
+- Mobile menu close controls and the theme/language row were tightened and verified at 340px.
+- Signed-in account dashboard controls were tightened: stats hover states, order accordions, return progress markers, address actions, device/session controls, wishlist move-to-bag controls, and delete-account expansion now use the same storefront motion/affordance language.
+- Account order detail pages now use rounded status chips, rounded timeline markers, and stronger invoice/return action states.
+- Return/request forms now use rounded selection/status markers, stronger evidence upload panels, styled file controls, and smoother primary/destructive action affordances.
+- Low-traffic storefront pages were swept again: FAQs, privacy, terms, care guide, fabric guide, size guide, email preferences, and 404.
+- FAQ search and accordion rendering now use the storefront surface/action language, clearer spacing, chevron affordances, and responsive grouping instead of dense one-line native details markup.
+- CMS/legal/support pages now use tighter shared summary panels, controlled text-only hero spacing, stronger content-block hierarchy, and consistent policy/guide/compare section rails.
+- Mobile comparison tables now render as stacked measurement cards, fixing clipped off-screen columns on the size guide.
+- Email preference loading, invalid-token, preference rows, checkbox markers, and action states now use solid storefront surfaces and smoother affordances.
+- A custom customer-facing 404 page now replaces the default framework fallback with storefront typography, spacing, and shop/search actions.
+- Direct hosted video URL support is now explicit for product videos and homepage direct video tiles: HTTPS or local `.mp4/.webm` URLs are validated, documented in admin copy, and covered by tests using the provided Cloudflare R2-style URL.
+- Homepage sections no longer depend on delayed reveal wrappers that could leave large blank slabs below the hero; follow-on sections now render immediately with a soft CSS entry.
+- Homepage product rails now use the shared storefront `ProductCard`, so color swatches are real controls that update imagery instead of passive color squares.
+- Homepage product rail density now shows five cards at desktop and six at very wide desktop, while still keeping horizontal drag/swipe.
+- The first visible homepage rail cards eager-load their media to avoid blank product panels during desktop/mobile visual sweeps.
+- Homepage product slider headings now reserve enough vertical and horizontal space, so titles such as `Desert Run` do not collide with carousel controls, cards, or section boundaries.
+- Product card hover media now activates only from the image link, not while hovering color swatches; selected color imagery is visible immediately after swatch clicks on homepage rails and shop grids.
+- Homepage product rail cards now stretch to a consistent height inside each carousel, removing dead space caused by taller off-screen cards on mobile.
+- Homepage mobile category media rail now shows a clearer next-card preview, exposes the `Shop all` action on mobile, and keeps the section free of horizontal page overflow.
 
 Verification artifacts:
 - `artifacts/ui-batch-fix/`
@@ -76,11 +116,27 @@ Verification artifacts:
 - `artifacts/ui-polish-redo-3/`
 - `artifacts/ui-polish-redo-4/`
 - `artifacts/ui-polish-redo-6/mobile-pdp-top.png`
+- `artifacts/ui-flow-sweep-20260721/`
+- `artifacts/ui-shell-sweep-20260721/`
+- `artifacts/ui-account-sweep-20260721/`
+- `artifacts/ui-lowtraffic-sweep-20260724/`
+- `artifacts/ui-homepage-focused-20260724/`
 
 Verification commands run:
 - `npx tsc --noEmit`
 - `npm run lint`
 - `npm run build`
+- Latest continuation on 2026-07-20: `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed. Focused Playwright screenshots captured `desktop-pdp-cart-open.png`, `desktop-pdp-after-cart-close.png`, `mobile-shop-header.png`, and `mobile-menu-open.png` in `artifacts/ui-current-polish/`.
+- Latest continuation on 2026-07-21: broad Playwright sweep captured light/dark desktop and mobile states in `artifacts/ui-goal-sweep-20260721/`; focused verification proved `beforeSearchFilterVisible: true` and `afterSearchFilterVisible: false` for the filter-to-search stack case. `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed.
+- Secondary-page continuation on 2026-07-21: Playwright sweep captured cart, search results, collection, story, FAQ, contact, shipping, returns, and tracking in light/dark desktop/mobile under `artifacts/ui-secondary-sweep-20260721/`. Focused after-screenshots verified cart/search/contact density improvements. `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed.
+- Flow continuation on 2026-07-21: Playwright captured empty checkout, filled checkout after shop -> PDP -> add-to-bag, account, reset-password, verify-email, track-order, and checkout-success states in desktop/mobile under `artifacts/ui-flow-sweep-20260721/`. `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed.
+- Shared shell continuation on 2026-07-21: Playwright captured cart drawer empty/filled, mobile/narrow menu, mobile/desktop footer viewports, and mobile/narrow newsletter modal states under `artifacts/ui-shell-sweep-20260721/`. `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed.
+- Account-flow continuation on 2026-07-21: Playwright captured reachable guest account and protected order/return redirect states under `artifacts/ui-account-sweep-20260721/`; signed-in account dashboard/order/return components are auth-gated and covered by TypeScript/build validation in this pass. `npm run lint`, `npx tsc --noEmit`, `git diff --check --`, and `npm run build` passed.
+- Low-traffic/content continuation on 2026-07-24: Playwright captured FAQ, privacy, terms, size guide, fabric guide, care guide, email preferences, and custom 404 in desktop/mobile under `artifacts/ui-lowtraffic-sweep-20260724/`; follow-up screenshot verified the size-guide mobile comparison table no longer clips columns. `npm run lint`, `npx tsc --noEmit`, focused validation tests, `git diff --check --`, and `npm run build` passed.
+- Homepage-focused continuation on 2026-07-24: Playwright captured desktop/mobile homepage screenshots under `artifacts/ui-homepage-focused-20260724/`; focused browser check verified homepage rail swatches change card imagery, and `npx playwright test homepage-merchandising.spec.ts --project=desktop-chromium` passed with coverage for full-bleed spotlight, corrected rail density, drag behavior, and swatch interaction.
+- Homepage visual follow-up on 2026-07-24: fresh desktop/laptop/mobile screenshots were captured as `home-desktop-latest.png`, `home-laptop-latest.png`, and `home-mobile-latest.png` under `artifacts/ui-homepage-focused-20260724/`; the focused Playwright suite now includes rendered-pixel swatch verification and product-slider heading collision checks.
+- Homepage rail-height follow-up on 2026-07-24: mobile product rail metrics verified visible cards and off-screen cards now share the same `553.859px` carousel height in both homepage rails; `npx playwright test homepage-merchandising.spec.ts --project=desktop-chromium`, `npm run lint`, `npx tsc --noEmit`, and `npm run build` passed.
+- Homepage category-rail follow-up on 2026-07-24: mobile screenshot `home-mobile-category-polish.png` verified the category rail shows about `1.6` cards at 390px with no horizontal page overflow and a visible mobile `Shop all` action; focused homepage Playwright suite passed.
 - `git diff --check` (clean except existing CRLF conversion warnings from the broader dirty worktree)
 - Latest focused pass on 2026-07-18: `npx tsc --noEmit`, `npm run lint`, and targeted `git diff --check` passed; Playwright screenshots were captured against the existing `http://localhost:3000` dev server.
 - Playwright smoke checks against `next dev --webpack -p 3001` for desktop home, shop, PDP, mobile home, mobile menu, cart drawer, desktop inline filters, search overlay, quick view, size guide, mobile filter drawer, and fresh mobile privacy/newsletter overlap.
@@ -383,6 +439,103 @@ Known remaining/non-blocking notes:
     - Location: Next dev overlay, not production UI.
     - Problem: local visual review is noisy and can obscure fixed bottom bars.
     - Fix direction: optionally set `devIndicators: false` in local config if visual review cleanliness matters.
+
+## 2026-07-24 Batch Notes
+
+- Fixed the homepage product slider header spacing at 1905px so the large collection title no longer sits on the next boundary and has a stronger gap before product cards.
+- Enlarged homepage/shop product-card swatch hit targets while keeping the visible color chips compact.
+- Enlarged shop desktop filter triggers to avoid squat/tiny toolbar buttons.
+- Enlarged PDP gallery arrows, share/expand controls, and media dot hit areas.
+- Enlarged PDP color swatches, size buttons, and size-guide trigger targets.
+- Verification artifacts: `artifacts/ui-polish-20260724/homepage-slider-1905.png`, `artifacts/ui-polish-20260724/shop-controls-desktop.png`, `artifacts/ui-polish-20260724/pdp-controls-mobile.png`.
+- Added focused coverage in `tests/e2e/storefront-control-polish.spec.ts`; updated `tests/e2e/homepage-merchandising.spec.ts` to enforce more room under product-slider headings.
+
+## 2026-07-24 Secondary Storefront Batch Notes
+
+- Enlarged mobile header menu/search/cart controls to 40px hit targets while preserving the tight icon rhythm.
+- Enlarged support-card `Learn more` links and account forgot-password/back-to-sign-in text actions to real tap targets.
+- Reworked empty-cart desktop behavior so the page shows a visible `Complete the Look` product recommendation grid instead of a large dead area.
+- Reduced empty-cart recommendation media height and moved to a four-card desktop grid so product names, prices, and `View details` actions are visible in the first viewport.
+- Verification artifacts: `artifacts/ui-secondary-polish-20260724/after/contact-mobile.png`, `artifacts/ui-secondary-polish-20260724/after/account-mobile.png`, `artifacts/ui-secondary-polish-20260724/after/cart-desktop-final.png`.
+- Added secondary-page coverage in `tests/e2e/storefront-control-polish.spec.ts`.
+
+## 2026-07-24 Utility Storefront Batch Notes
+
+- Swept checkout, track order, FAQs, shipping, returns, care guide, fabric guide, and privacy on desktop/mobile.
+- Enlarged the desktop theme toggle to match the 40px header icon target used by the rest of the storefront shell.
+- Enlarged checkout shell back links (`Cart` / `Shop`) to proper 40px hit targets.
+- Updated the checkout empty-state CTA to use the filled accent treatment consistently.
+- Verification artifacts: `artifacts/ui-utility-polish-20260724/checkout-desktop-after.png`, `artifacts/ui-utility-polish-20260724/track-order-desktop-after.png`.
+- Added utility-page coverage in `tests/e2e/storefront-control-polish.spec.ts`.
+
+## 2026-07-24 Overlay And Dark Mode Batch Notes
+
+- Swept mobile menu, search top sheet, cart drawer, and dark-mode storefront surfaces.
+- Enlarged the mobile menu theme toggle and language switcher rows so they no longer feel like tiny tucked-away controls.
+- Enlarged search dialog popular-search chips and text links to consistent tap targets.
+- Added an accessible cart-drawer close label while keeping the 40px close target.
+- Enlarged the cart empty-state secondary `Best sellers` text action so it no longer behaves like a thin inline link on touch.
+- Verification artifacts: `artifacts/ui-overlay-polish-20260724/mobile-menu.png`, `artifacts/ui-overlay-polish-20260724/search-dialog-mobile.png`, `artifacts/ui-overlay-polish-20260724/cart-drawer-mobile.png`, `artifacts/ui-overlay-polish-20260724/home-dark.png`, `artifacts/ui-overlay-polish-20260724/shop-dark.png`, `artifacts/ui-overlay-polish-20260724/pdp-dark.png`, `artifacts/ui-overlay-polish-20260724/cart-dark.png`.
+- Added overlay coverage in `tests/e2e/storefront-control-polish.spec.ts`.
+
+## 2026-07-26 Product Card Swatch Restart Check
+
+- Restarted the local storefront dev server and rechecked product-card color swatches on homepage and shop.
+- Reworked the shared `ProductCard` swatch treatment so selected borders are inset on the outer square and the inner color chip is centered by explicit grid geometry.
+- Updated the requested swatch geometry again: the visible inner color chip now renders as `16 x 16`, and the selected border square renders as `20 x 20` on homepage and shop cards.
+- Kept the invisible button hit target at `28 x 28` so the visual swatch can stay compact without becoming hard to tap.
+- Verified light and dark modes use the same exact geometry with a visible foreground selected outline and dark-mode inner-chip border contrast.
+- Verification artifacts: `artifacts/ui-next-pages-20260724/swatch-fix-restarted/home-desktop.png`, `artifacts/ui-next-pages-20260724/swatch-fix-restarted/shop-desktop.png`, `artifacts/ui-next-pages-20260724/swatch-fix-restarted/shop-mobile.png`, `artifacts/ui-next-pages-20260724/swatch-fix-restarted/metrics.json`, `artifacts/ui-next-pages-20260724/swatch-fix-restarted-dark/shop-dark-desktop.png`, `artifacts/ui-next-pages-20260724/swatch-fix-restarted-dark/metrics.json`.
+- Latest exact-geometry artifacts: `artifacts/ui-next-pages-20260726/swatch-16-20-restarted/home-desktop.png`, `artifacts/ui-next-pages-20260726/swatch-16-20-restarted/shop-desktop.png`, `artifacts/ui-next-pages-20260726/swatch-16-20-restarted/shop-mobile.png`, `artifacts/ui-next-pages-20260726/swatch-16-20-restarted/shop-dark-desktop.png`, `artifacts/ui-next-pages-20260726/swatch-16-20-restarted/metrics.json`.
+- Added numeric swatch centering coverage in `tests/e2e/storefront-control-polish.spec.ts`; homepage swatch image-change coverage remains in `tests/e2e/homepage-merchandising.spec.ts`.
+
+## 2026-07-26 Homepage Category CTA Pass
+
+- Fresh restarted-server homepage/shop sweep found the desktop `Shop all` CTA in `Shop by category` collapsed to a `16px` text-height hit target.
+- Updated the category CTA to keep a text-style visual while enforcing a `40px` action height on desktop and mobile.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/fresh-sweep/home-desktop.png`, `artifacts/ui-next-pages-20260726/fresh-sweep/metrics.json`, `artifacts/ui-next-pages-20260726/category-cta-fix/home-category-cta-desktop.png`, `artifacts/ui-next-pages-20260726/category-cta-fix/metrics.json`.
+- Added homepage regression coverage in `tests/e2e/homepage-merchandising.spec.ts`.
+
+## 2026-07-26 Homepage Slider Swatch Proof
+
+- Rechecked the homepage product slider in the browser after the latest restart because the expected behavior is that carousel product-card swatches swap the visible product image like shop cards.
+- Verified a homepage carousel card changed from `Track Jacket in Black` to `Track Jacket in Cheery Red`; the primary image URL changed and the selected swatch state moved to the clicked color.
+- Confirmed the selected homepage slider swatch still uses the requested exact geometry: `16 x 16` visible color chip, `20 x 20` selected border square, centered inside the `28 x 28` hit target with equal `6px` offsets on all sides.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/homepage-slider-swatch-proof/home-card-before.png`, `artifacts/ui-next-pages-20260726/homepage-slider-swatch-proof/home-card-after.png`, `artifacts/ui-next-pages-20260726/homepage-slider-swatch-proof/metrics.json`.
+- Focused coverage: `tests/e2e/homepage-merchandising.spec.ts` includes the homepage slider image-change regression check and compares the behavior against `/shop`.
+
+## 2026-07-26 PDP Gallery Dot Pass
+
+- Next-page sweep found the PDP gallery media-dot buttons still rendered as `32 x 32`, which felt smaller than the rest of the storefront control system on mobile.
+- Increased the gallery media-dot button target to `40 x 40` while keeping the visible dot/pill marks compact.
+- Verified the updated target on PDP mobile light, PDP mobile dark, and PDP desktop.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/pdp-gallery-dot-fix/pdp-mobile.png`, `artifacts/ui-next-pages-20260726/pdp-gallery-dot-fix/pdp-dark-mobile.png`, `artifacts/ui-next-pages-20260726/pdp-gallery-dot-fix/pdp-desktop.png`, `artifacts/ui-next-pages-20260726/pdp-gallery-dot-fix/metrics.json`.
+- Updated `tests/e2e/storefront-control-polish.spec.ts` so PDP gallery dots must stay at least `40 x 40`.
+
+## 2026-07-26 PDP Color Swatch Geometry Pass
+
+- Rechecked PDP color selectors after the product-card swatch work and found the product-page selected swatch still used ring offsets around a `36px` square.
+- Rebuilt PDP color swatches with explicit centered geometry: `40 x 40` hit target, `32 x 32` selected frame, and `24 x 24` color chip with equal `4px` frame offsets.
+- Verified light mobile, dark mobile, desktop, and scrolled PDP states have no horizontal overflow.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/pdp-swatch-and-bottom-bar/pdp-mobile-top.png`, `artifacts/ui-next-pages-20260726/pdp-swatch-and-bottom-bar/pdp-dark-mobile-top.png`, `artifacts/ui-next-pages-20260726/pdp-swatch-and-bottom-bar/pdp-desktop-top.png`, `artifacts/ui-next-pages-20260726/pdp-swatch-and-bottom-bar/metrics.json`.
+
+## 2026-07-26 Center Logo Header Pass
+
+- Updated the storefront header so the `Velora` logo is mathematically centered in the header on mobile, tablet, desktop, and wide desktop.
+- Desktop navigation now lives in the left zone and starts at `xl`; the mobile menu remains available below `1280px` so the 1024px header does not crowd the centered logo.
+- The hero-overlay logo now uses a warmer high-contrast color with a shadow so it remains readable when centered over hero imagery.
+- Verified logo center delta is `0px` at `390`, `1024`, `1440`, and `1920` widths with no horizontal overflow.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/center-logo-header-final/home-mobile-overlay.png`, `artifacts/ui-next-pages-20260726/center-logo-header-final/home-desktop-overlay.png`, `artifacts/ui-next-pages-20260726/center-logo-header-final/shop-1024.png`, `artifacts/ui-next-pages-20260726/center-logo-header-final/shop-desktop.png`, `artifacts/ui-next-pages-20260726/center-logo-header-final/shop-wide.png`, `artifacts/ui-next-pages-20260726/center-logo-header-final/metrics.json`.
+- Added header-center regression coverage in `tests/e2e/storefront-control-polish.spec.ts`.
+
+## 2026-07-26 Header Badge Position Pass
+
+- Rechecked the centered header at `360px`, dark mode, and with seeded cart/wishlist badge counts.
+- Pulled header count badges back inside their 40px icon buttons so the round number feels attached to the bag/heart instead of floating outside the icon.
+- Verified visible badges are round, at least `16 x 16`, inside their parent icon button, and the centered logo still has `0px` center delta at mobile and desktop edge widths.
+- Verification artifacts: `artifacts/ui-next-pages-20260726/header-badge-position-final/shop-360-with-badge.png`, `artifacts/ui-next-pages-20260726/header-badge-position-final/shop-390-dark-with-badge.png`, `artifacts/ui-next-pages-20260726/header-badge-position-final/shop-1280-desktop-edge.png`, `artifacts/ui-next-pages-20260726/header-badge-position-final/shop-1366-desktop-edge.png`, `artifacts/ui-next-pages-20260726/header-badge-position-final/metrics.json`.
+- Extended header regression coverage in `tests/e2e/storefront-control-polish.spec.ts` to seed badge counts and assert badge geometry.
+- Refreshed `tests/e2e/storefront-shell.spec.ts-snapshots` so the shell visual baselines match the centered-logo header and current polished footer at `360`, `390`, `768`, `1024`, `1366`, `1440`, and `1920` widths.
 
 ## Suggested Fix Order
 

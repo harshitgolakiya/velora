@@ -3,7 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, X, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { Minus, Plus, X, ChevronDown, ChevronUp, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cartSubtotal, useStore, type CartLine } from "@/lib/store";
@@ -14,9 +14,11 @@ import {
 } from "@/lib/cart-ui";
 import { formatAed } from "@/lib/utils";
 import { CartRecoveryBanner, ReservationTimer, useCartCopy } from "./cart-status";
+import { useLocalizedHref } from "@/lib/use-localized-href";
 
 function CartItemRow({ line }: { line: CartLine }) {
   const copy = useCartCopy();
+  const localize = useLocalizedHref();
   const [editing, setEditing] = useState(false);
   const updateQuantity = useStore((state) => state.updateQuantity);
   const removeFromCart = useStore((state) => state.removeFromCart);
@@ -49,7 +51,7 @@ function CartItemRow({ line }: { line: CartLine }) {
           <div className="flex min-w-0 items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <Link
-                href={`/product/${line.product.slug}`}
+                href={localize(`/product/${line.product.slug}`)}
                 className="block overflow-hidden break-words text-sm font-medium leading-5 hover:underline sm:text-base sm:leading-6 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
               >
                 {line.product.name}
@@ -61,7 +63,7 @@ function CartItemRow({ line }: { line: CartLine }) {
             <button
               onClick={() => removeFromCart(line.product.slug, line.size, line.color)}
               aria-label={copy.removeItem}
-              className="grid size-8 shrink-0 place-items-center text-[var(--muted)] transition hover:text-[var(--foreground)] motion-reduce:transition-none"
+              className="storefront-action grid size-8 shrink-0 place-items-center text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--foreground)] motion-reduce:transition-none"
             >
               <X className="size-4" />
             </button>
@@ -72,7 +74,7 @@ function CartItemRow({ line }: { line: CartLine }) {
               <div className="flex h-8 items-center border border-[var(--border)]">
                 <button
                   type="button"
-                  className="px-2.5 py-1 text-[var(--muted)] hover:text-[var(--foreground)]"
+                  className="storefront-action grid h-8 w-8 place-items-center text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--foreground)]"
                   onClick={() =>
                     updateQuantity(line.product.slug, line.quantity - 1, line.size, line.color)
                   }
@@ -84,7 +86,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                 <button
                   type="button"
                   disabled={!availability.canIncrease}
-                  className="px-2.5 py-1 text-[var(--muted)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
+                  className="storefront-action grid h-8 w-8 place-items-center text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
                   onClick={() =>
                     updateQuantity(line.product.slug, line.quantity + 1, line.size, line.color)
                   }
@@ -97,7 +99,7 @@ function CartItemRow({ line }: { line: CartLine }) {
               {product.variants?.length ? (
                 <button
                   onClick={() => setEditing(!editing)}
-                  className="flex items-center gap-0.5 whitespace-nowrap text-xs font-medium text-[var(--muted)] underline hover:text-[var(--foreground)]"
+                className="storefront-action flex min-h-8 items-center gap-0.5 whitespace-nowrap text-xs font-medium text-[var(--muted)] underline hover:text-[var(--foreground)]"
                 >
                   {copy.editStyle}
                   {editing ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
@@ -119,7 +121,7 @@ function CartItemRow({ line }: { line: CartLine }) {
       </div>
 
       {editing && (
-        <div className="mt-3 border border-[var(--border)] bg-[var(--card)] p-3 space-y-3">
+        <div className="storefront-expand-in storefront-stagger storefront-panel-row mt-3 space-y-3 border border-[var(--border)] p-3">
           <div>
             <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">{copy.color}</span>
             <div className="flex flex-wrap gap-2">
@@ -151,8 +153,8 @@ function CartItemRow({ line }: { line: CartLine }) {
                     onClick={() => handleVariantChange(s, line.color)}
                     className={`h-7 px-2.5 text-xs border font-semibold transition ${
                       line.size === s
-                        ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
-                        : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--muted)]"
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
+                        : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)]"
                     } disabled:opacity-30 disabled:cursor-not-allowed`}
                   >
                     {s}
@@ -167,87 +169,9 @@ function CartItemRow({ line }: { line: CartLine }) {
   );
 }
 
-function CartCouponBlock() {
-  const copy = useCartCopy();
-  const coupon = useStore((state) => state.coupon);
-  const couponError = useStore((state) => state.couponError);
-  const applyCoupon = useStore((state) => state.applyCouponCode);
-  const removeCoupon = useStore((state) => state.removeCoupon);
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleApply = async () => {
-    if (!code.trim()) return;
-    setLoading(true);
-    await applyCoupon(code);
-    setLoading(false);
-    setCode("");
-  };
-
-  return (
-    <div className="border-t border-[var(--border)] px-5 py-4">
-      {coupon ? (
-        <div role="status" className="flex items-center justify-between border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700">
-          <span className="font-semibold">{copy.couponApplied}: {coupon.code} (-{formatAed(coupon.discount)})</span>
-          <button onClick={removeCoupon} className="font-bold underline text-emerald-700 transition hover:text-[var(--foreground)] motion-reduce:transition-none">
-            {copy.remove}
-          </button>
-        </div>
-      ) : (
-        <div>
-          <span className="mb-1.5 block text-xs font-semibold text-[var(--muted)]">{copy.promoCode}</span>
-          <div className="flex gap-2">
-            <input
-              placeholder={copy.enterCoupon}
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              className="min-w-0 flex-1 border border-[var(--border)] px-3 py-2 text-xs uppercase outline-none focus:border-[var(--accent)]"
-            />
-            <button
-              onClick={handleApply}
-              disabled={loading || !code.trim()}
-              className="border border-[var(--foreground)] bg-[var(--foreground)] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:opacity-50 motion-reduce:transition-none"
-            >
-              {loading ? copy.applying : copy.apply}
-            </button>
-          </div>
-          {couponError && <p role="alert" className="mt-1 text-[11px] font-medium text-red-600">{couponError}</p>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CartNotesBlock() {
-  const copy = useCartCopy();
-  const note = useStore((state) => state.customerNote);
-  const setNote = useStore((state) => state.setCustomerNote);
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="border-t border-[var(--border)] px-5 py-3.5">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between text-xs font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)] motion-reduce:transition-none"
-      >
-        <span>{copy.addOrderNote}</span>
-        <span className="font-normal text-[var(--muted)]">{open ? `${copy.hide} -` : `${copy.add} +`}</span>
-      </button>
-      {open && (
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder={copy.deliveryInstructionsPlaceholder}
-          rows={3}
-          className="mt-2 w-full border border-[var(--border)] p-2 text-xs outline-none focus:border-[var(--accent)]"
-        />
-      )}
-    </div>
-  );
-}
-
 function CartRecommendations({ onAdd }: { onAdd?: () => void }) {
   const copy = useCartCopy();
+  const localize = useLocalizedHref();
   const [products, setProducts] = useState<CartRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const cart = useStore((state) => state.cart);
@@ -280,14 +204,22 @@ function CartRecommendations({ onAdd }: { onAdd?: () => void }) {
   if (loading || !products.length) return null;
 
   return (
-    <div className="border-t border-[var(--border)] bg-[var(--card)] py-4">
+    <div className="border-t border-[var(--border)] bg-[var(--card)] px-4 py-4">
       <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--muted)]">{copy.completeTheLook}</p>
       <div className="space-y-3">
-        {products.slice(0, 3).map((prod) => (
-          <div key={prod.id} className="flex items-center justify-between gap-3 border border-[var(--border)] bg-[var(--surface)] p-2 text-xs">
-            <div className="flex gap-2.5 items-center min-w-0">
-              <div className="relative size-12 shrink-0 overflow-hidden bg-[var(--card)]">
-                <Image src={prod.image} alt={prod.name} fill sizes="48px" className="object-cover" />
+        {products.slice(0, 2).map((prod, index) => (
+          <div key={prod.id} className="storefront-action storefront-panel-row flex items-center justify-between gap-3 border border-[var(--border)] p-2 text-xs">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="storefront-product-media relative size-12 shrink-0 overflow-hidden">
+                <Image
+                  src={prod.image || "/images/activewear-demo/active-duo.jpg"}
+                  alt={prod.name}
+                  fill
+                  sizes="48px"
+                  priority={index === 0}
+                  style={{ objectPosition: "50% 68%" }}
+                  className="object-cover"
+                />
               </div>
               <div className="min-w-0">
                 <p className="truncate font-semibold text-[var(--foreground)]">{prod.name}</p>
@@ -295,9 +227,9 @@ function CartRecommendations({ onAdd }: { onAdd?: () => void }) {
               </div>
             </div>
             <Link
-              href={`/product/${prod.slug}`}
+              href={localize(`/product/${prod.slug}`)}
               onClick={onAdd}
-              className="border border-[var(--foreground)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
+              className="storefront-action inline-flex min-h-10 shrink-0 items-center justify-center border border-[var(--accent)] px-3 text-[10px] font-bold uppercase tracking-wider hover:bg-[var(--accent)] hover:text-[#17262D]"
             >
               {copy.view}
             </Link>
@@ -310,6 +242,7 @@ function CartRecommendations({ onAdd }: { onAdd?: () => void }) {
 
 export function CartDrawer() {
   const copy = useCartCopy();
+  const localize = useLocalizedHref();
   const cart = useStore((state) => state.cart);
   const cartOpen = useStore((state) => state.cartOpen);
   const setCartOpen = useStore((state) => state.setCartOpen);
@@ -330,14 +263,19 @@ export function CartDrawer() {
     <Dialog.Root open={cartOpen} onOpenChange={setCartOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/55 backdrop-blur-sm motion-reduce:transition-none" />
-        <Dialog.Content className="storefront-drawer-right fixed end-0 top-0 z-[110] flex h-dvh w-full max-w-md flex-col bg-[var(--surface)] text-[var(--foreground)] shadow-2xl focus-visible:outline-none">
+        <Dialog.Content className="storefront-drawer-right storefront-panel fixed end-0 top-0 z-[110] flex h-dvh w-full max-w-lg flex-col bg-[var(--surface)] text-[var(--foreground)] focus-visible:outline-none">
           <Dialog.Description className="sr-only">
             {copy.reviewCartDescription}
           </Dialog.Description>
 
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
-            <Dialog.Title className="font-serif text-2xl">{copy.yourBag}</Dialog.Title>
-            <Dialog.Close className="storefront-action grid size-10 place-items-center border border-[var(--border)] bg-[var(--hover)] transition hover:border-[var(--foreground)] focus-visible:outline-none motion-reduce:transition-none">
+            <div>
+              <Dialog.Title className="font-serif text-2xl">{copy.yourBag}</Dialog.Title>
+              {cart.length > 0 ? (
+                <p className="mt-1 text-xs text-[var(--muted)]">{cart.length} {cart.length === 1 ? "piece" : "pieces"} reserved for checkout</p>
+              ) : null}
+            </div>
+            <Dialog.Close aria-label="Close cart" className="storefront-action storefront-icon-button grid size-10 place-items-center border border-[var(--border)] bg-[var(--hover)] transition hover:border-[var(--foreground)] focus-visible:outline-none motion-reduce:transition-none">
               <X className="size-5" />
             </Dialog.Close>
           </div>
@@ -346,7 +284,7 @@ export function CartDrawer() {
           <CartRecoveryBanner />
 
           {cart.length > 0 ? (
-            <div className="border-b border-[var(--border)] px-5 py-4">
+            <div className="border-b border-[var(--border)] bg-[var(--card)]/45 px-5 py-4">
               <div className="flex justify-between text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 <span>
                   {isFreeShippingUnlocked
@@ -361,10 +299,20 @@ export function CartDrawer() {
                   style={{ width: `${progress}%` }}
                 />
               </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] font-medium text-[var(--muted)]">
+                <span className="flex items-center gap-2">
+                  <Truck className="size-3.5 text-[var(--accent)]" />
+                  UAE delivery
+                </span>
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="size-3.5 text-[var(--accent)]" />
+                  Secure checkout
+                </span>
+              </div>
             </div>
           ) : null}
 
-          <div className="max-h-[min(48dvh,26rem)] overflow-y-auto px-5 py-5">
+          <div className="flex-1 overflow-y-auto px-5 py-5">
             {lastRemovedLine && (
               <div role="status" className="mb-4 flex items-center justify-between border border-[var(--border)] bg-[var(--hover)] px-4 py-2 text-xs">
                 <span className="text-[var(--foreground)] font-medium">
@@ -381,16 +329,16 @@ export function CartDrawer() {
             )}
 
             {cart.length === 0 ? (
-              <div className="flex min-h-full flex-col gap-8 pt-8 text-start">
+              <div className="flex min-h-full flex-col gap-6 pt-4 text-start">
                 <div className="max-w-sm">
-                  <p className="font-serif text-3xl">{copy.yourBagEmpty}</p>
+                  <p className="text-2xl font-semibold">{copy.yourBagEmpty}</p>
                   <p className="mt-2 text-sm text-[var(--muted)]">
                     {copy.emptyBagBody}
                   </p>
                   <Dialog.Close asChild>
                     <Link
-                      href="/shop"
-                      className="storefront-action mt-6 inline-flex h-11 items-center border border-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
+                      href={localize("/shop")}
+                      className="storefront-action mt-6 inline-flex h-11 items-center border border-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none"
                     >
                       {copy.shopVelora}
                     </Link>
@@ -399,8 +347,8 @@ export function CartDrawer() {
                 <CartRecommendations onAdd={() => setCartOpen(false)} />
               </div>
             ) : (
-              <div className="flex flex-col space-y-5">
-                <div className="space-y-4">
+            <div className="flex flex-col space-y-5">
+                <div className="storefront-stagger space-y-4">
                   {cart.map((line) => (
                     <CartItemRow key={`${line.product.slug}-${line.size}-${line.color}`} line={line} />
                   ))}
@@ -413,9 +361,6 @@ export function CartDrawer() {
 
           {cart.length > 0 && (
             <div className="border-t border-[var(--border)] bg-[var(--surface)]">
-              <CartNotesBlock />
-              <CartCouponBlock />
-              
               <div className="space-y-4 border-t border-[var(--border)] p-5">
                 <div className="space-y-1.5 text-sm text-[var(--muted)]">
                   <div className="flex justify-between">
@@ -446,13 +391,18 @@ export function CartDrawer() {
                   </Button>
                 ) : (
                   <Dialog.Close asChild>
-                    <Link href="/checkout" className="block">
+                    <Link href={localize("/checkout")} className="block">
                       <Button className="h-12 w-full text-sm font-bold uppercase tracking-wider">
                         {copy.proceedToCheckout}
                       </Button>
                     </Link>
                   </Dialog.Close>
                 )}
+                <Dialog.Close asChild>
+                  <Link href={localize("/cart")} className="storefront-action flex h-11 items-center justify-center border border-[var(--border)] text-sm font-semibold hover:border-[var(--foreground)] hover:bg-[var(--hover)]">
+                    {copy.viewAndEditBag}
+                  </Link>
+                </Dialog.Close>
               </div>
             </div>
           )}

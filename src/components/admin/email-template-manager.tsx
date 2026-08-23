@@ -176,7 +176,7 @@ export function EmailTemplateManager({
               {workflowEmailTypes.map((type) => <option key={type} value={type}>{type}</option>)}
             </select>
             <input name="locale" aria-label="Locale code" required minLength={2} maxLength={12} placeholder="ar-AE" className="h-11 w-full border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
-            <button disabled={busy === "create"} className="h-11 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50">
+            <button disabled={busy === "create"} className="h-11 w-full bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-50">
               Create localized draft
             </button>
           </form>
@@ -232,7 +232,7 @@ export function EmailTemplateManager({
                 <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em]"><Send className="size-4" />Test send</h3>
                 <div className="mt-4 flex gap-2">
                   <input aria-label="Test recipient email" value={testRecipient} onChange={(event) => setTestRecipient(event.target.value)} className="h-11 min-w-0 flex-1 border border-[var(--border)] bg-[var(--background)] px-3 text-sm" />
-                  <button type="button" onClick={sendTest} disabled={busy === "test"} className="h-11 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#111315] disabled:opacity-50">Send</button>
+                  <button type="button" onClick={sendTest} disabled={busy === "test"} className="h-11 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.08em] text-[#17262D] disabled:opacity-50">Send</button>
                 </div>
               </section>
 

@@ -34,16 +34,16 @@ export const metadata: Metadata = {
     default: "Velora | Premium Activewear",
     template: "%s | Velora",
   },
-  description: "Premium activewear essentials shaped for movement, warm-weather city life, and fast checkout.",
+  description: "Premium activewear for workouts, Pilates, yoga, tennis, active days, and everyday movement.",
   openGraph: {
     title: "Velora",
-    description: "Premium activewear designed for movement across warm-weather city life.",
+    description: "Premium activewear designed for training, studio sessions, active days, and everyday life.",
     type: "website",
     siteName: "Velora",
     locale: "en_AE",
     images: [
       {
-        url: "/images/velora/hero-sculpted-essentials.jpg",
+        url: "/images/activewear-demo/active-duo.jpg",
         width: 1440,
         height: 900,
         alt: "Velora premium activewear campaign",
@@ -53,8 +53,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Velora | Premium Activewear",
-    description: "Premium activewear essentials shaped for movement and fast checkout.",
-    images: ["/images/velora/hero-sculpted-essentials.jpg"],
+    description: "Premium activewear for workouts, studio sessions, active days, and everyday movement.",
+    images: ["/images/activewear-demo/active-duo.jpg"],
   },
 };
 

@@ -15,7 +15,7 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <section className="mx-auto flex min-h-[60dvh] max-w-[1440px] flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
+    <section className="storefront-container flex min-h-[60dvh] flex-col items-center justify-center py-20 text-center">
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--muted)]">Something went wrong</p>
       <h1 className="mt-4 font-serif text-5xl sm:text-6xl">We hit a snag.</h1>
       <p className="mt-4 max-w-md text-[var(--muted)]">

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const product = await getProductForPage(slug);
   const title = product?.seoTitle ?? product?.name ?? "Product";
-  const description = product?.seoDescription ?? product?.description ?? "Premium Velora activewear product.";
+  const description = product?.seoDescription ?? product?.description ?? "Premium Velora activewear designed for movement.";
 
   return {
     title,
@@ -79,7 +79,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     : [];
 
   return (
-    <section className="mx-auto max-w-360 px-4 pb-32 pt-10 sm:px-6 sm:pb-28 lg:px-8">
+    <section className="storefront-container-narrow pb-32 pt-6 sm:pb-28 sm:pt-10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -91,6 +91,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       />
 
       <Breadcrumbs
+        className="hidden sm:block"
         items={[
           { label: "Shop", href: "/shop" },
           { label: product.category, href: "/shop" },
@@ -100,13 +101,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       <ProductDetail product={product} />
 
-      <div data-pdp-lower-content>
+      <div className="mt-8 sm:mt-12 lg:mt-0" data-pdp-lower-content>
         {/* Full-width tabs */}
         <DeferredProductTabs product={product} />
         <DeferredProductReviews product={product} />
 
         {/* People Also Bought */}
-        <div className="mt-20">
+        <div className="mt-10 scroll-mt-28 sm:mt-14 lg:mt-16">
         {recommendationSettings.enabled ? (
           <>
             <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">

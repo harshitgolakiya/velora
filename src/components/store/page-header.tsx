@@ -15,14 +15,14 @@ export function PageHeader({
 }) {
   if (image) {
     return (
-      <section className="relative h-[58dvh] min-h-[420px] overflow-hidden">
+      <section className="relative h-[48svh] min-h-[340px] overflow-hidden sm:min-h-[380px]">
         <Image src={image} alt={imageAlt ?? title} fill priority fetchPriority="high" loading="eager" sizes="100vw" quality={84} className="object-cover" />
-        <div className="absolute inset-0 bg-stone-950/35" />
-        <div className="relative mx-auto flex h-full max-w-[1440px] items-end px-4 pb-12 text-white sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(5,6,8,.66),rgba(5,6,8,.2)_58%,rgba(5,6,8,.08))]" />
+        <div className="storefront-container relative flex h-full items-end pb-8 text-white sm:pb-10">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em]">{eyebrow}</p>
-            <h1 className="mt-4 font-serif text-5xl sm:text-6xl">{title}</h1>
-            {description ? <p className="mt-4 leading-7 text-stone-100">{description}</p> : null}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] sm:text-xs">{eyebrow}</p>
+            <h1 className="mt-3 text-4xl font-medium leading-[1.02] sm:text-6xl">{title}</h1>
+            {description ? <p className="storefront-body-copy mt-3 max-w-xl text-stone-100">{description}</p> : null}
           </div>
         </div>
       </section>
@@ -30,10 +30,10 @@ export function PageHeader({
   }
 
   return (
-    <div className="mb-8 max-w-3xl sm:mb-10">
+    <div className="mb-7 max-w-3xl sm:mb-9">
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--muted)]">{eyebrow}</p>
-      <h1 className="mt-3 font-serif text-4xl leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
-      {description ? <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-base sm:leading-7">{description}</p> : null}
+      <h1 className="mt-3 text-4xl font-medium leading-[1.04] sm:text-5xl lg:text-[56px]">{title}</h1>
+      {description ? <p className="storefront-body-copy mt-3 max-w-2xl text-[var(--muted)]">{description}</p> : null}
     </div>
   );
 }

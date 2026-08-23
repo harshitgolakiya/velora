@@ -72,13 +72,13 @@ export function WishlistProductCard({ product }: { product: Product }) {
         imageSizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
       />
       <div className="grid gap-2 border border-[var(--border)] bg-[var(--background)] p-3">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid gap-2 min-[360px]:grid-cols-2">
           <label className="grid gap-1 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
             Color
             <select
               value={color}
               onChange={(event) => chooseColor(event.target.value)}
-              className="h-10 border border-[var(--border)] bg-[var(--surface)] px-2 text-sm font-medium normal-case tracking-normal text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+              className="h-10 min-w-0 border border-[var(--border)] bg-[var(--surface)] px-2 text-sm font-medium normal-case tracking-normal text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
             >
               {product.colors.map((name) => (
                 <option key={name} value={name}>{name}</option>
@@ -90,7 +90,7 @@ export function WishlistProductCard({ product }: { product: Product }) {
             <select
               value={size}
               onChange={(event) => chooseSize(event.target.value)}
-              className="h-10 border border-[var(--border)] bg-[var(--surface)] px-2 text-sm font-medium normal-case tracking-normal text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+              className="h-10 min-w-0 border border-[var(--border)] bg-[var(--surface)] px-2 text-sm font-medium normal-case tracking-normal text-[var(--foreground)] outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
             >
               {colorVariants.map((variant) => (
                 <option
@@ -108,7 +108,7 @@ export function WishlistProductCard({ product }: { product: Product }) {
           type="button"
           onClick={moveToBag}
           disabled={unavailable}
-          className="inline-flex h-11 items-center justify-center gap-2 bg-[var(--foreground)] px-4 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] disabled:opacity-45"
+          className="storefront-action inline-flex h-11 items-center justify-center gap-2 bg-[var(--foreground)] px-4 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-45 motion-reduce:transition-none"
         >
           {added ? <Check className="size-4" /> : <ShoppingBag className="size-4" />}
           {added ? "Added" : "Move to bag"}

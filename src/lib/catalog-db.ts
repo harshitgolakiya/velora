@@ -67,18 +67,22 @@ function parseStringArray(value: string | null | undefined) {
   }
 }
 
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm)(\?.*)?$/i.test(url.trim());
+}
+
 const fallbackHomepageSections: StorefrontHomepageSection[] = [
   {
     id: "fallback-hero",
     key: "hero-drop",
     type: "HERO",
     status: "PUBLISHED",
-    title: "Sculpted essentials",
-    subtitle: "New drop",
-    body: "Minimal activewear, engineered support, soft compression, and a secure checkout.",
+    title: "Modern occasion pieces",
+    subtitle: "New edit",
+    body: "Polished dresses, clean layers, and refined separates styled for day-to-evening dressing.",
     ctaLabel: "Shop now",
     ctaHref: "/shop",
-    imageUrl: "/images/velora/hero-sculpted-essentials.jpg",
+    imageUrl: "/images/activewear-demo/active-duo.jpg",
     productIds: [],
     settings: {},
     categoryMediaItems: [],
@@ -88,9 +92,9 @@ const fallbackHomepageSections: StorefrontHomepageSection[] = [
     key: "best-sellers",
     type: "FEATURED_PRODUCTS",
     status: "PUBLISHED",
-    title: "Support that sells out",
+    title: "Pieces selling now",
     subtitle: "Best sellers",
-    body: "A merchandising rail with quick size add, wishlist, sale states, color counts, and persistent cart feedback.",
+    body: "Customer favorites with quick size add, wishlist, sale states, color counts, and persistent cart feedback.",
     ctaLabel: "Shop best sellers",
     ctaHref: "/shop",
     productIds: [],
@@ -126,12 +130,12 @@ const fallbackHomepageSections: StorefrontHomepageSection[] = [
     key: "fit-system",
     type: "STORY_BAND",
     status: "PUBLISHED",
-    title: "Choose by support, coverage, and compression.",
-    subtitle: "Fit system",
-    body: "Low impact rib crops, medium support training bras, and heat-ready technical layers for movement.",
+    title: "Choose by silhouette, fabric, and finish.",
+    subtitle: "Fit notes",
+    body: "Compare drape, structure, stretch, and coverage before choosing your next Velora piece.",
     ctaLabel: "Open fit guide",
     ctaHref: "/fabric-guide",
-    imageUrl: "/images/velora/fit-guide.jpg",
+    imageUrl: "/images/activewear-demo/active-neutral.jpg",
     productIds: [],
     settings: {},
     categoryMediaItems: [],
@@ -206,16 +210,26 @@ function mapProduct(row: ProductWithRelations, mediaMetadata: MediaMetadataByUrl
   const colorHex = Object.fromEntries(row.variants.map((variant) => [displayColorName(variant.color.name), variant.color.hex]));
   const variantMediaByColor = row.variants.reduce<Record<string, ProductMedia[]>>((map, variant) => {
     const colorName = displayColorName(variant.color.name);
-    if (!map[colorName]) {
-      map[colorName] = variant.medias.map((media) => mapMedia(media, mediaMetadata));
+    const existing = map[colorName] ?? [];
+    const existingKeys = new Set(existing.map((media) => `${media.type}:${media.url}:${media.sortOrder}:${media.isHoverImage}`));
+    const merged = [...existing];
+
+    for (const media of variant.medias.map((item) => mapMedia(item, mediaMetadata))) {
+      const key = `${media.type}:${media.url}:${media.sortOrder}:${media.isHoverImage}`;
+      if (!existingKeys.has(key)) {
+        existingKeys.add(key);
+        merged.push(media);
+      }
     }
+
+    map[colorName] = merged.sort((a, b) => a.sortOrder - b.sortOrder);
     return map;
   }, {});
-  const productImages = row.images.map((image) => image.url);
+  const productImages = row.images.map((image) => image.url).filter((url) => !isVideoUrl(url));
   const firstColorMedia = colorNames[0] ? variantMediaByColor[colorNames[0]] ?? [] : [];
   const mediaImages = firstColorMedia.filter((media) => media.type === "IMAGE").map((media) => media.url);
   const resolvedImages = mediaImages.length ? mediaImages : productImages;
-  const images = resolvedImages.length ? resolvedImages : ["/images/velora/hero-sculpted-essentials.jpg"];
+  const images = resolvedImages.length ? resolvedImages : ["/images/activewear-demo/active-duo.jpg"];
   const hoverImage =
     firstColorMedia.find((media) => media.isHoverImage && media.type === "IMAGE")?.url ??
     images[1] ??
@@ -247,7 +261,7 @@ function mapProduct(row: ProductWithRelations, mediaMetadata: MediaMetadataByUrl
       slug: collection.slug,
       name: findTranslation(collection.translations, locale)?.name || collection.name,
       summary: findTranslation(collection.translations, locale)?.summary || collection.summary,
-      image: collection.bannerImage ?? images[0] ?? "/images/velora/hero-sculpted-essentials.jpg",
+      image: collection.bannerImage ?? images[0] ?? "/images/activewear-demo/active-duo.jpg",
       seoTitle: findTranslation(collection.translations, locale)?.seoTitle ?? collection.seoTitle ?? undefined,
       seoDescription: findTranslation(collection.translations, locale)?.seoDescription ?? collection.seoDescription ?? undefined,
       socialImage: collection.socialImage ?? undefined,
@@ -419,7 +433,7 @@ export async function getDbCollections(locale: Locale = "en"): Promise<Collectio
             slug: collection.slug,
             name: translation?.name || collection.name,
             summary: translation?.summary || collection.summary,
-            image: collection.bannerImage ?? "/images/velora/hero-sculpted-essentials.jpg",
+            image: collection.bannerImage ?? "/images/activewear-demo/active-duo.jpg",
             status: collection.status,
             scheduledAt: collection.scheduledAt?.toISOString(),
             publishedAt: collection.publishedAt?.toISOString(),
@@ -479,7 +493,7 @@ export async function getDbHomepageSections(locale: Locale = "en"): Promise<Stor
               slug: section.collection.slug,
               name: collectionTranslation?.name || section.collection.name,
               summary: collectionTranslation?.summary || section.collection.summary,
-              image: section.collection.bannerImage ?? section.imageUrl ?? "/images/velora/hero-sculpted-essentials.jpg",
+              image: section.collection.bannerImage ?? section.imageUrl ?? "/images/activewear-demo/active-duo.jpg",
               seoTitle: collectionTranslation?.seoTitle ?? section.collection.seoTitle ?? undefined,
               seoDescription: collectionTranslation?.seoDescription ?? section.collection.seoDescription ?? undefined,
             }

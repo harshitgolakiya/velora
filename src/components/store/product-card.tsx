@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, Heart } from "lucide-react";
+import { Heart, Play } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Product, ProductMedia } from "@/lib/catalog";
 import { getDiscountPercentage, getProductBadges } from "@/lib/product-presentation";
 import { trackSearchClick } from "@/lib/search-click-client";
 import { useStore } from "@/lib/store";
 import { cn, formatAed } from "@/lib/utils";
-import { QuickView } from "./quick-view";
+import { localeFromPathname, localizedPath } from "@/lib/i18n-shell";
 
 const swatchColors: Record<string, string> = {
   Black: "#2C2824",
@@ -44,12 +45,14 @@ export function ProductCard({
   imageSizes?: string;
 }) {
   const wishlist = useStore((state) => state.wishlist);
+  const pathname = usePathname();
+  const productHref = localizedPath(`/product/${product.slug}`, localeFromPathname(pathname));
   const toggleWishlist = useStore((state) => state.toggleWishlist);
   const liked = wishlist.includes(product.slug);
   const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? "");
-  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const selectedMedia = product.variantMediaByColor?.[selectedColor] ?? [];
   const selectedImages = selectedMedia.filter((media) => media.type === "IMAGE");
+  const motionMedia = selectedMedia.find((media) => media.type === "VIDEO");
   const primaryMedia = selectedImages.find((media) => !media.isHoverImage);
   const image = primaryMedia?.url ?? product.images[0];
   const hoverMedia =
@@ -57,7 +60,8 @@ export function ProductCard({
     selectedImages.find((media) => media.url !== image);
   const hoverImage =
     hoverMedia?.url ??
-    (product.hoverImage && product.hoverImage !== image ? product.hoverImage : product.images[1]);
+    (!selectedImages.length && product.hoverImage && product.hoverImage !== image ? product.hoverImage : undefined) ??
+    (!selectedImages.length ? product.images[1] : undefined);
   const imageFit = productCardImageFit(primaryMedia);
   const badges = getProductBadges(product);
   const discount = getDiscountPercentage(product);
@@ -65,24 +69,25 @@ export function ProductCard({
   function rememberPosition() {
     sessionStorage.setItem("velora-product-list-scroll", String(window.scrollY));
     sessionStorage.setItem("velora-product-list-path", `${window.location.pathname}${window.location.search}`);
-    if (window.location.pathname === "/search") {
+    if (window.location.pathname === "/search" || window.location.pathname === "/ar/search") {
       const query = new URLSearchParams(window.location.search).get("q") ?? "";
       trackSearchClick({
         query,
         source: "results_page",
         resultType: "product",
         resultId: product.id,
-        href: `/product/${product.slug}`,
+        href: productHref,
       });
     }
   }
 
   return (
-    <article className={cn("group relative min-w-0", className)}>
-      <div className="storefront-product-media relative overflow-hidden">
-        <Link href={`/product/${product.slug}`} className="block" onClick={rememberPosition}>
+    <article className={cn("storefront-product-card relative min-w-0", className)}>
+      <div className="storefront-product-card-media storefront-product-media relative">
+        <Link href={productHref} className="storefront-product-media-link block" onClick={rememberPosition}>
           <div className="relative aspect-[3/4]">
             <Image
+              key={`primary-${selectedColor}-${image}`}
               src={image}
               alt={`${product.name} in ${selectedColor || "selected color"}`}
               fill
@@ -92,13 +97,15 @@ export function ProductCard({
               decoding={priority ? "sync" : "async"}
               sizes={imageSizes}
               quality={priority ? 72 : 84}
+              draggable={false}
               className={cn(
-                !priority && "transition duration-700 ease-out motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.015]",
+                !priority && "storefront-product-primary-image transition duration-700 ease-out motion-reduce:transition-none",
                 imageFit,
               )}
             />
             {hoverImage ? (
               <Image
+                key={`hover-${selectedColor}-${hoverImage}`}
                 src={hoverImage}
                 alt=""
                 aria-hidden="true"
@@ -107,22 +114,41 @@ export function ProductCard({
                 fetchPriority="low"
                 sizes={imageSizes}
                 quality={84}
+                draggable={false}
                 className={cn(
-                  "pointer-events-none opacity-0 transition duration-500 motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100",
+                  "storefront-product-hover-image pointer-events-none opacity-0 transition duration-500 motion-reduce:transition-none",
                   imageFit,
                 )}
               />
             ) : null}
+            {motionMedia ? (
+              <>
+                <video
+                  src={motionMedia.url}
+                  poster={image}
+                  className="storefront-product-motion-media pointer-events-none absolute inset-0 hidden h-full w-full object-cover opacity-0 transition duration-500 motion-reduce:hidden"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  preload="none"
+                  aria-hidden="true"
+                />
+                <span className="storefront-light-chip absolute bottom-3 left-3 hidden items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] [@media(hover:hover)_and_(pointer:fine)]:inline-flex">
+                  <Play className="size-3 fill-current" />
+                  Motion
+                </span>
+              </>
+            ) : null}
             {badges.length ? (
-              <div className="absolute start-3 top-3 flex max-w-[70%] flex-wrap gap-1.5">
+              <div className="absolute start-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-wrap gap-1.5">
                 {badges.map((badge) => (
                   <span
                     key={badge.label}
                     className={cn(
-                      "px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]",
+                      "storefront-light-chip px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] shadow-sm",
                       badge.tone === "sale" && "bg-[#B42318] text-white",
                       badge.tone === "dark" && "bg-stone-950 text-white",
-                      badge.tone === "light" && "storefront-light-chip",
                     )}
                   >
                     {badge.label}
@@ -137,24 +163,13 @@ export function ProductCard({
           aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           aria-pressed={liked}
           onClick={() => toggleWishlist(product.slug)}
-          className="storefront-action storefront-light-control absolute end-2.5 top-2.5 grid size-9 place-items-center border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 sm:end-3 sm:top-3 sm:size-10 motion-reduce:transition-none"
+          className="storefront-action storefront-icon-button storefront-product-overlay-control absolute end-3 top-3 grid size-9 place-items-center transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#17262D] sm:size-10 motion-reduce:transition-none"
         >
-          <Heart className={cn("size-4.5", liked && "fill-current")} />
+          <Heart className={cn("size-5", liked && "fill-[#d12b2b] text-[#d12b2b]")} />
         </button>
-        <button
-          type="button"
-          aria-label={`Quick view ${product.name}`}
-          onClick={() => setQuickViewOpen(true)}
-          className="storefront-action storefront-light-control absolute end-2.5 top-[3.25rem] grid size-9 place-items-center border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 sm:end-3 sm:top-14 sm:size-10 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 motion-reduce:transition-none"
-        >
-          <Eye className="size-4.5" />
-        </button>
-        {quickViewOpen ? (
-          <QuickView product={product} open={quickViewOpen} onOpenChange={setQuickViewOpen} showTrigger={false} />
-        ) : null}
       </div>
-      <div className="mt-3 flex min-h-6 items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2" role="group" aria-label={`Available colors for ${product.name}`}>
+      <div className="mt-2.5 flex min-h-8 items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Available colors for ${product.name}`}>
           {product.colors.map((color) => (
             <button
               type="button"
@@ -164,12 +179,12 @@ export function ProductCard({
               title={color}
               onClick={() => setSelectedColor(color)}
               className={cn(
-                "storefront-action storefront-swatch size-[18px] border p-0.5 outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 motion-reduce:transition-none",
+                "storefront-action storefront-swatch grid size-9 place-items-center p-0 outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 sm:size-8 motion-reduce:transition-none",
               )}
             >
               <span
                 aria-hidden="true"
-                style={{ backgroundColor: product.colorHex?.[color] ?? swatchColors[color] ?? "#C5A46D" }}
+                style={{ backgroundColor: product.colorHex?.[color] ?? swatchColors[color] ?? "#BCE3F4" }}
               />
             </button>
           ))}
@@ -180,26 +195,25 @@ export function ProductCard({
           </span>
         ) : null}
       </div>
-      <div className="mt-2.5 grid gap-2 sm:flex sm:items-start sm:justify-between sm:gap-4">
+      <div className="mt-0.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-4">
         <div className="min-w-0">
           <Link
-            href={`/product/${product.slug}`}
+            href={productHref}
             onClick={rememberPosition}
-            className="line-clamp-2 break-words text-sm font-medium leading-5 text-[var(--foreground)] hover:underline sm:text-base sm:leading-6"
+            className="line-clamp-2 min-h-10 break-words text-sm font-medium leading-5 text-[var(--foreground)] hover:underline sm:min-h-12 sm:text-base sm:leading-6"
           >
             {product.name}
           </Link>
-          <p className="mt-1 truncate text-xs text-[var(--muted)] sm:text-sm">{product.category}</p>
         </div>
         <div className="shrink-0 text-sm sm:text-end">
           {product.salePrice ? (
             <>
-              <p className="font-medium text-[#B42318]">{formatAed(product.salePrice)}</p>
-              <p className="text-xs text-[var(--muted)] line-through">{formatAed(product.price)}</p>
+              <p className="font-medium text-[#B42318]">{formatAed(product.salePrice, localeFromPathname(pathname))}</p>
+              <p className="text-xs text-[var(--muted)] line-through">{formatAed(product.price, localeFromPathname(pathname))}</p>
               {discount ? <p className="mt-1 text-[10px] uppercase tracking-[0.08em] text-[#B42318]">Save {discount}%</p> : null}
             </>
           ) : (
-            <p>{formatAed(product.price)}</p>
+            <p>{formatAed(product.price, localeFromPathname(pathname))}</p>
           )}
         </div>
       </div>

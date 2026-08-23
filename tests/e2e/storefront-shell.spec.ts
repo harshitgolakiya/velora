@@ -144,8 +144,8 @@ test("search dialog focuses input and returns focus when closed", async ({ page 
   await expect(trigger).toBeFocused();
 });
 
-test("quick view dialog opens from product cards and closes with escape", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "Shared dialog coverage only needs one browser project.");
+test("product cards open the product detail page", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "Shared card coverage only needs one browser project.");
   await page.setViewportSize({ width: 390, height: 760 });
   await page.addInitScript(() => {
     localStorage.setItem("velora-theme", "light");
@@ -153,19 +153,11 @@ test("quick view dialog opens from product cards and closes with escape", async 
   await page.goto("/shop", { waitUntil: "domcontentloaded" });
   await stabilizeShell(page);
 
-  const trigger = page.getByRole("button", { name: /Quick view/i }).first();
-  await trigger.click();
-  const dialog = page.getByRole("dialog").filter({ has: page.getByRole("button", { name: "Add to bag" }) });
-  await expect(dialog).toBeVisible();
-
-  const dimensions = await page.evaluate(() => ({
-    viewport: window.innerWidth,
-    document: document.documentElement.scrollWidth,
-  }));
-  expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport + 1);
-
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
+  const productLink = page.locator("article a[href^='/product/']").first();
+  const href = await productLink.getAttribute("href");
+  expect(href).toMatch(/^\/product\//);
+  await productLink.click();
+  await expect(page).toHaveURL(new RegExp(`${href}$`));
 });
 
 test("newsletter dialog traps focus and respects escape dismissal", async ({ page }, testInfo) => {
@@ -200,11 +192,11 @@ test("refresh and browser navigation preserve shell layout and route state", asy
   await page.addInitScript(() => {
     localStorage.setItem("velora-theme", "light");
   });
-  await page.goto("/shop?category=Leggings", { waitUntil: "domcontentloaded" });
+  await page.goto("/shop?category=Dresses", { waitUntil: "domcontentloaded" });
   await stabilizeShell(page);
 
   await page.reload({ waitUntil: "domcontentloaded" });
-  await expect(page).toHaveURL(/\/shop\?category=Leggings/);
+  await expect(page).toHaveURL(/\/shop\?category=Dresses/);
   await expect(page.locator("header")).toBeVisible();
   await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
   let dimensions = await page.evaluate(() => ({
@@ -213,9 +205,9 @@ test("refresh and browser navigation preserve shell layout and route state", asy
   }));
   expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport + 1);
 
-  await page.goto("/collections/studio-sculpt", { waitUntil: "domcontentloaded" });
+  await page.goto("/collections/pilates-studio", { waitUntil: "domcontentloaded" });
   await page.goBack({ waitUntil: "domcontentloaded" });
-  await expect(page).toHaveURL(/\/shop\?category=Leggings/);
+  await expect(page).toHaveURL(/\/shop\?category=Dresses/);
   await expect(page.locator("header")).toBeVisible();
   dimensions = await page.evaluate(() => ({
     viewport: window.innerWidth,

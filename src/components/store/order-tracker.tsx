@@ -40,7 +40,7 @@ function statusLabel(value: string) {
   return value.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-const trackerInputClass = "h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none";
+const trackerInputClass = "storefront-action h-12 min-w-0 border border-[var(--border)] bg-[var(--background)] px-4 text-sm outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none";
 
 function LookupForm({
   customerEmail,
@@ -65,7 +65,7 @@ function LookupForm({
         <input name="email" required type="email" defaultValue={customerEmail} suppressHydrationWarning className={trackerInputClass} placeholder="you@example.com" />
       </label>
       {error ? <p role="alert" className="text-sm text-red-500">{error}</p> : null}
-      <Button disabled={loading}>
+      <Button disabled={loading} className="h-12">
         <Search className="size-4" />
         {loading ? copy.findingOrder : copy.trackOrder}
       </Button>
@@ -107,10 +107,10 @@ export function OrderTracker({
   }
 
   return (
-    <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)]">
+    <div className="mt-7 grid items-start gap-5 lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)]">
       <div className="grid gap-4">
         {initialOrders.length ? (
-          <section className="border border-[var(--border)] bg-[var(--surface)]">
+          <section className="storefront-framed">
             <div className="border-b border-[var(--border)] px-5 py-4">
               <h2 className="font-semibold">{copy.ordersInProgress}</h2>
               <p className="mt-1 text-xs text-[var(--muted)]">{copy.selectOrderHint}</p>
@@ -129,7 +129,7 @@ export function OrderTracker({
                     className={`flex w-full items-center gap-4 px-5 py-4 text-start transition motion-reduce:transition-none ${active ? "bg-[var(--card)]" : "hover:bg-[var(--hover)]"}`}
                     aria-pressed={active}
                   >
-                    <span className={`grid size-10 shrink-0 place-items-center ${active ? "bg-[var(--accent)] text-[#111315]" : "bg-[var(--card)] text-[var(--muted)]"}`}>
+                    <span className={`grid size-10 shrink-0 place-items-center rounded-full ${active ? "bg-[var(--accent)] text-[#17262D]" : "bg-[var(--card)] text-[var(--muted)]"}`}>
                       <Package className="size-4" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -147,17 +147,21 @@ export function OrderTracker({
         ) : null}
 
         {initialOrders.length ? (
-          <details className="group border border-[var(--border)] bg-[var(--surface)]">
+          <details className="storefront-framed group">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold">
               {copy.trackAnotherOrder}
               <ChevronDown className="size-4 transition group-open:rotate-180 motion-reduce:transition-none" />
             </summary>
-            <div className="border-t border-[var(--border)] p-5">
-              <LookupForm customerEmail={customerEmail} loading={loading} error={error} onSubmit={submit} />
+            <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out group-open:grid-rows-[1fr] motion-reduce:transition-none">
+              <div className="min-h-0 overflow-hidden border-t border-[var(--border)]">
+                <div className="p-5">
+                  <LookupForm customerEmail={customerEmail} loading={loading} error={error} onSubmit={submit} />
+                </div>
+              </div>
             </div>
           </details>
         ) : (
-          <section className="border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6">
+          <section className="storefront-framed p-5">
             <h2 className="mb-5 font-semibold">{copy.findAnOrder}</h2>
             <LookupForm customerEmail={customerEmail} loading={loading} error={error} onSubmit={submit} />
           </section>
@@ -165,14 +169,14 @@ export function OrderTracker({
       </div>
 
       {order ? (
-        <section className="border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6">
+        <section className="storefront-framed p-5 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--border)] pb-5">
             <div>
               <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{copy.order}</p>
               <h2 className="mt-1 text-2xl font-semibold">{order.orderNumber}</h2>
               <p className="mt-2 text-xs text-[var(--muted)]">{copy.updated} {new Date(order.updatedAt).toLocaleString("en-AE")}</p>
             </div>
-            <span className="bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase text-[#111315]">{statusLabel(order.status)}</span>
+            <span className="rounded-full bg-[var(--accent)] px-3 py-2 text-xs font-semibold uppercase text-[#17262D]">{statusLabel(order.status)}</span>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -181,7 +185,7 @@ export function OrderTracker({
               [Package, copy.fulfillment, statusLabel(order.fulfillmentStatus)],
               [Truck, copy.shipment, statusLabel(order.shipmentStatus ?? copy.notDispatched)],
             ].map(([Icon, label, value]) => (
-              <div key={label as string} className="border border-[var(--border)] bg-[var(--card)] p-4">
+              <div key={label as string} className="storefront-framed bg-[var(--card)] p-4">
                 <Icon className="size-5 text-[var(--accent)]" />
                 <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[var(--muted)]">{label as string}</p>
                 <p className="mt-1 font-semibold">{value as string}</p>
@@ -199,7 +203,7 @@ export function OrderTracker({
             <ol className="mt-6 border-t border-[var(--border)] pt-5">
               {order.shipmentEvents.map((event, index) => (
                 <li key={event.id} className="grid grid-cols-[24px_minmax(0,1fr)] gap-3 pb-5 last:pb-0">
-                  <span className="mt-1 grid size-5 place-items-center bg-[var(--accent)] text-[10px] font-semibold text-[#111315]">{index + 1}</span>
+                  <span className="mt-1 grid size-5 place-items-center rounded-full bg-[var(--accent)] text-[10px] font-semibold text-[#17262D]">{index + 1}</span>
                   <span>
                     <span className="block text-sm font-semibold">{event.message ?? statusLabel(event.status)}</span>
                     <span className="mt-1 block text-xs text-[var(--muted)]">{[event.carrier, event.trackingNo, new Date(event.createdAt).toLocaleString("en-AE")].filter(Boolean).join(" / ")}</span>
@@ -214,14 +218,14 @@ export function OrderTracker({
           )}
 
           {customerEmail ? (
-            <Link href={`/account/orders/${order.orderNumber}`} className="mt-6 inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-sm font-semibold transition hover:border-[var(--foreground)] motion-reduce:transition-none">
+            <Link href={`/account/orders/${order.orderNumber}`} className="storefront-action mt-6 inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-sm font-semibold transition hover:border-[var(--foreground)] motion-reduce:transition-none">
               {copy.viewFullOrderDetails} <ArrowRight className="size-4" />
             </Link>
           ) : null}
         </section>
       ) : (
-        <div className="grid min-h-72 place-items-center border border-dashed border-[var(--border)] px-6 text-center text-[var(--muted)]">
-          <div><Package className="mx-auto size-7" /><p className="mt-3">{copy.trackingDetailsPlaceholder}</p></div>
+        <div className="storefront-framed grid min-h-64 place-items-center px-6 text-center text-[var(--muted)]">
+          <div><Package className="mx-auto size-7 text-[var(--accent)]" /><p className="mt-3 text-sm leading-6">{copy.trackingDetailsPlaceholder}</p></div>
         </div>
       )}
     </div>

@@ -52,7 +52,7 @@ export function ContentManager({ pages }: { pages: PageRow[] }) {
               <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.1em]">Slug<input name="slug" required minLength={2} placeholder="shipping-guide" className="h-11 border border-[var(--border)] bg-[var(--background)] px-3 text-sm font-normal normal-case tracking-normal" /></label>
               <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-[0.1em]">Type<select name="contentType" className="h-11 border border-[var(--border)] bg-[var(--background)] px-3 text-sm font-normal normal-case tracking-normal"><option value="EDITORIAL">Editorial</option><option value="GUIDE">Guide</option><option value="FAQ">FAQ</option><option value="POLICY">Policy</option><option value="SUPPORT">Support</option><option value="LEGAL">Legal</option></select></label>
               {message ? <p role="alert" className="text-sm text-red-500">{message}</p> : null}
-              <button disabled={creating} className="inline-flex h-11 w-full items-center justify-center gap-2 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] disabled:opacity-50"><Plus className="size-4" />{creating ? "Creating" : "Create draft"}</button>
+              <button disabled={creating} className="inline-flex h-11 w-full items-center justify-center gap-2 bg-[var(--accent)] text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] disabled:opacity-50"><Plus className="size-4" />{creating ? "Creating" : "Create draft"}</button>
             </form>
           </section>
           <section className="border border-[var(--border)] bg-[var(--surface)]">

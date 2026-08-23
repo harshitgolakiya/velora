@@ -2,7 +2,7 @@ import { ProductGridSkeleton } from "@/components/store/product-grid-skeleton";
 
 export default function SearchLoading() {
   return (
-    <main className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
+    <main className="storefront-container py-12">
       <div className="mb-10">
         <div className="h-10 w-80 animate-pulse bg-[var(--card)]" />
         <div className="mt-4 h-4 w-full max-w-xl animate-pulse bg-[var(--card)]" />

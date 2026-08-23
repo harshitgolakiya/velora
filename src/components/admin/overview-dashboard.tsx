@@ -66,7 +66,7 @@ function StatusPill({
 }) {
   const classes = {
     neutral: "bg-[var(--hover)] text-[var(--foreground)]",
-    gold: "bg-[var(--accent)] text-[#111315]",
+    gold: "bg-[var(--accent)] text-[#17262D]",
     green: "bg-emerald-500/10 text-emerald-500",
     red: "bg-red-500/10 text-red-500",
   };
@@ -162,7 +162,7 @@ export function OverviewDashboard({
               {overview.periodLabel}
             </span>
             {(["Today", "Week", "Month", "Quarter"] as const).map((option) => (
-              <button key={option} type="button" onClick={() => setRange(option)} aria-pressed={range === option} className={`h-10 border border-[var(--border)] px-3 text-sm font-semibold ${range === option ? "bg-[var(--accent)] text-[#111315]" : "hover:bg-[var(--hover)]"}`}>
+              <button key={option} type="button" onClick={() => setRange(option)} aria-pressed={range === option} className={`h-10 border border-[var(--border)] px-3 text-sm font-semibold ${range === option ? "bg-[var(--accent)] text-[#17262D]" : "hover:bg-[var(--hover)]"}`}>
                 {option}
               </button>
             ))}

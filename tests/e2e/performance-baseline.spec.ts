@@ -17,7 +17,7 @@ type LayoutShiftEntry = PerformanceEntry & {
 const routes = [
   { path: "/", name: "home", maxLcp: 6_500, maxTransferKb: 9_000, maxTtfb: 2_000 },
   { path: "/shop", name: "shop", maxLcp: 7_000, maxTransferKb: 10_000, maxTtfb: 2_500 },
-  { path: "/product/flared-pants-7461", name: "product", maxLcp: 7_000, maxTransferKb: 10_000, maxTtfb: 3_000 },
+  { path: "/product/airlift-full-length-legging", name: "product", maxLcp: 7_000, maxTransferKb: 10_000, maxTtfb: 3_000 },
   { path: "/cart", name: "cart", maxLcp: 5_500, maxTransferKb: 7_000, maxTtfb: 2_000 },
 ] as const;
 

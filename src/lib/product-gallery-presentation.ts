@@ -2,21 +2,30 @@ import type { Product, ProductMedia } from "./catalog";
 
 export type GalleryPresentationMedia = Pick<ProductMedia, "type" | "url" | "width" | "height" | "altText" | "focalPointX" | "focalPointY">;
 
+function orderImagesBeforeVideo(media: GalleryPresentationMedia[]) {
+  return [...media].sort((first, second) => {
+    if (first.type === second.type) return 0;
+    return first.type === "IMAGE" ? -1 : 1;
+  });
+}
+
 export function resolveProductGalleryMedia(
   product: Pick<Product, "images" | "variantMediaByColor">,
   selectedColor?: string,
 ): GalleryPresentationMedia[] {
   const colorMedia = selectedColor ? product.variantMediaByColor?.[selectedColor] : undefined;
   if (colorMedia?.length) {
-    return colorMedia.map(({ type, url, width, height, altText, focalPointX, focalPointY }) => ({
-      type,
-      url,
-      width,
-      height,
-      altText,
-      focalPointX,
-      focalPointY,
-    }));
+    return orderImagesBeforeVideo(
+      colorMedia.map(({ type, url, width, height, altText, focalPointX, focalPointY }) => ({
+        type,
+        url,
+        width,
+        height,
+        altText,
+        focalPointX,
+        focalPointY,
+      })),
+    );
   }
   return product.images.map((url) => ({ type: "IMAGE" as const, url }));
 }

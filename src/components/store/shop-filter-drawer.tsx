@@ -21,27 +21,27 @@ export function ShopFilterDrawer({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/55 backdrop-blur-sm" />
-        <Dialog.Content className="storefront-drawer-right fixed inset-y-0 end-0 z-[110] flex w-full max-w-xl flex-col bg-[var(--surface)] text-[var(--foreground)] shadow-2xl lg:max-w-md">
+        <Dialog.Content className="storefront-drawer-right storefront-panel fixed inset-y-0 end-0 z-[110] flex w-full max-w-xl flex-col bg-[var(--surface)] text-[var(--foreground)] lg:max-w-md">
           <Dialog.Title className="sr-only">Filter and sort products</Dialog.Title>
           <Dialog.Description className="sr-only">
             Refine the product grid by sort order, category, size, color, collection, style, gender, and material.
           </Dialog.Description>
-          <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-5">
+          <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/40 px-5 py-4 backdrop-blur">
             <div>
               <p className="font-semibold">Filter & sort</p>
               <p className="mt-1 text-sm text-[var(--muted)]">{matchCount} matching {matchCount === 1 ? "product" : "products"}</p>
             </div>
             <Dialog.Close asChild>
-              <button type="button" aria-label="Close filters" className="storefront-action grid size-10 place-items-center hover:bg-[var(--hover)]">
-                <X className="size-6" />
+              <button type="button" aria-label="Close filters" className="storefront-action storefront-icon-button grid size-10 place-items-center border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--foreground)]">
+                <X className="size-5" />
               </button>
             </Dialog.Close>
           </div>
           {chips}
           <div className="flex-1 overflow-y-auto">{children}</div>
-          <div className="border-t border-[var(--border)] bg-[var(--surface)] p-5">
+          <div className="border-t border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_-12px_30px_var(--shadow)]">
             <Dialog.Close asChild>
-              <button type="button" className="storefront-action h-14 w-full bg-[var(--accent)] text-sm font-semibold uppercase tracking-[0.16em] text-[#111315] hover:bg-[var(--foreground)] hover:text-[var(--background)]">
+              <button type="button" className="storefront-action h-12 w-full bg-[var(--accent)] text-sm font-semibold uppercase tracking-[0.14em] text-[#17262D] hover:brightness-95">
                 View {matchCount} {matchCount === 1 ? "product" : "products"}
               </button>
             </Dialog.Close>

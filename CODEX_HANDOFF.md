@@ -1,264 +1,188 @@
-# Codex Handoff
+# Codex Handoff: Velora
 
-## Project
+Last updated: 2026-08-22
 
-Velora is a temporary name for a premium activewear ecommerce build. The storefront must feel international and high-end; UAE is an important audience, but the site should not be designed or written as UAE-only.
+## Start Here
 
-Primary working directory: `C:\Users\golak\Desktop\ecomm\velora`
+Continue work in:
 
-## Tech Stack
+`C:\Users\golak\Desktop\ecomm\velora`
 
-- Next.js `16.2.10` App Router, React `19.2.4`, TypeScript.
-- Tailwind CSS v4, Radix UI, lucide-react, native CSS/scroll interactions for storefront sliders.
-- Prisma `7.8.0` with SQLite/libSQL adapter for local development.
-- NextAuth credentials auth, bcryptjs.
-- Stripe-ready checkout, cash on delivery, SMTP/cPanel email, Resend-ready templates.
-- Vitest for unit/integration tests, Playwright for E2E/screenshot tests.
+Read this file, then inspect `git status --short` before editing. The worktree is intentionally very dirty after a long implementation and UI-polish session. Do not reset, checkout, restore, or otherwise discard existing changes. Treat all modified, deleted, and untracked source files as user work unless a task explicitly says otherwise.
 
-## Architecture
+The current objective is to deploy the application to a temporary public domain for review. This is a staging/preview deployment, not a real customer launch. Real payments, final products, production evidence, and final provider integrations are not required for this temporary deployment.
 
-- Storefront routes live in `src/app/*` and pull catalog/homepage data through `src/lib/cms.ts`.
-- Current CMS provider is `local`; `src/lib/cms.ts` is the adapter boundary for future Sanity, Shopify headless, or Strapi.
-- Database models are Prisma-first in `prisma/schema.prisma`; Prisma 7 datasource URL is configured in `prisma.config.ts`, not inside `schema.prisma`.
-- Prisma client uses `@prisma/adapter-libsql` in `src/lib/prisma.ts`.
-- Admin data aggregation lives mostly in `src/lib/admin-catalog.ts`; the main admin UI is `src/components/admin/admin-console.tsx`.
-- Storefront UI components live in `src/components/store/*`.
-- Admin/API mutations live in `src/app/api/admin/*` and customer APIs in `src/app/api/*`.
-- `MASTER_PROJECT_ROADMAP.md` is the source of truth for remaining work.
+## Project Summary
 
-## Folder Map
+- Name: Velora
+- Type: international activewear ecommerce storefront and admin application
+- Framework: Next.js 16.2.10 App Router
+- Runtime: React 19.2.4, TypeScript, Tailwind CSS
+- Database: Prisma 7.8 with libSQL/SQLite support
+- Authentication: NextAuth credentials flow
+- Payments: Stripe-ready checkout plus provider scaffolding; keep payments in test/demo mode for preview
+- Email: SMTP/Resend-ready infrastructure
+- State/UI: Zustand, Radix UI, Lucide, Framer Motion, Embla
+- Local workspace currently uses Node.js 20.20.2
+- Temporary server should use Node.js 22.23.2
 
-- `src/app` - Next.js routes, layouts, metadata, API routes.
-- `src/components/store` - storefront header, footer, product cards, cart, checkout, search, account-facing UI.
-- `src/components/admin` - admin dashboard, product editor, content manager, support/email tools.
-- `src/components/auth` - account dashboard, login/access, returns, reorder, wishlist account cards.
-- `src/lib` - server/client business logic, catalog mapping, settings, email, returns, analytics, admin helpers.
-- `prisma` - schema, migrations, seed script, local `dev.db`.
-- `public/images` - local product/editorial images, including WooCommerce import images.
-- `scripts` - import/seed utilities.
-- `tests` - Vitest suites and Playwright E2E/screenshot specs.
-- `artifacts` - screenshots from visual audits.
+The app contains storefront, product, collection, search, cart, checkout, account, order, returns, support, content, admin, health, webhook, SEO, and accessibility surfaces. The latest successful build generated 118 routes.
 
-## Completed Features
+## Current Verification State
 
-- Storefront: home, shop, collections, product detail, cart, checkout, account, tracking, support/content pages.
-- Themes: light/dark switcher, Poppins-like modern storefront direction in progress.
-- Catalog: database-backed products, categories, collections, colors, sizes, tags, variants, per-color media, hover images, videos.
-- Product import: WooCommerce CSV/image import foundation; local imported images under `public/images/products/woocommerce`.
-- Homepage: admin-backed sections, ordering, category media tiles, full-bleed collection banner, draggable product sliders.
-- Shop: side-panel filters, sorting, URL state, mobile filter behavior, 4-column laptop and 5-column wide desktop grid.
-- Product detail: variant selection, per-color galleries, zoom/fullscreen, fit/care/spec fields, reviews, recommendations.
-- Cart/inventory: persistent cart, drawer/page, reservations, backorders, atomic oversell protection, inventory anomalies.
-- Checkout: guest/account checkout, saved addresses, coupons, configurable shipping/payment settings, Stripe/COD foundations.
-- Returns/exchanges: dedicated return route, resolution-specific reasons, replacement size lookup, partial quantity, evidence upload, lifecycle/admin queue.
-- Admin: overview, products, categories, collections, attributes, inventory, orders, customers, coupons, media, reviews, homepage, automation, analytics/settings.
-- Security/admin: admin login, RBAC, permissions, API protection, rate limiting, activity logs.
-- Email/marketing: SMTP/cPanel env support, Resend-ready templates, newsletter, automation, provider event records.
-- SEO/analytics/localization foundations exist, but localization is not the current priority.
+Most recent commands completed on 2026-08-22:
 
-## Current Bugs / Known Issues
+1. `npm ci` passed and installed 776 packages.
+2. `npm run prisma:generate` passed with Prisma Client 7.8.0.
+3. `npm run build` passed completely:
+   - Next.js compilation passed.
+   - TypeScript passed.
+   - All 118 static/dynamic routes were processed.
+   - Production `.next` output was recreated.
 
-- Priority 13 is now the active roadmap area: accessibility, performance, security, release gates, jobs, local media, observability, and deployment hardening remain.
-- A critical Playwright accessibility gate exists and runs through `npm run test:e2e:a11y`; it now covers critical storefront routes, dark-mode/200%-zoom-equivalent passes, admin login, authenticated admin dashboard/orders/media/content/support routes, and deeper admin product edit/preview, content edit/preview, email-template, order-review, and media-edit workflows. Full WCAG 2.2 AA still needs manual assistive-technology signoff.
-- A text contrast release gate exists through `npm run test:e2e:contrast`; it computes rendered WCAG AA contrast for critical storefront routes in light/dark mode and authenticated admin routes.
-- A screen-reader smoke gate exists through `npm run test:e2e:screen-reader`; it inspects Chromium's accessibility tree for critical storefront routes, populated checkout, and authenticated admin dashboard/orders/media/content/support landmarks, headings, and named actions.
-- A Playwright screenshot release gate exists through `npm run test:e2e:screenshots`; it snapshots mobile/desktop first-viewport states for home, shop, and PDP.
-- A mobile Playwright performance baseline exists through `npm run test:e2e:perf`; it checks LCP, CLS, navigation timing, transfer size, script transfer, and interaction-frame latency on home, shop, PDP, and cart.
-- A throttled mobile Playwright performance gate exists through `npm run test:e2e:perf:throttled`; it emulates slower mobile network and 4x CPU for home, shop, and PDP LCP/CLS/interaction checks.
-- A critical-flow Playwright release gate exists through `npm run test:e2e:critical`; it covers PDP selected-variant readiness, persisted-cart checkout validation, unauthenticated account/admin protection, and search recovery.
-- A Lighthouse release gate exists through `npm run test:lighthouse`; it runs against a production `next start`, writes JSON reports to `test-results/lighthouse`, enforces current mobile score floors, and reports remaining 90+ target gaps. See `docs/LIGHTHOUSE_BASELINES.md`.
-- Storefront shell JavaScript was reduced by dynamically loading cart/newsletter dialogs and removing full product catalog data from the shared header mega menu.
-- Storefront performance was further improved by removing Framer Motion and Embla from the runtime, replacing reveal/page/announcement/carousel motion with CSS/native scroll, deferring Quick View and product fullscreen gallery dialog code until click, rendering hover product images only after hover-capable clients mount, compacting list-page product payloads, deferring the consent prompt past initial paint, splitting lightweight shell i18n away from large route-copy dictionaries, demand-loading the predictive search dialog, reducing initial shop product hydration, narrowing PDP recommendation queries, and adding explicit high fetch priority to hero/PDP/list LCP images.
-- CSP and browser security headers are configured in `next.config.ts` with Vitest coverage in `tests/security-headers.test.ts`.
-- Secret scanning exists through `npm run security:secrets`; high-severity dependency auditing exists through `npm run security:deps`; moderate-advisory tracking exists through `npm run security:moderates`; `npm run security:audit` runs all three.
-- Customer account session tracking exists with device visibility/revocation; `requireCustomerSession` rejects revoked tracked sessions and `src/lib/request-security.ts` enforces same-origin checks across browser-called customer mutation routes, excluding provider webhooks and NextAuth internals.
-- A centralized maintenance job runner exists at `POST /api/admin/jobs/maintenance`; it runs cart reservation expiry, scheduled publishing, automation email/retry processing, and product alert queue processing.
-- Admin media upload now uses local-only storage in `src/lib/media-storage.ts`; uploads are written under `public/images/admin/products` while preserving `originalUrl` and optimization metadata on `MediaAsset`. External media switching and backfill scripts were removed because this project is staying local-only for media.
-- Observability foundation exists: `src/lib/observability.ts` emits redacted structured logs, `GET /api/health` checks uptime/database health, and `GET /api/admin/ops/health` summarizes business-health queues and can notify `MONITORING_WEBHOOK_URL`.
-- Deployment hardening foundation exists: `npm run deployment:check` validates required production env, and `docs/DEPLOYMENT_RUNBOOK.md` covers deploy, migration, backup, restore drill, monitoring, and rollback steps.
-- Local backup/restore validation exists through `npm run backup:restore-drill`; it copies the configured local SQLite/libSQL database, opens the restored copy through Prisma, checks SQLite integrity, records core table counts, and writes `.restore-drill/latest-report.json`.
-- `npm run env:inventory` verifies env vars read by code are documented in `.env.example`; `npm run release:check` now runs lint, TypeScript, env inventory, Vitest, security audit, accessibility, critical flows, screenshots, baseline performance, throttled performance, production build, and Lighthouse baselines end to end.
-- Cart and checkout now wait for persisted store hydration before rendering empty states, preventing hard-refresh persisted-cart sessions from flashing or staying empty.
-- Product Detail/catalog field and media coverage is codified in `src/lib/storefront-catalog-audit.ts` and `tests/storefront-catalog-audit.test.ts`; the live published catalog currently has no critical PDP contract/media issues.
-- Imported WooCommerce products are assigned to public collections through `src/lib/collection-assignment.ts`; `npm run catalog:backfill-collections` is idempotent, and `tests/collection-assignment.test.ts` verifies assignment rules plus live published-product collection coverage.
-- Cart/Checkout mobile and recovery audit is complete: `src/lib/cart-ui.ts` centralizes reservation error labels, cart drawer/PDP/checkout use customer-facing recovery copy, and `tests/e2e/checkout-mobile.spec.ts` covers mobile form ergonomics plus blocked inventory-sync recovery without overflow.
-- Admin-backed support/content pages are complete: `scripts/seed-page-content.ts` seeds 10 managed pages including contact, support/legal/guide routes use `PageContent` blocks, `getPageContentMetadata` applies admin SEO fields, and `tests/support-pages-content.test.ts` guards required published slugs.
-- Global responsive/accessibility audit is complete for the current release gate: `tests/e2e/accessibility-critical.spec.ts` now covers account/contact/FAQ, dark-mode and 200%-zoom-equivalent passes for critical customer routes, plus authenticated admin dashboard/orders/media/content/support/product edit/product preview/content edit/content preview/email-template/order-review/media-edit DOM accessibility; `tests/e2e/storefront-shell.spec.ts` and `tests/e2e/content-responsive.spec.ts` pass for shell/content responsiveness and dialog focus behavior.
-- Lighthouse hard release floors and 90+ performance targets pass for the audited mobile storefront routes. Latest `npm run test:lighthouse` scores from `2026-07-07` are home 93, shop 97, PDP 97, cart 98. Cart SEO is intentionally below 90 because the cart is blocked from indexing.
-- `npm audit --audit-level=high` exits cleanly. Moderate advisories were reduced with safe overrides for Prisma's `@hono/node-server`, Next's nested `postcss`, and next-auth's `uuid`; npm still reports 17 moderate advisories in the Lighthouse -> Sentry/OpenTelemetry dev-tooling chain. `npm run security:moderates` now allowlists only this documented chain, writes `.launch-readiness/advisory-report.json`, and fails on any new moderate/high/critical advisory. Latest safe-forward check on `2026-07-08` found Lighthouse 13.x requires Node `>=22.19`, so keep `lighthouse@12.8.2` while this repo runs Node 20.
-- Production security/operations work remains: provider backup configuration and a real restore drill. `npm run deployment:check` now fails on missing required production variables and obvious placeholder/local values. `npm run launch:evidence` validates filled local evidence files from `PROVIDER_RESTORE_EVIDENCE_PATH`, `ASSISTIVE_TECH_SIGNOFF_PATH`, and `GO_LIVE_DECISION_RECORD_PATH`, then writes `.launch-readiness/evidence-report.json`. Local `npm run launch:readiness` writes `.launch-readiness/latest-report.json` and currently fails on the local `.env` because `ADMIN_JOB_SECRET` is missing and `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and `NEXT_PUBLIC_SITE_URL` are still local/placeholder values; it also warns until `MONITORING_WEBHOOK_URL`, `MONITORING_WEBHOOK_SECRET`, `BACKUP_RESTORE_RUNBOOK_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, manual assistive-tech evidence, and local launch evidence paths are configured. A production-shaped env simulation passed required/recommended env and evidence URL checks on `2026-07-08`, leaving only the known moderate advisory warning.
-- Latest local `npm run backup:restore-drill` on `2026-07-08` passed with SQLite integrity `ok`, products=29, variants=333, orders=14, users=14, pages=10, mediaAssets=0, and localAdminMediaFiles=0.
-- Customer-facing support, shell, cart, checkout, PDP, search, and seeded content copy has been revised away from UAE-only positioning while keeping UAE-capable checkout defaults where they are functional.
-- Product image optimization must stay smart: do not over-compress originals into tiny low-quality derivatives.
-- Windows/Next dev server can generate malformed `.next/dev/types/routes.d.ts` or hit `.next` EPERM issues; stop the server and delete/rebuild `.next` if it happens.
+The project is currently runnable locally with:
 
-## Important Implementation Decisions
-
-- Variant-first catalog is required: Product is the concept; ProductVariant is the sellable SKU by color/size.
-- Each color/variant can have its own gallery, hover image, video, SKU, stock, and availability.
-- Local media upload is preferred for now; avoid URL-only image fields in admin product workflows.
-- `StoreSetting` stores many configurable settings as JSON strings for SQLite compatibility.
-- Admin actions should be audited through `ActivityLog`.
-- Customer-facing state transitions must be server-enforced, not only UI-controlled.
-- External side effects must be idempotent and observable: email, Stripe, carrier, alert queues, automation.
-- Do not focus on translation/localization work until UI/UX priorities are complete.
-- UAE should influence shipping/payment defaults, but the storefront should read as international.
-
-## Commands
-
-```bash
-npm install
+```powershell
 npm run dev
+```
+
+Do not remove `node_modules` or `.next` merely to clean screenshots. They were accidentally removed during cleanup, then fully restored using the commands above.
+
+`npm ci` reported 39 dependency advisories: 22 moderate, 16 high, and 1 critical. This is newer/different from an earlier advisory report and must be audited before a real customer launch. It does not automatically block a private temporary preview, but do not claim full production readiness without reviewing it.
+
+## Cleanup Already Performed
+
+The user wanted historical screenshots and similar clutter removed. The following were intentionally removed:
+
+- The entire tracked/untracked `artifacts/` QA screenshot archive
+- Old development and server logs
+- `test-results/`
+- Stale `.launch-readiness/` reports
+- Stale `.restore-drill/` reports
+- Local `backups/` files
+- Old `.next-stale/`
+
+`.gitignore` was updated to include:
+
+```gitignore
+/artifacts/
+/backups/
+```
+
+The tracked screenshot and backup deletions therefore appear as many `D` entries in Git. They are intentional cleanup changes. Historical references to those screenshots remain in `docs/STOREFRONT_UI_BUG_AUDIT.md`; they are audit history, not runtime dependencies.
+
+## Important Git State
+
+There are extensive existing edits across storefront pages, admin components, catalog logic, styles, tests, snapshots, Prisma seed data, and configuration. Preserve them.
+
+Notable current state:
+
+- `CODEX_HANDOFF.md` had been deleted and is recreated by this handoff.
+- `MASTER_PROJECT_ROADMAP.md` is currently deleted. Do not silently restore or recreate it without checking the user's intent.
+- `src/components/store/quick-view.tsx` is deleted and newer quick-view/account interaction work may be implemented elsewhere.
+- `src/app/not-found.tsx`, `src/components/store/account-dialog.tsx`, and `tests/e2e/storefront-control-polish.spec.ts` are untracked source/test files and must be preserved.
+- Many old local product images and admin-uploaded videos are marked deleted.
+- The current catalog/seed work uses remote image sources including DummyJSON, Fake Store API, Pexels, and Imgur; `next.config.ts` permits these image hosts.
+- Before committing or packaging, verify that every remaining local image reference resolves and that the deleted media are intentionally obsolete.
+
+Never use destructive Git commands against this worktree. Do not clean untracked source files.
+
+## Temporary Domain Deployment Context
+
+The user is configuring a Node.js application through a cPanel/Plesk-style Passenger interface for the `ccea.ae` account.
+
+Known control-panel choices:
+
+- Node.js version: `22.23.2`
+- Application mode: `Production`
+- Suggested application root: `velora`
+- Application URL: use a temporary subdomain created by the user
+- Suggested Passenger log: `/home/cceaae/logs/velora-passenger.log`
+- Expected startup file: `server.js`
+
+Important: `server.js` does not currently exist. Before telling the user to enter it in the panel, implement and test a Passenger-compatible Next.js startup entry, or confirm whether the host can execute `npm start` directly. Do not assume standard Vercel deployment behavior on this host.
+
+Likely next implementation batch:
+
+1. Inspect the hosting panel requirements and add a minimal CommonJS `server.js` compatible with Passenger and Next.js 16.
+2. Add an appropriate start script only if required by the host.
+3. Test the startup file locally using production `.next` output and a non-default port.
+4. Prepare a deployment package/list that excludes `.git`, `.env`, local databases, logs, tests, artifacts, and other development-only files while retaining required source/build/runtime files.
+5. Document the exact upload, install, Prisma, build, environment, and Passenger restart sequence.
+6. Configure preview-only protections such as `noindex` and disabled/test checkout where practical.
+
+Do not deploy externally or change DNS without explicit user authorization and the required hosting access.
+
+## Minimum Preview Environment
+
+For a temporary public preview, at minimum configure real staging values for:
+
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET` (strong, unique staging secret)
+- `NEXTAUTH_URL` (temporary HTTPS URL)
+- `NEXT_PUBLIC_SITE_URL` (temporary HTTPS URL)
+- `ADMIN_JOB_SECRET` (strong, unique staging secret)
+- `NODE_ENV=production`
+
+Keep Stripe and other payment providers in test/demo mode. Do not use production payment keys for this preview.
+
+The environment inventory currently has a known failure because code reads `NEXT_PUBLIC_CLOUDFLARE_STREAM_DOMAIN`, but `.env.example` does not document it. Fix/document that before calling the environment inventory clean.
+
+Never print or commit `.env` contents. The local `.env` exists and is ignored.
+
+## Full Production Readiness Status
+
+The successful build means the project is suitable to continue toward a temporary preview. It is not yet approved for real customer traffic or transactions.
+
+Known full-production blockers from the latest readiness run:
+
+- Required production URLs/secrets are placeholders or missing locally.
+- Payment, monitoring, support-email, and webhook production configuration is incomplete.
+- Backup restore evidence is stale and no real provider restore drill is recorded.
+- Manual assistive-technology signoff is not recorded.
+- Go-live and provider evidence paths are not configured.
+- Dependency advisory evidence is stale, and the latest clean install now reports additional high/critical advisories that require investigation.
+- Current Git changes are not consolidated into a reviewed commit.
+- Deleted local media versus remote replacements still needs explicit validation.
+
+These items should not be confused with temporary-domain preview requirements.
+
+## Useful Commands
+
+```powershell
+# Local development
+npm run dev
+
+# Regenerate Prisma Client after a clean dependency install
+npm run prisma:generate
+
+# Production build
 npm run build
+
+# Focused quality checks
 npm run lint
 npx tsc --noEmit
 npm test
-npm run prisma:generate
-npm run prisma:migrate
-npm run prisma:seed
-npm run content:seed
-npm run import:woocommerce
-npm run catalog:backfill-collections
-npm run backup:restore-drill
-```
 
-Useful targeted checks:
-
-```bash
-npm test -- homepage-sections.test.ts
-npm test -- content-cms.test.ts support-pages-content.test.ts
-npm test -- product-gallery-presentation.test.ts
-npm test -- cart-reservations.test.ts
-npm test -- return-request-lifecycle.test.ts
-npm test -- security-headers.test.ts
-npm test -- maintenance-jobs.test.ts
-npm test -- media-storage.test.ts
-npm test -- observability.test.ts health-routes.test.ts
-npm test -- request-security.test.ts cart-route-security.test.ts checkout-route.test.ts product-alert-route.test.ts return-request-cancellation.test.ts return-flow-reconciliation.test.ts order-tracking.test.ts recommendation-event-route.test.ts account-session-security.test.ts account-sessions.test.ts
-npm test -- storefront-catalog-audit.test.ts collection-assignment.test.ts collection-filters.integration.test.ts product-filters.test.ts
-npm run deployment:check
+# Environment and release tooling
 npm run env:inventory
-npm run backup:restore-drill
-npm run launch:evidence
-npm run security:moderates
+npm run deployment:check
+npm run launch:readiness
 npm run security:audit
-npm run test:e2e:a11y
-npm run test:e2e:contrast
-npm run test:e2e:screen-reader
-npm run test:e2e:critical
-npx playwright test tests/e2e/checkout-mobile.spec.ts --project=mobile-chromium
-npx playwright test tests/e2e/content-responsive.spec.ts --project=desktop-chromium
-npm run test:e2e:screenshots
-npm run test:e2e:perf
-npm run test:e2e:perf:throttled
-npm run test:lighthouse
+
+# Complete release gate (long-running)
 npm run release:check
-npx playwright test tests/e2e/storefront-shell.spec.ts
 ```
 
-## Environment Assumptions
+If `npm ci` is run again, follow it with `npm run prisma:generate` before building. Without the generated Prisma Client, TypeScript reports that `PrismaClient` is not exported from `@prisma/client`.
 
-- Local app URL: `http://localhost:3000` unless another port is chosen.
-- `.env.example` documents required variables.
-- Local DB default: `DATABASE_URL="file:./prisma/dev.db"`.
-- Prisma 7 warning is intentional: datasource URL belongs in `prisma.config.ts`.
-- SMTP/cPanel email uses env vars such as `SMTP_HOST=mail.ccea.ae`, `SMTP_PORT=465`, `SMTP_USER=no-reply@ccea.ae`, and `SMTP_PASSWORD`.
-- Set `ADMIN_JOB_SECRET` before wiring production cron to `POST /api/admin/jobs/maintenance`; send it as `Authorization: Bearer <secret>`.
-- Set `MONITORING_WEBHOOK_URL` and `MONITORING_WEBHOOK_SECRET` before enabling external alert routing; set `PRODUCTION_BROWSER_SOURCE_MAPS=true` only when the deployment target stores source maps securely.
-- Playwright overrides `NEXTAUTH_URL` to `http://127.0.0.1:3000` in `playwright.config.ts` so authenticated e2e admin flows share the same origin as the test browser.
-- Do not commit or expose real secrets from `.env`.
-- Demo admin in README: `admin@velora.ae` / `VeloraAdmin123!` unless changed in local DB.
+## Working Rules For The Next Chat
 
-## Next Tasks
-
-1. Configure real production env values and rerun `npm run deployment:check` plus `npm run launch:readiness`.
-2. Configure production database/provider backups and perform a real staging restore drill using `docs/DEPLOYMENT_RUNBOOK.md`.
-3. Perform final manual assistive-technology review using `docs/ASSISTIVE_TECH_SIGNOFF.md`.
-4. Track the remaining Lighthouse/Sentry/OpenTelemetry moderate dependency advisories until the runtime can move to Node `>=22.19` or an upstream-safe Lighthouse 12.x fix is available.
-
-## Inspect These Files First
-
-### Roadmap / Requirements
-
-- `MASTER_PROJECT_ROADMAP.md`
-- `PROJECT_REQUIREMENTS.md`
-- `CODEX_HANDOFF.md`
-
-### Storefront Shell / UI System
-
-- `src/components/app-shell.tsx`
-- `src/components/store/header.tsx`
-- `src/components/store/footer.tsx`
-- `src/components/store/announcement-bar.tsx`
-- `src/components/store/theme-toggle.tsx`
-- `src/components/store/store-search-dialog.tsx`
-- `src/components/store/cart-drawer.tsx`
-- `src/app/globals.css`
-
-### Homepage
-
-- `src/app/page.tsx`
-- `src/lib/homepage-sections.ts`
-- `src/lib/homepage-section-validation.ts`
-- `src/app/api/admin/homepage-sections/route.ts`
-- `src/components/admin/admin-console.tsx`
-
-### Catalog / Product Data
-
-- `prisma/schema.prisma`
-- `src/lib/catalog-db.ts`
-- `src/lib/catalog.ts`
-- `src/lib/cms.ts`
-- `src/lib/product-presentation.ts`
-- `src/lib/product-gallery-presentation.ts`
-- `src/components/store/product-card.tsx`
-- `src/components/store/product-detail.tsx`
-- `src/components/admin/product-edit-form.tsx`
-
-### Admin Panel
-
-- `src/app/admin/page.tsx`
-- `src/lib/admin-catalog.ts`
-- `src/components/admin/admin-console.tsx`
-- `src/components/admin/product-detail-page.tsx`
-- `src/components/admin/product-edit-form.tsx`
-- `src/lib/admin-permissions.ts`
-- `src/lib/admin-activity.ts`
-
-### Checkout / Payments / Shipping
-
-- `src/components/store/checkout-form.tsx`
-- `src/app/api/checkout/route.ts`
-- `src/lib/store-settings.ts`
-- `src/lib/shipping-settings.ts`
-- `src/lib/payment-method-settings.ts`
-- `src/lib/address-autocomplete.ts`
-- `src/lib/cart-reservations.ts`
-
-### Returns / Support
-
-- `src/app/account/orders/[orderNumber]/return/page.tsx`
-- `src/components/auth/return-request-form.tsx`
-- `src/lib/return-request-lifecycle.ts`
-- `src/lib/return-policy.ts`
-- `src/app/api/account/orders/[orderNumber]/return-request/route.ts`
-- `src/app/api/admin/returns/[id]/route.ts`
-- `src/components/admin/support-manager.tsx`
-
-### Email / Automation
-
-- `src/lib/email-delivery.ts`
-- `src/lib/email-templates.ts`
-- `src/lib/transactional-email.ts`
-- `src/components/admin/email-template-manager.tsx`
-- `src/app/api/admin/email-templates/*`
-
-### Tests To Check Before Handing Back
-
-- `tests/e2e/storefront-shell.spec.ts`
-- `tests/e2e/homepage-merchandising.spec.ts`
-- `tests/product-field-contract.test.ts`
-- `tests/product-gallery-presentation.test.ts`
-- `tests/cart-reservations.test.ts`
-- `tests/return-request-lifecycle.test.ts`
-- `tests/admin-routes.test.ts`
+- Inspect before editing.
+- Preserve all existing source and test changes.
+- Do not restore removed screenshots, logs, or backup artifacts.
+- Do not remove `node_modules` or `.next` for routine cleanup.
+- Use Node.js 22.23.2 on the temporary server.
+- Treat temporary preview readiness separately from real production readiness.
+- Verify any deployment-specific startup code locally before giving control-panel instructions.
+- Keep the user informed, but continue autonomously through related implementation and verification work when asked.

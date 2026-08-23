@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Product } from "@/lib/catalog";
 import { defaultSearchMerchandisingSettings, getSearchRedirect } from "@/lib/search-merchandising";
-import { searchStore } from "@/lib/store-search";
+import { searchStore, suggestSearchQuery } from "@/lib/store-search";
 
 const product = (overrides: Partial<Product>): Product => ({
   id: "1",
@@ -46,6 +46,16 @@ describe("store search", () => {
   it("supports small spelling mistakes", () => {
     const results = searchStore("flred", [product({})], ["Leggings"], []);
     expect(results.products).toHaveLength(1);
+  });
+
+  it("matches Arabic product and category text", () => {
+    const arabicProduct = product({ name: "ليقنز ناعم", category: "ليقنز", colors: ["أسود"] });
+    expect(searchStore("ناعم", [arabicProduct], ["ليقنز"], []).products).toHaveLength(1);
+    expect(searchStore("ليقنز", [arabicProduct], ["ليقنز"], []).categories).toEqual(["ليقنز"]);
+  });
+
+  it("suggests a close catalog term for a zero-result typo", () => {
+    expect(suggestSearchQuery("legins", [product({})], ["Leggings"], [])).toBe("leggings");
   });
 
   it("searches colors, tags, categories, and collections", () => {

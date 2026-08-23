@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { signIn, signOut } from "next-auth/react";
 import { Heart, LogOut, MapPin, Package, UserRound } from "lucide-react";
-import { authCopy, localeFromPathname } from "@/lib/i18n";
+import { authCopy, localeFromPathname, localizedPath } from "@/lib/i18n";
 
 type AccountUser = {
   name?: string | null;
@@ -16,9 +16,19 @@ type SocialProvider = {
   label: string;
 };
 
-export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUser; socialProviders?: SocialProvider[] }) {
+export function AccountAccess({
+  user,
+  socialProviders = [],
+  compact = false,
+}: {
+  user?: AccountUser;
+  socialProviders?: SocialProvider[];
+  compact?: boolean;
+}) {
   const pathname = usePathname();
-  const copy = authCopy[localeFromPathname(pathname)];
+  const locale = localeFromPathname(pathname);
+  const copy = authCopy[locale];
+  const accountHref = localizedPath("/account", locale);
   const [mode, setMode] = useState<"signin" | "register" | "forgot" | "verify">("signin");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,23 +38,25 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
   if (user) {
     return (
       <>
-        <div className="mt-10 grid gap-4 md:grid-cols-4">
+        <div className="mt-8 grid gap-4 md:grid-cols-4">
           {[
             [UserRound, copy.profile, user.email ?? copy.manageYourProfile],
             [Package, copy.orders, copy.ordersConnectSoon],
             [Heart, copy.wishlist, copy.wishlistSyncSoon],
             [MapPin, copy.addresses, copy.addressesAppearSoon],
           ].map(([Icon, title, body]) => (
-            <section key={title as string} className="border border-[var(--border)] bg-[var(--surface)] p-5">
-              <Icon className="size-5" />
-              <h2 className="mt-4 font-serif text-2xl">{title as string}</h2>
+            <section key={title as string} className="storefront-framed p-5 transition hover:-translate-y-0.5 hover:border-[var(--foreground)]/35 motion-reduce:transition-none">
+              <span className="grid size-10 place-items-center rounded-full bg-[var(--card)] text-[var(--accent)]">
+                <Icon className="size-5" />
+              </span>
+              <h2 className="mt-4 text-lg font-semibold">{title as string}</h2>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{body as string}</p>
             </section>
           ))}
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="mt-8 inline-flex h-11 items-center gap-2 border border-[var(--border)] px-5 text-sm font-medium"
+          onClick={() => signOut({ callbackUrl: localizedPath("/", locale) })}
+          className="storefront-action mt-7 inline-flex h-11 items-center gap-2 border border-[var(--border)] px-5 text-sm font-medium hover:border-[var(--foreground)]/40 hover:bg-[var(--hover)] motion-reduce:transition-none"
         >
           <LogOut className="size-4" />
           {copy.signOut}
@@ -104,7 +116,7 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
     const result = await signIn("credentials", {
       email,
       password,
-      callbackUrl: "/account",
+      callbackUrl: accountHref,
       redirect: false,
     });
     if (!result?.ok) {
@@ -112,7 +124,7 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
       setSubmitting(false);
       return;
     }
-    window.location.assign(result.url ?? "/account");
+    window.location.assign(result.url ?? accountHref);
   }
 
   async function resendVerification() {
@@ -132,27 +144,27 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
   async function signInWithProvider(providerId: SocialProvider["id"]) {
     setSubmitting(true);
     setError(null);
-    await signIn(providerId, { callbackUrl: "/account" });
+    await signIn(providerId, { callbackUrl: accountHref });
   }
 
   if (mode === "verify") {
     return (
-      <div className="mt-10 max-w-lg border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.accountCreated}</p>
-        <h2 className="mt-3 text-3xl font-semibold">{copy.verifyYourEmail}</h2>
+      <div className={`${compact ? "" : "mt-8"} storefront-framed max-w-lg p-5 sm:p-6`}>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{copy.accountCreated}</p>
+        <h2 className="mt-3 text-2xl font-semibold">{copy.verifyYourEmail}</h2>
         <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{message}</p>
         <p className="mt-2 text-sm font-medium">{verificationEmail}</p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={resendVerification} disabled={submitting} className="h-11 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] disabled:opacity-60">{copy.resendEmail}</button>
-          <button type="button" onClick={() => setMode("signin")} className="h-11 border border-[var(--border)] px-5 text-sm font-semibold">{copy.backToSignIn}</button>
+          <button type="button" onClick={resendVerification} disabled={submitting} className="storefront-action h-11 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">{copy.resendEmail}</button>
+          <button type="button" onClick={() => setMode("signin")} className="storefront-action h-11 border border-[var(--border)] px-5 text-sm font-semibold hover:border-[var(--foreground)]/40 hover:bg-[var(--hover)] motion-reduce:transition-none">{copy.backToSignIn}</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mt-10 max-w-lg border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
-      <div className="grid grid-cols-2 border border-[var(--border)]">
+    <div className={`${compact ? "" : "mt-8"} storefront-framed max-w-lg p-5 sm:p-6`}>
+      <div className="storefront-framed grid grid-cols-2 bg-[var(--background)] p-1">
         {(["signin", "register"] as const).map((value) => (
           <button
             key={value}
@@ -162,7 +174,7 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
               setError(null);
               setMessage(null);
             }}
-            className={`h-11 text-sm font-semibold ${mode === value ? "bg-[var(--foreground)] text-[var(--background)]" : ""}`}
+            className={`storefront-action h-10 text-sm font-semibold transition motion-reduce:transition-none ${mode === value ? "bg-[var(--foreground)] text-[var(--background)]" : "hover:bg-[var(--hover)]"}`}
           >
             {value === "signin" ? copy.signIn : copy.createAccount}
           </button>
@@ -177,9 +189,9 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
                 type="button"
                 disabled={submitting}
                 onClick={() => void signInWithProvider(provider.id)}
-                className="inline-flex h-12 items-center justify-center gap-3 border border-[var(--border)] text-sm font-semibold transition hover:border-[var(--foreground)] disabled:opacity-60 motion-reduce:transition-none"
+                className="storefront-action inline-flex h-12 items-center justify-center gap-3 border border-[var(--border)] text-sm font-semibold hover:border-[var(--foreground)] hover:bg-[var(--hover)] disabled:opacity-60 motion-reduce:transition-none"
               >
-                <span className="grid size-6 place-items-center border border-[var(--border)] text-xs uppercase">{provider.label[0]}</span>
+                <span className="grid size-6 place-items-center rounded-full border border-[var(--border)] text-xs uppercase">{provider.label[0]}</span>
                 {copy.signIn} / {provider.label}
               </button>
             ))}
@@ -188,30 +200,30 @@ export function AccountAccess({ user, socialProviders = [] }: { user?: AccountUs
         {mode === "register" ? (
           <label className="grid gap-2 text-sm font-medium">
             {copy.name}
-            <input required name="name" autoComplete="name" className="h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none focus:border-[var(--accent)]" />
+            <input required name="name" autoComplete="name" className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
         ) : null}
         <label className="grid gap-2 text-sm font-medium">
           {copy.emailAddress}
-          <input required name="email" type="email" autoComplete="email" className="h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none focus:border-[var(--accent)]" />
+          <input required name="email" type="email" autoComplete="email" className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
         </label>
         {mode !== "forgot" ? (
           <label className="grid gap-2 text-sm font-medium">
             {copy.password}
-            <input required name="password" type="password" autoComplete={mode === "register" ? "new-password" : "current-password"} className="h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none focus:border-[var(--accent)]" />
+            <input required name="password" type="password" autoComplete={mode === "register" ? "new-password" : "current-password"} className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
             {mode === "register" ? <span className="text-xs text-[var(--muted)]">{copy.passwordHint}</span> : null}
           </label>
         ) : null}
         {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
         {message ? <p role="status" className="text-sm leading-6 text-[var(--muted)]">{message}</p> : null}
-        <button disabled={submitting} className="h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.14em] text-[var(--background)] disabled:opacity-60">
+        <button disabled={submitting} className="storefront-action h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">
           {submitting ? copy.pleaseWait : mode === "signin" ? copy.signIn : mode === "register" ? copy.createAccount : copy.sendResetLink}
         </button>
         {mode === "signin" ? (
-          <button type="button" onClick={() => { setMode("forgot"); setError(null); setMessage(null); }} className="justify-self-start text-sm underline underline-offset-4">{copy.forgotPassword}</button>
+          <button type="button" onClick={() => { setMode("forgot"); setError(null); setMessage(null); }} className="storefront-action -mx-2 inline-flex min-h-10 w-fit items-center px-2 text-sm underline underline-offset-4">{copy.forgotPassword}</button>
         ) : null}
         {mode === "forgot" ? (
-          <button type="button" onClick={() => { setMode("signin"); setError(null); setMessage(null); }} className="justify-self-start text-sm underline underline-offset-4">{copy.backToSignIn}</button>
+          <button type="button" onClick={() => { setMode("signin"); setError(null); setMessage(null); }} className="storefront-action -mx-2 inline-flex min-h-10 w-fit items-center px-2 text-sm underline underline-offset-4">{copy.backToSignIn}</button>
         ) : null}
       </form>
     </div>

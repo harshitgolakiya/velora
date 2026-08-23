@@ -26,18 +26,27 @@ const fallbackBlocks: ContentBlock[] = [
   },
 ];
 
-export default async function ContactPage() {
+export default async function ContactPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const query = await searchParams;
   const session = await getServerSession(authOptions);
   const [orders, page] = await Promise.all([
     session?.user?.id && session.user.email ? getActiveAccountOrders(session.user.id, session.user.email) : [],
     getPublishedPageContent("contact"),
   ]);
   return (
-    <section className="mx-auto max-w-360 px-4 py-8 sm:px-6 lg:px-8">
+    <section className="storefront-container-narrow py-8">
       <Breadcrumbs items={[{ label: "Contact" }]} />
       <ContentBlockRenderer blocks={page?.blocks.length ? page.blocks : fallbackBlocks} />
-      <div className="mt-14">
-        <ContactForm activeOrders={orders.map((order) => ({ orderNumber: order.orderNumber, status: order.status }))} defaultName={session?.user?.name ?? ""} defaultEmail={session?.user?.email ?? ""} />
+      <div className="mt-8 sm:mt-10">
+        <ContactForm
+          activeOrders={orders.map((order) => ({ orderNumber: order.orderNumber, status: order.status }))}
+          defaultName={session?.user?.name ?? ""}
+          defaultEmail={session?.user?.email ?? ""}
+          defaultCategory={typeof query.category === "string" ? query.category : undefined}
+          defaultOrderNumber={typeof query.order === "string" ? query.order : undefined}
+          product={typeof query.product === "string" ? query.product : undefined}
+          source={typeof query.source === "string" ? query.source : undefined}
+        />
       </div>
     </section>
   );

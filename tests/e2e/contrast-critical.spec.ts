@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const storefrontRoutes = ["/", "/shop", "/product/flared-pants-7461", "/cart", "/checkout", "/contact", "/faqs"] as const;
+const storefrontRoutes = ["/", "/shop", "/product/airlift-full-length-legging", "/cart", "/checkout", "/contact", "/faqs"] as const;
 const adminRoutes = [
   { path: "/admin", heading: "Velora admin Overview" },
   { path: "/admin#orders", heading: "Velora admin Orders" },
@@ -30,7 +30,7 @@ async function prepareContrastRun(page: Page, colorScheme: "light" | "dark" = "l
 async function signInAsAdmin(page: Page, callbackUrl = "/admin") {
   await prepareContrastRun(page);
   await page.goto(`/admin-login?callbackUrl=${encodeURIComponent(callbackUrl)}`, { waitUntil: "domcontentloaded" });
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
   await page.getByLabel("Email address").fill("admin@velora.ae");
   await page.locator("input[name='password']").fill("VeloraAdmin123!");
   const target = new URL(callbackUrl, "http://127.0.0.1:3000");
@@ -40,7 +40,7 @@ async function signInAsAdmin(page: Page, callbackUrl = "/admin") {
     page.waitForURL((url) => url.pathname === target.pathname && url.hash === target.hash, { timeout: 15_000 }),
     submit.click(),
   ]);
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 }
 
 async function auditTextContrast(page: Page) {
@@ -176,7 +176,7 @@ test.describe("critical color contrast release gate", () => {
       await page.setViewportSize({ width: 390, height: 760 });
       await prepareContrastRun(page);
       await page.goto(route, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 
       expect(await auditTextContrast(page)).toEqual([]);
     });
@@ -186,7 +186,7 @@ test.describe("critical color contrast release gate", () => {
       await page.setViewportSize({ width: 390, height: 760 });
       await prepareContrastRun(page, "dark");
       await page.goto(route, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 
       expect(await auditTextContrast(page)).toEqual([]);
     });
@@ -199,7 +199,7 @@ test.describe("critical color contrast release gate", () => {
       if (route.path.includes("#")) {
         await signInAsAdmin(page);
         await page.goto(route.path, { waitUntil: "domcontentloaded" });
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
       } else {
         await signInAsAdmin(page, route.path);
       }

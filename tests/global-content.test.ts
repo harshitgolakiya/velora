@@ -18,7 +18,7 @@ describe("global storefront content settings", () => {
     const settings = parseGlobalContentSettings("{not json");
 
     expect(settings.published.announcementEnabled).toBe(true);
-    expect(localText(settings.published.footer.location, "en")).toBe("Designed for international movement");
+    expect(localText(settings.published.footer.location, "en")).toBe("Premium activewear · UAE");
   });
 
   it("supports draft-only persisted settings for previewable admin edits", () => {

@@ -21,7 +21,7 @@ async function seedCheckoutCart(page: Page) {
               category: "Sets",
               price: 250,
               salePrice: null,
-              images: ["/images/velora/aura-legging-2.jpg"],
+              images: ["https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/1.webp"],
               colors: ["Black"],
               sizes: ["M"],
               variants: [
@@ -75,7 +75,7 @@ async function seedBlockedCheckoutCart(page: Page) {
               category: "Sets",
               price: 250,
               salePrice: null,
-              images: ["/images/velora/aura-legging-2.jpg"],
+              images: ["https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/1.webp"],
               colors: ["Black"],
               sizes: ["M"],
               variants: [],

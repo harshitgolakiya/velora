@@ -5,8 +5,8 @@ const criticalViews = [
   { name: "home-desktop", path: "/", viewport: { width: 1440, height: 900 } },
   { name: "shop-mobile", path: "/shop", viewport: { width: 390, height: 760 } },
   { name: "shop-desktop", path: "/shop", viewport: { width: 1440, height: 900 } },
-  { name: "pdp-mobile", path: "/product/flared-pants-7461?color=Nude&size=S", viewport: { width: 390, height: 760 } },
-  { name: "pdp-desktop", path: "/product/flared-pants-7461?color=Nude&size=S", viewport: { width: 1440, height: 900 } },
+  { name: "pdp-mobile", path: "/product/airlift-full-length-legging?color=Black&size=S", viewport: { width: 390, height: 760 } },
+  { name: "pdp-desktop", path: "/product/airlift-full-length-legging?color=Black&size=S", viewport: { width: 1440, height: 900 } },
 ] as const;
 
 async function stabilizeVisuals(page: Page) {

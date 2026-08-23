@@ -3,15 +3,18 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowRight, Clock3, Search, X } from "lucide-react";
 import { trackSearchClick } from "@/lib/search-click-client";
+import { localeFromPathname, searchCopy } from "@/lib/i18n";
 import { formatAed } from "@/lib/utils";
+import { useLocalizedHref } from "@/lib/use-localized-href";
 
 type PredictiveResults = {
   query: string;
   redirect?: string;
+  suggestedQuery?: string;
   products: Array<{
     id: string;
     slug: string;
@@ -40,6 +43,9 @@ const emptyResults: PredictiveResults = {
   pages: [],
 };
 
+const popularSearches = ["pilates", "sports bra", "black leggings", "tennis"];
+const quickCategories = ["Sports Bras", "Leggings", "Jackets", "Tops"];
+
 function Highlight({ text, query }: { text: string; query: string }) {
   const term = query.trim();
   if (!term) return text;
@@ -62,6 +68,10 @@ export function StoreSearchDialog({
   showTrigger?: boolean;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const copy = searchCopy[locale];
+  const localize = useLocalizedHref();
   const inputRef = useRef<HTMLInputElement>(null);
   const requestSequence = useRef(0);
   const [query, setQuery] = useState("");
@@ -69,8 +79,10 @@ export function StoreSearchDialog({
   const [recent, setRecent] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const localizedPopularSearches = locale === "ar" ? ["بيلاتس", "حمالة رياضية", "ليقنز أسود", "تنس"] : popularSearches;
+  const localizedQuickCategories = locale === "ar" ? ["حمالات رياضية", "ليقنز", "جاكيتات", "توبات"] : quickCategories;
 
-  const productLinks = results.products.map((product) => `/product/${product.slug}`);
+  const productLinks = results.products.map((product) => localize(`/product/${product.slug}`));
 
   function loadRecentSearches() {
     try {
@@ -87,7 +99,7 @@ export function StoreSearchDialog({
     const timer = window.setTimeout(async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}&locale=${locale}`);
         if (response.ok && requestSequence.current === requestId) setResults(await response.json());
       } catch {
         if (requestSequence.current === requestId) setResults(emptyResults);
@@ -99,7 +111,7 @@ export function StoreSearchDialog({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [open, query]);
+  }, [locale, open, query]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -145,7 +157,7 @@ export function StoreSearchDialog({
         trackPredictiveClick({
           resultType: "product",
           resultId: product.id,
-          href: `/product/${product.slug}`,
+          href: localize(`/product/${product.slug}`),
           position: activeIndex,
         });
       }
@@ -157,14 +169,14 @@ export function StoreSearchDialog({
     if (!term) return;
     remember(term);
     onOpenChange(false);
-    router.push(results.redirect || `/search?q=${encodeURIComponent(term)}`);
+    router.push(localize(results.redirect || `/search?q=${encodeURIComponent(term)}`));
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {showTrigger ? (
         <Dialog.Trigger asChild>
-          <button type="button" aria-label="Search" className="grid size-11 place-items-center">
+          <button type="button" aria-label={copy.search} className="grid size-11 place-items-center">
             <Search className="size-5" />
           </button>
         </Dialog.Trigger>
@@ -177,11 +189,11 @@ export function StoreSearchDialog({
             loadRecentSearches();
             inputRef.current?.focus();
           }}
-          className="storefront-top-sheet fixed inset-x-0 top-0 z-[110] mx-auto flex max-h-dvh w-full flex-col overflow-hidden bg-[var(--surface)] text-[var(--foreground)] shadow-2xl outline-none sm:inset-x-5 sm:top-16 sm:max-h-[calc(100dvh-5rem)] sm:max-w-3xl"
+          className="storefront-top-sheet storefront-panel fixed inset-x-0 top-0 z-[110] mx-auto flex max-h-dvh w-full flex-col overflow-hidden bg-[var(--surface)] text-[var(--foreground)] outline-none sm:inset-x-5 sm:top-16 sm:max-h-[calc(100dvh-5rem)] sm:max-w-4xl"
         >
-          <Dialog.Title className="sr-only">Search products and collections</Dialog.Title>
+          <Dialog.Title className="sr-only">{copy.title}</Dialog.Title>
           <Dialog.Description className="sr-only">
-            Search products, categories, collections, colors, tags, and product codes.
+            {copy.description}
           </Dialog.Description>
           <form onSubmit={submit} className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3 sm:px-5">
             <Search className="size-5 shrink-0 text-[var(--muted)]" />
@@ -202,27 +214,44 @@ export function StoreSearchDialog({
                 }
               }}
               role="combobox"
-              aria-label="Search products"
+              aria-label={copy.title}
               aria-expanded={results.products.length > 0}
               aria-controls="predictive-search-results"
               aria-activedescendant={activeIndex >= 0 ? `search-product-${results.products[activeIndex]?.id}` : undefined}
               autoComplete="off"
-              placeholder="Search products, colors, categories..."
+              placeholder={copy.placeholder}
               className="h-11 min-w-0 flex-1 bg-transparent text-base outline-none sm:text-lg"
             />
-            {loading && query.trim() ? <span className="text-xs uppercase tracking-widest text-[var(--muted)]">Searching</span> : null}
+            {loading && query.trim() ? <span className="hidden text-xs uppercase tracking-widest text-[var(--muted)] sm:inline">{copy.searching}</span> : null}
             <Dialog.Close asChild>
-              <button type="button" aria-label="Close search" className="storefront-action grid size-10 shrink-0 place-items-center">
+              <button type="button" aria-label={copy.close} className="storefront-action storefront-icon-button grid size-10 shrink-0 place-items-center">
                 <X className="size-5" />
               </button>
             </Dialog.Close>
           </form>
 
-          <div className="grid min-h-72 flex-1 overflow-y-auto sm:grid-cols-[200px_minmax(0,1fr)]">
-            <aside className="border-b border-[var(--border)] p-4 sm:border-b-0 sm:border-r sm:pb-5">
+          <div className="grid min-h-72 flex-1 overflow-y-auto sm:grid-cols-[240px_minmax(0,1fr)]">
+            <aside className="border-b border-[var(--border)] bg-[var(--card)]/45 p-4 sm:border-b-0 sm:border-r sm:pb-5">
+              {!query.trim() ? (
+                <div className="mb-7">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.popularSearches}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {localizedPopularSearches.map((term) => (
+                      <button
+                        type="button"
+                        key={term}
+                        onClick={() => updateQuery(term)}
+                        className="storefront-action storefront-panel-row inline-flex min-h-10 items-center rounded-full border border-[var(--border)] px-3 text-xs font-medium hover:border-[var(--foreground)]"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               {recent.length ? (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Recent</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.recent}</p>
                   <div className="mt-3 grid gap-1">
                     {recent.map((term) => (
                       <button
@@ -241,12 +270,12 @@ export function StoreSearchDialog({
 
               {results.categories.length ? (
                 <div className={recent.length ? "mt-7" : ""}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Categories</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.categories}</p>
                   <div className="mt-3 grid gap-1">
                     {results.categories.map((category, index) => (
                       <Dialog.Close key={category} asChild>
                         <Link
-                          href={`/shop?category=${encodeURIComponent(category)}`}
+                          href={localize(`/shop?category=${encodeURIComponent(category)}`)}
                           onClick={() => {
                             remember(query || category);
                             trackPredictiveClick({
@@ -268,12 +297,12 @@ export function StoreSearchDialog({
 
               {results.collections.length ? (
                 <div className="mt-7">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Collections</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.collections}</p>
                   <div className="mt-3 grid gap-1">
                     {results.collections.map((collection, index) => (
                       <Dialog.Close key={collection.slug} asChild>
                         <Link
-                          href={`/collections/${collection.slug}`}
+                          href={localize(`/collections/${collection.slug}`)}
                           onClick={() => {
                             remember(query || collection.name);
                             trackPredictiveClick({
@@ -295,22 +324,22 @@ export function StoreSearchDialog({
 
               {results.pages.length ? (
                 <div className="mt-7">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Help & content</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.helpContent}</p>
                   <div className="mt-3 grid gap-2">
                     {results.pages.map((page, index) => (
                       <Dialog.Close key={page.href} asChild>
                         <Link
-                          href={page.href}
+                          href={localize(page.href)}
                           onClick={() => {
                             remember(query || page.title);
                             trackPredictiveClick({
                               resultType: "page",
                               resultId: page.href,
-                              href: page.href,
+                              href: localize(page.href),
                               position: index,
                             });
                           }}
-                          className="storefront-action block rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent)]"
+                          className="storefront-action block min-h-11 rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent)]"
                         >
                           <span className="block font-medium">{page.title}</span>
                           <span className="mt-0.5 block text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">
@@ -327,15 +356,31 @@ export function StoreSearchDialog({
             <div className="p-4 sm:p-5">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-                  {query.trim() ? "Products" : "Popular now"}
+                  {query.trim() ? copy.products : copy.popularNow}
                 </p>
                 {query.trim() ? (
                   <button type="button" onClick={() => submit()} className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
-                    View all
+                    {copy.viewAll}
                     <ArrowRight className="size-4" />
                   </button>
                 ) : null}
               </div>
+
+              {!query.trim() ? (
+                <div className="mb-5 grid gap-2 sm:grid-cols-4">
+                  {localizedQuickCategories.map((category) => (
+                    <Dialog.Close key={category} asChild>
+                      <Link
+                        href={localize(`/shop?category=${encodeURIComponent(category)}`)}
+                        className="storefront-action storefront-panel-row flex min-h-11 items-center justify-between border border-[var(--border)] px-3 text-sm hover:border-[var(--foreground)]"
+                      >
+                        {category}
+                        <ArrowRight className="size-4" />
+                      </Link>
+                    </Dialog.Close>
+                  ))}
+                </div>
+              ) : null}
 
               <div id="predictive-search-results" role="listbox" className="grid gap-2">
                 {results.products.map((product, index) => (
@@ -344,7 +389,7 @@ export function StoreSearchDialog({
                       id={`search-product-${product.id}`}
                       role="option"
                       aria-selected={activeIndex === index}
-                      href={`/product/${product.slug}`}
+                      href={localize(`/product/${product.slug}`)}
                       onMouseEnter={() => setActiveIndex(index)}
                       onClick={() => {
                         remember(query || product.name);
@@ -355,7 +400,7 @@ export function StoreSearchDialog({
                           position: index,
                         });
                       }}
-                    className={`storefront-action grid grid-cols-[64px_1fr_auto] items-center gap-3 border-b border-[var(--border)] py-2.5 outline-none ${
+                    className={`storefront-action grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 border-b border-[var(--border)] px-2 py-2.5 outline-none sm:grid-cols-[64px_minmax(0,1fr)_auto] ${
                         activeIndex === index ? "bg-[var(--hover)]" : ""
                       }`}
                     >
@@ -376,17 +421,22 @@ export function StoreSearchDialog({
                           {product.category}{product.colors.length ? ` · ${product.colors.join(", ")}` : ""}
                         </p>
                       </div>
-                      <p className="text-sm">{formatAed(product.price)}</p>
+                    <p className="whitespace-nowrap text-sm">{formatAed(product.price, locale)}</p>
                     </Link>
                   </Dialog.Close>
                 ))}
 
                 {!loading && query.trim() && !results.products.length ? (
                   <div className="py-12 text-center">
-                    <p className="font-medium">No direct product matches</p>
-                    <p className="mt-2 text-sm text-[var(--muted)]">Try a category, color, material, support topic, or shorter term.</p>
-                    <button type="button" onClick={() => submit()} className="mt-5 underline underline-offset-4">
-                      Open full search
+                    <p className="font-medium">{copy.noDirectMatches}</p>
+                    <p className="mt-2 text-sm text-[var(--muted)]">{copy.noDirectMatchesBody}</p>
+                    {results.suggestedQuery ? (
+                      <button type="button" onClick={() => updateQuery(results.suggestedQuery ?? "")} className="storefront-action mt-3 font-semibold underline underline-offset-4">
+                        {copy.didYouMean} “{results.suggestedQuery}”?
+                      </button>
+                    ) : null}
+                    <button type="button" onClick={() => submit()} className="storefront-action mt-5 min-h-10 px-2 underline underline-offset-4">
+                      {copy.openFullSearch}
                     </button>
                   </div>
                 ) : null}

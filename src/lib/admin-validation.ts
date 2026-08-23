@@ -1,11 +1,23 @@
 import { z } from "zod";
 
+export function isVideoUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  if (trimmed.startsWith("/")) return /\.(mp4|webm)(\?.*)?$/i.test(trimmed);
+  try {
+    const url = new URL(trimmed);
+    return url.protocol === "https:" && /\.(mp4|webm)(\?.*)?$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 const productColorSchema = z.object({
   name: z.string().min(1),
   hex: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   images: z.array(z.string().min(1)).default([]),
   hoverImage: z.string().optional(),
-  video: z.string().optional(),
+  video: z.string().trim().refine(isVideoUrl, "Use an HTTPS or local .mp4/.webm video URL.").optional(),
   stockBySize: z.record(z.string(), z.coerce.number().int().min(0)).default({}),
   skuBySize: z.record(z.string(), z.string()).default({}),
 });

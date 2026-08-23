@@ -26,12 +26,15 @@ export function dirForLocale(locale: Locale) {
 const categoryLabels: Record<Locale, Record<string, string>> = {
   en: {},
   ar: {
-    Leggings: "ليقنز",
-    "Sports Bras": "حمالات رياضية",
+    "Sports Bras": "حمالات صدر رياضية",
+    Leggings: "ليغنز",
+    "Shorts & Skirts": "شورتات وتنانير رياضية",
+    Accessories: "إكسسوارات",
+    Dresses: "فساتين",
     Jackets: "جاكيتات",
     Tops: "توبات",
     Pants: "بناطيل",
-    Accessories: "إكسسوارات",
+    Skirts: "تنانير",
   },
 };
 
@@ -42,9 +45,16 @@ export function categoryLabel(locale: Locale, category: string) {
 const collectionLabels: Record<Locale, Record<string, string>> = {
   en: {},
   ar: {
-    "studio-sculpt": "ستوديو سكلبت",
-    "desert-run": "ديزرت ران",
-    "after-hours": "آفتر آورز",
+    pilates: "بيلاتس",
+    tennis: "تنس",
+    everyday: "للاستخدام اليومي",
+    "evening-edit": "إطلالة المساء",
+    "city-layers": "طبقات المدينة",
+    "soft-tailoring": "تفصيل ناعم",
+    "pilates-studio": "استوديو البيلاتس",
+    "court-club": "نادي الملعب",
+    "everyday-motion": "حركة يومية",
+    "training-core": "أساسيات التدريب",
   },
 };
 
@@ -76,8 +86,8 @@ export const shellCopy = {
     sizeGuide: "Size guide",
     careGuide: "Care guide",
     privateAccess: "Private access",
-    footerHeadline: "The next movement, first.",
-    footerBody: "Activewear designed with restraint, engineered for movement, and considered for warm-weather city life.",
+    footerHeadline: "Made to move. Designed to live in.",
+    footerBody: "Premium activewear for training, studio sessions, active days, and everything after.",
     newsletterPlaceholder: "Email address",
     announcement: [
       "Complimentary standard delivery over AED 300",
@@ -93,7 +103,7 @@ export const shellCopy = {
     faqs: "FAQs",
     bestsellerEdit: "Bestseller edit",
     joinNewsletter: "Join newsletter",
-    location: "International warm-weather activewear",
+    location: "Premium activewear · UAE",
     privacy: "Privacy",
     terms: "Terms",
     copyright: "© 2026 Velora",
@@ -121,8 +131,8 @@ export const shellCopy = {
     sizeGuide: "دليل المقاسات",
     careGuide: "دليل العناية",
     privateAccess: "وصول خاص",
-    footerHeadline: "الحركة القادمة أولاً.",
-    footerBody: "ملابس أداء مصممة بهدوء ودقة للحركة والحياة في المدن الدافئة.",
+    footerHeadline: "الإطلالة التالية أولاً.",
+    footerBody: "أزياء نسائية مصممة بتوازن وأناقة للمدينة.",
     newsletterPlaceholder: "البريد الإلكتروني",
     announcement: [
       "توصيل قياسي مجاني للطلبات فوق 300 درهم",
@@ -138,7 +148,7 @@ export const shellCopy = {
     faqs: "الأسئلة الشائعة",
     bestsellerEdit: "من الأكثر مبيعاً",
     joinNewsletter: "انضم للنشرة البريدية",
-    location: "ملابس أداء عالمية للمناخ الدافئ",
+    location: "تشكيلة أزياء نسائية عالمية",
     privacy: "الخصوصية",
     terms: "الشروط",
     copyright: "© 2026 فيلورا",

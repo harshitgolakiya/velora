@@ -5,6 +5,7 @@ import { getActiveAccountOrders } from "@/lib/account-data";
 import { authOptions } from "@/lib/auth";
 import { localizedAlternates } from "@/lib/seo";
 import { getServerSession } from "next-auth";
+import { ContextualSupport } from "@/components/store/contextual-support";
 
 export const metadata: Metadata = { alternates: localizedAlternates("/track-order") };
 
@@ -15,10 +16,10 @@ export default async function TrackOrderPage() {
     : [];
 
   return (
-    <section className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
+    <section className="storefront-container py-10 sm:py-12">
       <Breadcrumbs items={[{ label: "Track Order" }]} />
-      <h1 className="text-4xl font-semibold sm:text-6xl">{session?.user ? "Track your orders" : "Track order"}</h1>
-      <p className="mt-4 max-w-2xl text-[var(--muted)]">
+      <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">{session?.user ? "Track your orders" : "Track order"}</h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-base">
         {session?.user
           ? activeOrders.length
             ? "Follow orders that are being prepared or are currently on the way."
@@ -50,6 +51,7 @@ export default async function TrackOrderPage() {
           updatedAt: order.updatedAt.toISOString(),
         }))}
       />
+      <div className="mt-8"><ContextualSupport context="tracking" /></div>
     </section>
   );
 }

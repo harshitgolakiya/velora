@@ -22,21 +22,21 @@ async function seedSelectedCart(page: Page) {
         cart: [
           {
             product: {
-              id: "flared-pants-7461",
-              slug: "flared-pants-7461",
-              name: "Flared Pants",
+              id: "airlift-full-length-legging",
+              slug: "airlift-full-length-legging",
+              name: "Airlift Full-Length Legging",
               category: "Leggings",
-              price: 219,
+              price: 325,
               salePrice: null,
-              images: ["/images/velora/aura-legging-2.jpg"],
-              colors: ["Nude"],
+              images: ["/images/activewear-demo/flow-yoga.jpg"],
+              colors: ["Black"],
               sizes: ["S"],
               stock: 10,
               variants: [],
               variantMediaByColor: {},
             },
             size: "S",
-            color: "Nude",
+            color: "Black",
             quantity: 1,
           },
         ],
@@ -57,8 +57,8 @@ test.describe("critical storefront and operations flows", () => {
     test.skip(testInfo.project.name !== "desktop-chromium", "Critical flow gate runs once on desktop.");
     await stabilize(page);
 
-    await page.goto("/product/flared-pants-7461?color=Nude&size=S", { waitUntil: "networkidle" });
-    await expect(page.getByRole("heading", { name: "Flared Pants" })).toBeVisible();
+    await page.goto("/product/airlift-full-length-legging?color=Black&size=S", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { name: "Airlift Full-Length Legging" })).toBeVisible();
 
     const purchaseOptions = page.locator("#purchase-options");
     await expect(purchaseOptions.getByRole("button", { name: "S", exact: true })).toHaveAttribute("aria-pressed", "true");
@@ -67,15 +67,15 @@ test.describe("critical storefront and operations flows", () => {
     await seedSelectedCart(page);
     await page.goto("/cart", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "Shopping bag" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Flared Pants", exact: true })).toBeVisible();
-    await expect(page.getByText("Nude / S")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Airlift Full-Length Legging", exact: true })).toBeVisible();
+    await expect(page.getByText("Black / S")).toBeVisible();
 
     await page.getByRole("button", { name: "Proceed to Checkout" }).click();
     await expect(page).toHaveURL(/\/checkout/);
-    await expect(page.getByText("Order summary")).toBeVisible();
-    await expect(page.getByText("Flared Pants").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Order summary" })).toBeVisible();
+    await expect(page.getByText("Airlift Full-Length Legging").first()).toBeVisible();
 
-    const submit = page.getByRole("button", { name: /Pay .* securely|Place order/i });
+    const submit = page.getByRole("button", { name: /Continue to delivery/i });
     await expect(submit).toBeVisible();
     await submit.click();
     await expect(page.getByLabel("Email address")).toBeFocused();
@@ -105,6 +105,6 @@ test.describe("critical storefront and operations flows", () => {
     await page.goto("/search?q=zzzznotfound", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "No products found" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Shop all" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Leggings" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Dresses" })).toBeVisible();
   });
 });

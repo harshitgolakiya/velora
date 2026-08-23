@@ -116,7 +116,7 @@ export const defaultGlobalContent: GlobalContent = {
     {
       id: "best-sellers",
       label: { en: "Best Sellers", ar: "الأكثر مبيعاً" },
-      href: "/collections/studio-sculpt",
+      href: "/shop?sort=featured",
       enabled: true,
       sortOrder: 30,
     },
@@ -193,19 +193,19 @@ export const defaultGlobalContent: GlobalContent = {
     },
   ],
   newsletter: {
-    eyebrow: { en: "Private access", ar: "وصول خاص" },
-    headline: { en: "The next movement, first.", ar: "الحركة القادمة أولاً." },
+    eyebrow: { en: "Move with us", ar: "تحركي معنا" },
+    headline: { en: "New movement, first.", ar: "كوني أول من يكتشف الجديد" },
     placeholder: { en: "Email address", ar: "البريد الإلكتروني" },
     enabled: true,
   },
   footer: {
     body: {
-      en: "Activewear engineered for movement and warm-weather city life.",
-      ar: "ملابس أداء مصممة للحركة والحياة في المدن الدافئة.",
+      en: "Premium activewear designed for workouts, studio sessions, active days, and everyday life.",
+      ar: "ملابس رياضية فاخرة مصممة للتمارين والاستوديو والأيام النشطة والحياة اليومية.",
     },
     location: {
-      en: "Designed for international movement",
-      ar: "مصممة للحركة عالمياً",
+      en: "Premium activewear · UAE",
+      ar: "ملابس رياضية فاخرة · الإمارات",
     },
     copyright: { en: "© 2026 Velora", ar: "© 2026 فيلورا" },
   },

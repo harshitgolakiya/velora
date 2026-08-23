@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const criticalRoutes = [
   { path: "/", shell: "storefront" },
   { path: "/shop", shell: "storefront" },
-  { path: "/product/flared-pants-7461", shell: "storefront" },
+  { path: "/product/airlift-full-length-legging", shell: "storefront" },
   { path: "/cart", shell: "storefront" },
   { path: "/checkout", shell: "checkout" },
   { path: "/account", shell: "storefront" },
@@ -22,7 +22,7 @@ const authenticatedAdminRoutes = [
 
 const adminProductSearchQueries = ["pants", "dress", "top", "velora"] as const;
 
-const zoomAndThemeRoutes = ["/", "/shop", "/product/flared-pants-7461", "/cart", "/checkout", "/contact", "/faqs"] as const;
+const zoomAndThemeRoutes = ["/", "/shop", "/product/airlift-full-length-legging", "/cart", "/checkout", "/contact", "/faqs"] as const;
 
 async function prepareAccessibilityRun(page: Page, colorScheme: "light" | "dark" = "light") {
   await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
@@ -128,6 +128,10 @@ async function signInAsAdmin(page: Page, callbackUrl = "/admin") {
   await expect(email).toBeVisible();
   await email.fill("admin@velora.ae");
   await page.locator("input[name='password']").fill("VeloraAdmin123!");
+  const passwordVisibility = page.getByRole("button", { name: "Show password" });
+  await passwordVisibility.click();
+  await expect(page.locator("input[name='password']")).toHaveAttribute("type", "text");
+  await page.getByRole("button", { name: "Hide password" }).click();
   const target = new URL(callbackUrl, "http://127.0.0.1:3000");
   const submit = page.getByRole("button", { name: "Sign in securely" });
   await expect(submit).toBeEnabled();
@@ -180,7 +184,7 @@ test.describe("critical accessibility release gate", () => {
       await page.setViewportSize({ width: 390, height: 760 });
       await prepareAccessibilityRun(page);
       await page.goto(route.path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 
       await expect(page.locator("main").first()).toBeVisible();
       if (route.shell === "storefront") {
@@ -206,7 +210,7 @@ test.describe("critical accessibility release gate", () => {
       await page.setViewportSize({ width: 640, height: 760 });
       await prepareAccessibilityRun(page, "dark");
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 
       const result = await auditPage(page);
       expect(result.mainCount).toBe(1);

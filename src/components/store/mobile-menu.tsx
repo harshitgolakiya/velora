@@ -1,19 +1,20 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import Image from "next/image";
 import Link from "next/link";
-import { Heart, Search, ShoppingBag, UserRound, X } from "lucide-react";
+import { ArrowUpRight, Heart, Search, ShoppingBag, UserRound, X } from "lucide-react";
 import { LanguageSwitcher } from "@/components/store/language-switcher";
 import { ThemeToggle } from "@/components/store/theme-toggle";
 import { categoryLabel, collectionLabel, type Locale } from "@/lib/i18n-shell";
 import { cn } from "@/lib/utils";
 
-const navCategories = ["Leggings", "Sports Bras", "Jackets", "Tops", "Pants", "Accessories"];
+const navCategories = ["Tops", "Sports Bras", "Jackets", "Leggings", "Accessories"];
 
 const navCollections = [
-  { slug: "studio-sculpt", name: "Studio Sculpt" },
-  { slug: "desert-run", name: "Desert Run" },
-  { slug: "after-hours", name: "After Hours" },
+  { slug: "pilates-studio", name: "Pilates", href: "/collections/pilates-studio" },
+  { slug: "court-club", name: "Tennis", href: "/collections/court-club" },
+  { slug: "everyday-motion", name: "Everyday", href: "/collections/everyday-motion" },
 ];
 
 type MobileMenuCopy = {
@@ -41,6 +42,7 @@ export function MobileMenu({
   cartCount,
   openSearch,
   openCart,
+  openAccount,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -54,6 +56,7 @@ export function MobileMenu({
   cartCount: number;
   openSearch: () => void;
   openCart: () => void;
+  openAccount: () => void;
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -61,24 +64,45 @@ export function MobileMenu({
         <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/45 backdrop-blur-sm lg:hidden" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="storefront-drawer-full fixed inset-0 z-[110] overflow-y-auto bg-[var(--background)] p-5 text-[var(--foreground)] outline-none lg:hidden"
+          className="storefront-drawer-full fixed inset-0 z-[110] overflow-y-auto bg-[var(--background)] px-4 pb-5 pt-3 text-[var(--foreground)] outline-none sm:p-5 lg:hidden"
         >
-          <div className="flex items-center justify-between">
+          <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/92 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
             <Dialog.Title asChild>
-              <Link href={localize("/")} className="font-serif text-3xl font-medium tracking-[0.08em] text-[var(--accent)]">Velora</Link>
+              <Link href={localize("/")} className="font-serif text-[1.7rem] font-medium tracking-[0.08em] text-[var(--accent)] sm:text-3xl">Velora</Link>
             </Dialog.Title>
-            <Dialog.Close aria-label="Close menu" className="storefront-action grid size-11 -me-2 place-items-center">
+            <Dialog.Close aria-label="Close menu" className="storefront-action storefront-icon-button grid size-11 place-items-center border border-[var(--border)] bg-[var(--surface)]">
               <X className="size-6" />
             </Dialog.Close>
           </div>
-          <nav className="storefront-stagger mt-7 flex flex-col font-serif text-3xl font-medium" aria-label="Primary mobile navigation">
+          <Dialog.Close asChild>
+            <Link href={localize("/collections/pilates-studio")} className="storefront-panel group mt-4 grid min-h-36 grid-cols-[1fr_0.82fr] overflow-hidden sm:mt-5 sm:min-h-44">
+              <div className="flex min-w-0 flex-col justify-end p-3.5 sm:p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Featured movement</p>
+                <p className="mt-2 text-[1.35rem] font-medium leading-none sm:text-2xl">Pilates Studio</p>
+                <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] sm:mt-4">
+                  Move in it
+                  <ArrowUpRight className="size-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </div>
+              <div className="relative min-h-36 overflow-hidden bg-[var(--card)] sm:min-h-44">
+                <Image
+                  src="/images/activewear-demo/studio-yoga.jpg"
+                  alt=""
+                  fill
+                  sizes="45vw"
+                  className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                />
+              </div>
+            </Link>
+          </Dialog.Close>
+          <nav className="storefront-stagger mt-5 flex flex-col font-serif text-[1.42rem] font-medium leading-none sm:mt-6 sm:text-[1.85rem]" aria-label="Primary mobile navigation">
             {nav.map((item) => (
               <Dialog.Close key={item.label} asChild>
                 <Link
                   href={localize(item.href)}
                   aria-current={item.href !== "/shop?sort=latest" && isActive(item.href) ? "page" : undefined}
                   className={cn(
-                    "storefront-action flex min-h-12 items-center border-b border-[var(--border)]",
+                    "storefront-action flex min-h-11 items-center border-b border-[var(--border)] py-1 sm:min-h-12",
                     item.href !== "/shop?sort=latest" && isActive(item.href) && "text-[var(--accent)]",
                   )}
                 >
@@ -92,43 +116,53 @@ export function MobileMenu({
               <button
                 type="button"
                 onClick={() => window.requestAnimationFrame(openSearch)}
-                className="storefront-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] uppercase hover:bg-[var(--hover)]"
+                className="storefront-action storefront-mobile-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] uppercase"
               >
                 <Search className="size-4" />
                 {copy.search}
               </button>
             </Dialog.Close>
             <Dialog.Close asChild>
-              <Link href={localize("/account")} className="storefront-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] hover:bg-[var(--hover)]">
+              <button
+                type="button"
+                onClick={() => window.requestAnimationFrame(openAccount)}
+                className="storefront-action storefront-mobile-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] uppercase"
+              >
                 <UserRound className="size-4" />
                 {copy.account}
-              </Link>
+              </button>
             </Dialog.Close>
             <Dialog.Close asChild>
-              <Link href={localize("/account#wishlist")} className="storefront-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] hover:bg-[var(--hover)]">
-                <Heart className="size-4" />
-                {copy.wishlist}{wishlistCount ? ` (${wishlistCount})` : ""}
+              <Link href={localize("/account/wishlist")} className="storefront-action storefront-mobile-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)]">
+                <span className="relative grid size-5 place-items-center">
+                  <Heart className="size-4" />
+                  {wishlistCount ? <span className="storefront-count-badge storefront-header-badge absolute">{wishlistCount}</span> : null}
+                </span>
+                {copy.wishlist}
               </Link>
             </Dialog.Close>
             <Dialog.Close asChild>
               <button
                 type="button"
                 onClick={() => window.requestAnimationFrame(openCart)}
-                className="storefront-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] uppercase hover:bg-[var(--hover)]"
+                className="storefront-action storefront-mobile-action flex min-h-[3.25rem] flex-col items-center justify-center gap-1.5 border border-[var(--border)] uppercase"
               >
-                <ShoppingBag className="size-4" />
-                {copy.cart}{cartCount ? ` (${cartCount})` : ""}
+                <span className="relative grid size-5 place-items-center">
+                  <ShoppingBag className="size-4" />
+                  {cartCount ? <span className="storefront-count-badge storefront-header-badge absolute">{cartCount}</span> : null}
+                </span>
+                {copy.cart}
               </button>
             </Dialog.Close>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-2">
-            <div className="flex min-h-11 items-center justify-between gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
+          <div className="mt-6 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+            <div className="storefront-panel-row flex min-h-12 items-center justify-between gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
               <span className="shrink-0 text-stone-500">{copy.theme}</span>
-              <ThemeToggle className="!size-7 border-0" />
+              <ThemeToggle className="!size-10 border-0" />
             </div>
-            <div className="grid min-h-11 min-w-0 grid-cols-[auto_1fr] items-center gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
-              <span className="shrink-0 text-stone-500" aria-label={copy.language}>Lang</span>
-              <LanguageSwitcher className="justify-end gap-1.5 whitespace-nowrap tracking-[0.08em]" />
+            <div className="storefront-panel-row grid min-h-12 min-w-0 grid-cols-[auto_1fr] items-center gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
+              <span className="shrink-0 text-stone-500" aria-label={copy.language}>{copy.language}</span>
+              <LanguageSwitcher className="-me-2 min-h-10 justify-end gap-1.5 whitespace-nowrap px-2 tracking-[0.08em]" />
             </div>
           </div>
           <div className="mt-8">
@@ -136,7 +170,7 @@ export function MobileMenu({
             <div className="mt-3 grid grid-cols-2 border-l border-t border-[var(--border)]">
               {navCategories.map((category) => (
                 <Dialog.Close key={category} asChild>
-                  <Link href={localize(`/shop?category=${encodeURIComponent(category)}`)} className="storefront-action flex min-h-12 items-center border-b border-r border-[var(--border)] p-3 text-sm hover:bg-[var(--hover)]">
+                  <Link href={localize(`/shop?category=${encodeURIComponent(category)}`)} className="storefront-action storefront-panel-row flex min-h-12 items-center border-b border-r border-[var(--border)] p-3 text-sm">
                     {categoryLabel(locale, category)}
                   </Link>
                 </Dialog.Close>
@@ -149,7 +183,7 @@ export function MobileMenu({
               <div className="mt-3 grid gap-1 text-sm">
                 {navCollections.map((collection) => (
                   <Dialog.Close key={collection.slug} asChild>
-                    <Link href={localize(`/collections/${collection.slug}`)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent)]">
+                    <Link href={localize(collection.href)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent)]">
                       {collectionLabel(locale, collection.slug, collection.name)}
                     </Link>
                   </Dialog.Close>

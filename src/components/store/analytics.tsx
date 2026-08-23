@@ -118,7 +118,7 @@ export function Analytics() {
       <AnalyticsScripts preferences={preferences} />
       {!preferences && showConsentPrompt ? (
         <div className="storefront-bottom-bar fixed inset-x-0 bottom-0 z-[90] border-t border-[var(--border)] bg-[#151922] shadow-[0_-18px_70px_rgba(0,0,0,0.42)]">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-5 py-3 md:flex-row md:items-center md:justify-between md:px-8 md:py-4">
+          <div className="storefront-container flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between md:py-4">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">Privacy choices</p>
               <p className="mt-1.5 text-sm leading-6 text-[var(--muted)] md:hidden">
@@ -135,7 +135,7 @@ export function Analytics() {
               <button type="button" onClick={() => save(rejectedConsentPreferences())} className="storefront-action inline-flex h-11 items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--hover)]">
                 <X className="size-4" /> Reject
               </button>
-              <button type="button" onClick={() => save(acceptedConsentPreferences())} className="storefront-action col-span-2 inline-flex h-11 items-center justify-center gap-2 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] hover:bg-[var(--foreground)] hover:text-[var(--background)] sm:col-span-1">
+              <button type="button" onClick={() => save(acceptedConsentPreferences())} className="storefront-action col-span-2 inline-flex h-11 items-center justify-center gap-2 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] hover:bg-[var(--foreground)] hover:text-[var(--background)] sm:col-span-1">
                 <Check className="size-4" /> Accept
               </button>
             </div>
@@ -144,7 +144,7 @@ export function Analytics() {
       ) : null}
       {customizing ? (
         <div className="storefront-overlay fixed inset-0 z-[100] bg-black/55 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Privacy preferences" data-state="open">
-          <div className="mx-auto max-w-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-2xl [animation:drawer-full-in_0.3s_var(--motion-ease-emphasized)_both]">
+          <div className="mx-auto max-w-xl storefront-framed p-5 shadow-2xl [animation:drawer-full-in_0.3s_var(--motion-ease-emphasized)_both]">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">Privacy preferences</p>
@@ -154,7 +154,7 @@ export function Analytics() {
                 <X className="size-4" />
               </button>
             </div>
-            <div className="mt-5 divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <div className="mt-5 divide-y divide-[var(--border)] storefront-railed">
               {([
                 ["necessary", "Necessary", "Required for cart, checkout, account security, and preference storage.", true],
                 ["analytics", "Analytics", "Helps us understand product discovery, checkout friction, and store performance.", false],
@@ -182,7 +182,7 @@ export function Analytics() {
             </div>
             <div className="mt-5 flex flex-wrap justify-end gap-2">
               <button type="button" onClick={() => save(rejectedConsentPreferences())} className="storefront-action h-11 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] hover:bg-[var(--hover)]">Reject optional</button>
-              <button type="button" onClick={() => save({ ...draft, necessary: true, updatedAt: new Date().toISOString() })} className="storefront-action h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#111315] hover:bg-[var(--foreground)] hover:text-[var(--background)]">Save choices</button>
+              <button type="button" onClick={() => save({ ...draft, necessary: true, updatedAt: new Date().toISOString() })} className="storefront-action h-11 bg-[var(--accent)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[#17262D] hover:bg-[var(--foreground)] hover:text-[var(--background)]">Save choices</button>
             </div>
           </div>
         </div>

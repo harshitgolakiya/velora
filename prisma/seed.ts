@@ -34,9 +34,50 @@ const COLOR_HEX: Record<string, string> = {
   Olive: "#6b7a3d",
   Black: "#111111",
   White: "#f5f5f0",
+  Red: "#8f1f24",
+  Stripe: "#f2f0ea",
+  Camel: "#b48a61",
+  Pink: "#d9a5bd",
+  "Light Blue": "#9fc5df",
+  Indigo: "#263f73",
+  Ivory: "#f6f0e6",
+  Rose: "#b76d82",
+  Khaki: "#9b8d63",
+  Pearl: "#f2eee7",
+  Espresso: "#2f211b",
+  Stone: "#b8ad9f",
+  Fig: "#5a304a",
+  Midnight: "#161d2e",
+  Taupe: "#a18f7d",
+  Sand: "#d4b889",
+  Sea: "#7fa7a3",
 };
 
+const catalogImagePoolByCategory = new Map(
+  categories.map((category) => [
+    category,
+    Array.from(new Set(products.filter((product) => product.category === category).flatMap((product) => product.images)))
+      .filter((url) => !/\.(mp4|webm)(\?.*)?$/i.test(url)),
+  ]),
+);
+
+function fallbackMediaForColor(product: (typeof products)[number], colorName: string) {
+  const colorIndex = Math.max(0, product.colors.indexOf(colorName));
+  const pool = [...product.images, ...(catalogImagePoolByCategory.get(product.category) ?? [])]
+    .filter((url) => !/\.(mp4|webm)(\?.*)?$/i.test(url));
+  const uniquePool = Array.from(new Set(pool));
+  const gallery = Array.from({ length: Math.min(3, uniquePool.length) }, (_, index) => uniquePool[(colorIndex + index) % uniquePool.length]);
+
+  return gallery.map((url, index) => ({
+    type: "IMAGE" as const,
+    url,
+    sortOrder: index,
+    isHoverImage: index === 1,
+  }));
+}
+
 async function main() {
+  const resetDemoCatalog = process.argv.includes("--reset-demo-catalog") || process.env.RESET_DEMO_CATALOG === "1";
   const passwordHash = await bcrypt.hash("VeloraAdmin123!", 12);
 
   // Admin role — permissions stored as JSON string for SQLite compat
@@ -77,6 +118,131 @@ async function main() {
       role: UserRole.CUSTOMER,
     },
   });
+
+  if (resetDemoCatalog) {
+    await prisma.$transaction([
+      prisma.recommendationEvent.deleteMany(),
+      prisma.returnRequest.deleteMany(),
+      prisma.order.deleteMany(),
+      prisma.cart.deleteMany(),
+      prisma.wishlistItem.deleteMany(),
+      prisma.review.deleteMany(),
+      prisma.productAlertSubscription.deleteMany(),
+      prisma.product.deleteMany(),
+      prisma.homepageSection.updateMany({ data: { collectionId: null } }),
+      prisma.collection.deleteMany(),
+      prisma.mediaAsset.deleteMany(),
+    ]);
+  }
+
+  // Collect all sizes dynamically from the catalog.
+  const allSizes = [...new Set(products.flatMap((p) => p.sizes))];
+  const sizeMap: Record<string, string> = {};
+  for (const name of allSizes) {
+    const s = await prisma.size.upsert({ where: { id: name }, update: {}, create: { id: name, name } });
+    sizeMap[name] = s.id;
+  }
+
+  // Collect all color names used in the catalog
+  const allColors = [...new Set(products.flatMap((p) => p.colors))];
+  const colorMap: Record<string, string> = {};
+  for (const name of allColors) {
+    const hex = COLOR_HEX[name] ?? "#888888";
+    const existing = await prisma.color.findFirst({ where: { name } });
+    const c = existing ?? (await prisma.color.create({ data: { name, hex } }));
+    colorMap[name] = c.id;
+  }
+
+  // Categories
+  for (const category of categories) {
+    await prisma.category.upsert({
+      where: { slug: slugify(category) },
+      update: { description: categoryDescriptions[category] },
+      create: { name: category, slug: slugify(category), description: categoryDescriptions[category] },
+    });
+  }
+
+  // Collections
+  for (const collection of collections) {
+    await prisma.collection.upsert({
+      where: { slug: collection.slug },
+      update: {},
+      create: {
+        name: collection.name,
+        slug: collection.slug,
+        summary: collection.summary,
+        bannerImage: collection.image,
+        seoTitle: `${collection.name} | Velora`,
+        seoDescription: collection.summary,
+      },
+    });
+  }
+
+  // Products
+  for (const product of products) {
+    const category = await prisma.category.findUniqueOrThrow({ where: { slug: slugify(product.category) } });
+    const collection = await prisma.collection.findUnique({ where: { slug: product.collection } });
+
+    const stockPerVariant = Math.max(3, Math.floor(product.stock / product.sizes.length));
+
+    const productImageUrls = product.images.filter((url) => !/\.(mp4|webm)(\?.*)?$/i.test(url));
+    await prisma.product.upsert({
+      where: { slug: product.slug },
+      update: {
+        collections: collection ? { set: [{ id: collection.id }] } : undefined,
+      },
+      create: {
+        title: product.name,
+        slug: product.slug,
+        description: product.description,
+        price: product.price,
+        salePrice: product.salePrice ?? null,
+        sku: product.id.toUpperCase(),
+        fabricDetails: product.fabric,
+        careInstructions: product.care,
+        seoTitle: `${product.name} | Velora`,
+        seoDescription: product.description,
+        featured: Boolean(product.featured),
+        bestSeller: Boolean(product.bestSeller),
+        newArrival: Boolean(product.newArrival),
+        status: ProductStatus.PUBLISHED,
+        categoryId: category.id,
+        collections: collection ? { connect: [{ id: collection.id }] } : undefined,
+        images: {
+          create: productImageUrls.map((url, index) => ({
+            url,
+            alt: product.name,
+            position: index,
+          })),
+        },
+        // Each color × size = one variant with its own stock
+        variants: {
+          create: product.colors.flatMap((colorName) =>
+            product.sizes.map((sizeName) => {
+              const colorMedia = product.variantMediaByColor?.[colorName]?.length
+                ? product.variantMediaByColor[colorName]
+                : fallbackMediaForColor(product, colorName);
+
+              return {
+                colorId: colorMap[colorName],
+                sizeId: sizeMap[sizeName] ?? sizeName,
+                sku: `${product.id}-${sizeName}-${colorName}`.toUpperCase().replace(/\s+/g, "-"),
+                stock: stockPerVariant,
+                medias: {
+                  create: colorMedia.map((media, i) => ({
+                    type: media.type,
+                    url: media.url,
+                    sortOrder: media.sortOrder ?? i,
+                    isHoverImage: media.isHoverImage,
+                  })),
+                },
+              };
+            }),
+          ),
+        },
+      },
+    });
+  }
 
   const sampleProduct = await prisma.product.findFirst({
     where: { status: ProductStatus.PUBLISHED },
@@ -158,6 +324,7 @@ async function main() {
           create: [
             {
               productId: sampleProduct.id,
+              variantId: variant.id,
               title: sampleProduct.title,
               size: variant.size.name,
               color: variant.color.name,
@@ -182,109 +349,6 @@ async function main() {
             shippedAt: new Date(),
             deliveredAt: new Date(),
           },
-        },
-      },
-    });
-  }
-
-  // Collect all sizes dynamically from the catalog (handles "750ml", "One Size", etc.)
-  const allSizes = [...new Set(products.flatMap((p) => p.sizes))];
-  const sizeMap: Record<string, string> = {};
-  for (const name of allSizes) {
-    const s = await prisma.size.upsert({ where: { id: name }, update: {}, create: { id: name, name } });
-    sizeMap[name] = s.id;
-  }
-
-  // Collect all color names used in the catalog
-  const allColors = [...new Set(products.flatMap((p) => p.colors))];
-  const colorMap: Record<string, string> = {};
-  for (const name of allColors) {
-    const hex = COLOR_HEX[name] ?? "#888888";
-    const existing = await prisma.color.findFirst({ where: { name } });
-    const c = existing ?? (await prisma.color.create({ data: { name, hex } }));
-    colorMap[name] = c.id;
-  }
-
-  // Categories
-  for (const category of categories) {
-    await prisma.category.upsert({
-      where: { slug: slugify(category) },
-      update: { description: categoryDescriptions[category] },
-      create: { name: category, slug: slugify(category), description: categoryDescriptions[category] },
-    });
-  }
-
-  // Collections
-  for (const collection of collections) {
-    await prisma.collection.upsert({
-      where: { slug: collection.slug },
-      update: {},
-      create: {
-        name: collection.name,
-        slug: collection.slug,
-        summary: collection.summary,
-        bannerImage: collection.image,
-        seoTitle: `${collection.name} | Velora`,
-        seoDescription: collection.summary,
-      },
-    });
-  }
-
-  // Products
-  for (const product of products) {
-    const category = await prisma.category.findUniqueOrThrow({ where: { slug: slugify(product.category) } });
-    const collection = await prisma.collection.findUnique({ where: { slug: product.collection } });
-
-    const stockPerVariant = Math.max(3, Math.floor(product.stock / product.sizes.length));
-
-    await prisma.product.upsert({
-      where: { slug: product.slug },
-      update: {
-        collections: collection ? { set: [{ id: collection.id }] } : undefined,
-      },
-      create: {
-        title: product.name,
-        slug: product.slug,
-        description: product.description,
-        price: product.price,
-        salePrice: product.salePrice ?? null,
-        sku: product.id.toUpperCase(),
-        fabricDetails: product.fabric,
-        careInstructions: product.care,
-        seoTitle: `${product.name} | Velora`,
-        seoDescription: product.description,
-        featured: Boolean(product.featured),
-        bestSeller: Boolean(product.bestSeller),
-        newArrival: Boolean(product.newArrival),
-        status: ProductStatus.PUBLISHED,
-        categoryId: category.id,
-        collections: collection ? { connect: [{ id: collection.id }] } : undefined,
-        images: {
-          create: product.images.map((url, index) => ({
-            url,
-            alt: product.name,
-            position: index,
-          })),
-        },
-        // Each color × size = one variant with its own stock
-        variants: {
-          create: product.colors.flatMap((colorName) =>
-            product.sizes.map((sizeName) => ({
-              colorId: colorMap[colorName],
-              sizeId: sizeMap[sizeName] ?? sizeName,
-              sku: `${product.id}-${sizeName}-${colorName}`.toUpperCase().replace(/\s+/g, "-"),
-              stock: stockPerVariant,
-              // Seed variant media from product-level images
-              medias: {
-                create: product.images.map((url, i) => ({
-                  type: "IMAGE" as const,
-                  url,
-                  sortOrder: i,
-                  isHoverImage: i === 1,
-                })),
-              },
-            })),
-          ),
         },
       },
     });

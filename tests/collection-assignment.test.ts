@@ -4,19 +4,19 @@ import { suggestCollectionSlugsForProduct } from "@/lib/collection-assignment";
 import { prisma } from "@/lib/prisma";
 
 describe("collection assignment", () => {
-  it("assigns studio training products to Studio Sculpt", () => {
-    expect(suggestCollectionSlugsForProduct({ title: "Contour Leggings", categoryName: "Leggings" })).toContain("studio-sculpt");
-    expect(suggestCollectionSlugsForProduct({ title: "Soft Sports Bra", categoryName: "Sports Bras" })).toContain("studio-sculpt");
+  it("assigns studio pieces to Pilates Studio", () => {
+    expect(suggestCollectionSlugsForProduct({ title: "Studio Wrap Top", categoryName: "Tops", tags: ["Pilates"] })).toContain("pilates-studio");
+    expect(suggestCollectionSlugsForProduct({ title: "Flow Crossback Bra", categoryName: "Sports Bras", tags: ["Yoga"] })).toContain("pilates-studio");
   });
 
-  it("assigns jackets and bottles to Desert Run", () => {
-    expect(suggestCollectionSlugsForProduct({ title: "Track Jacket", categoryName: "Jackets" })).toContain("desert-run");
-    expect(suggestCollectionSlugsForProduct({ title: "ccéa Bottle Blue", categoryName: "Tumblers" })).toContain("desert-run");
+  it("assigns tennis pieces to Court Club", () => {
+    expect(suggestCollectionSlugsForProduct({ title: "Court Warm-Up Jacket", categoryName: "Jackets" })).toContain("court-club");
+    expect(suggestCollectionSlugsForProduct({ title: "Performance Cap", categoryName: "Accessories", tags: ["Tennis"] })).toContain("court-club");
   });
 
-  it("assigns soft tops to After Hours while allowing multi-collection merchandising", () => {
-    expect(suggestCollectionSlugsForProduct({ title: "Wrap top", categoryName: "Tops" })).toEqual(["after-hours"]);
-    expect(suggestCollectionSlugsForProduct({ title: "Soft Leggings", categoryName: "Leggings" })).toEqual(["studio-sculpt", "after-hours"]);
+  it("assigns everyday and training products while allowing multi-collection merchandising", () => {
+    expect(suggestCollectionSlugsForProduct({ title: "Motion Rib Tank", categoryName: "Tops", tags: ["Everyday"] })).toEqual(["everyday-motion"]);
+    expect(suggestCollectionSlugsForProduct({ title: "Studio Sculpt Legging", categoryName: "Leggings", tags: ["Pilates", "Training"] })).toEqual(["pilates-studio", "training-core"]);
   });
 
   it("keeps every published product attached to a published collection", async () => {

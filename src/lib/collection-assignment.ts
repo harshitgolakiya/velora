@@ -4,7 +4,7 @@ export type CollectionAssignmentInput = {
   tags?: string[];
 };
 
-export type KnownCollectionSlug = "studio-sculpt" | "desert-run" | "after-hours";
+export type KnownCollectionSlug = "pilates-studio" | "court-club" | "everyday-motion" | "training-core";
 
 function textForAssignment(input: CollectionAssignmentInput) {
   return `${input.title} ${input.categoryName} ${(input.tags ?? []).join(" ")}`.toLowerCase();
@@ -14,20 +14,24 @@ export function suggestCollectionSlugsForProduct(input: CollectionAssignmentInpu
   const text = textForAssignment(input);
   const suggestions = new Set<KnownCollectionSlug>();
 
-  if (/\b(leggings?|pants|bras?|contour|define|flared|sculpt|compression)\b/.test(text)) {
-    suggestions.add("studio-sculpt");
+  if (/\b(pilates|yoga|studio|flow|grip|soft)\b/.test(text)) {
+    suggestions.add("pilates-studio");
   }
 
-  if (/\b(jacket|track|bottle|tumbler|run|outdoor|hydration)\b/.test(text)) {
-    suggestions.add("desert-run");
+  if (/\b(tennis|court|racket|warm-up|cap)\b/.test(text)) {
+    suggestions.add("court-club");
   }
 
-  if (/\b(top|crop|wrap|rib|soft|after|lounge|wide leg)\b/.test(text)) {
-    suggestions.add("after-hours");
+  if (/\b(everyday|commute|transit|tote|casual|rib|wrap)\b/.test(text)) {
+    suggestions.add("everyday-motion");
+  }
+
+  if (/\b(training|support|sculpt|legging|performance|workout|tempo)\b/.test(text)) {
+    suggestions.add("training-core");
   }
 
   if (!suggestions.size) {
-    suggestions.add("studio-sculpt");
+    suggestions.add("everyday-motion");
   }
 
   return Array.from(suggestions);

@@ -4,6 +4,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 import { focalObjectPosition, type GalleryPresentationMedia } from "@/lib/product-gallery-presentation";
+import { usePathname } from "next/navigation";
+import { catalogCopy, localeFromPathname } from "@/lib/i18n";
 
 export function ProductGalleryViewer({
   productName,
@@ -32,6 +34,8 @@ export function ProductGalleryViewer({
   previous: () => void;
   next: () => void;
 }) {
+  const locale = localeFromPathname(usePathname());
+  const copy = catalogCopy[locale];
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -77,7 +81,7 @@ export function ProductGalleryViewer({
           >
             <div className="absolute inset-4 bg-[#E6E4DE] shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:inset-8" aria-hidden="true" />
             <Image
-              src={activeMedia?.url ?? "/images/velora/hero-sculpted-essentials.jpg"}
+              src={activeMedia?.url ?? "/images/activewear-demo/active-duo.jpg"}
               alt={activeMedia?.altText ?? `${productName} full-screen`}
               fill
               sizes={activeImageWidth ? `${activeImageWidth}px` : zoomed ? "150vw" : "100vw"}
@@ -91,10 +95,10 @@ export function ProductGalleryViewer({
                 event.stopPropagation();
                 previous();
               }}
-              aria-label="Previous media"
+              aria-label={copy.previousMedia}
               className="storefront-action storefront-light-control absolute left-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
             >
-              <ChevronLeft className="size-5" />
+              {locale === "ar" ? <ChevronRight className="size-5" /> : <ChevronLeft className="size-5" />}
             </button>
             <button
               type="button"
@@ -102,10 +106,10 @@ export function ProductGalleryViewer({
                 event.stopPropagation();
                 next();
               }}
-              aria-label="Next media"
+              aria-label={copy.nextMedia}
               className="storefront-action storefront-light-control absolute right-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
             >
-              <ChevronRight className="size-5" />
+              {locale === "ar" ? <ChevronLeft className="size-5" /> : <ChevronRight className="size-5" />}
             </button>
           </div>
           {resolutionLabel && !canSourceZoom ? (

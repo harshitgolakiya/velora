@@ -88,11 +88,22 @@ export function buildSecurityHeaders(options?: SecurityHeaderOptions) {
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  allowedDevOrigins: ["127.0.0.1"],
+  experimental: {
+    // Product videos are uploaded through the admin API. Next.js otherwise
+    // truncates proxied request bodies at its 10 MB default.
+    proxyClientMaxBodySize: "100mb",
+  },
   productionBrowserSourceMaps: process.env.PRODUCTION_BROWSER_SOURCE_MAPS === "true",
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [72, 75, 84, 85, 92],
-    remotePatterns: [],
+    remotePatterns: [
+      { protocol: "https", hostname: "cdn.dummyjson.com" },
+      { protocol: "https", hostname: "fakestoreapi.com" },
+      { protocol: "https", hostname: "images.pexels.com" },
+      { protocol: "https", hostname: "i.imgur.com" },
+    ],
   },
   async headers() {
     return [

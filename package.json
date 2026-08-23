@@ -47,6 +47,7 @@
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "emailjs": "^5.0.1",
+    "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.42.2",
     "image-size": "^2.0.2",
     "imapflow": "^1.4.0",

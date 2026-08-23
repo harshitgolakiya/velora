@@ -14,13 +14,24 @@ const schema = z.object({
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireCustomerSession();
-  if (!session?.user?.id) return NextResponse.json({ review: null });
+  if (!session?.user?.id || !session.user.email) return NextResponse.json({ review: null, canReview: false });
   const { id: productId } = await params;
-  const review = await prisma.review.findUnique({
-    where: { productId_userId: { productId, userId: session.user.id } },
-    include: { media: { orderBy: { createdAt: "asc" } } },
-  });
+  const [review, deliveredOrder] = await Promise.all([
+    prisma.review.findUnique({
+      where: { productId_userId: { productId, userId: session.user.id } },
+      include: { media: { orderBy: { createdAt: "asc" } } },
+    }),
+    prisma.order.findFirst({
+      where: {
+        OR: [{ userId: session.user.id }, { email: session.user.email }],
+        status: "DELIVERED",
+        items: { some: { productId } },
+      },
+      select: { id: true },
+    }),
+  ]);
   return NextResponse.json({
+    canReview: Boolean(deliveredOrder),
     review: review ? {
       id: review.id,
       rating: review.rating,

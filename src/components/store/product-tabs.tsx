@@ -16,7 +16,7 @@ export function ProductTabs({ product }: { product: Product }) {
   const showCare = product.care && !isGenericProductCopy(product.care);
 
   return (
-    <section className="mt-20 border-t border-[var(--border)]" aria-label="Product information">
+    <section className="mt-10 border-t border-[var(--border)] sm:mt-16 lg:mt-20" aria-label="Product information">
       <div className="flex overflow-x-auto border-b border-[var(--border)]" role="tablist">
         {TABS.map((tab) => (
           <button
@@ -25,7 +25,7 @@ export function ProductTabs({ product }: { product: Product }) {
             aria-selected={active === tab}
             key={tab}
             onClick={() => setActive(tab)}
-            className={`shrink-0 border-b-2 px-5 py-4 text-xs font-semibold uppercase tracking-widest transition-colors ${
+            className={`shrink-0 border-b-2 px-3 py-4 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors sm:px-5 sm:text-xs sm:tracking-widest ${
               active === tab
                 ? "border-[var(--foreground)] text-[var(--foreground)]"
                 : "border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"
@@ -36,7 +36,7 @@ export function ProductTabs({ product }: { product: Product }) {
         ))}
       </div>
 
-      <div className="max-w-3xl py-8 text-sm leading-7 text-[var(--muted)]" role="tabpanel">
+      <div className="max-w-3xl py-6 text-sm leading-7 text-[var(--muted)] sm:py-8" role="tabpanel">
         {active === "Size & Fit" ? (
           <div className="grid gap-8 sm:grid-cols-[1fr_1fr]">
             <div className="space-y-4">

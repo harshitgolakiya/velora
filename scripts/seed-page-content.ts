@@ -12,7 +12,7 @@ const pages: PageSeed[] = [
     seoTitle: "Our Story",
     seoDescription: "Discover the design philosophy behind our technical activewear.",
     blocks: [
-      { id: "story-hero", type: "HERO", eyebrow: "The story", heading: "Designed for composed movement.", body: "Technical pieces with quiet branding, warm-weather intelligence, and styling that works beyond training.", imageUrl: "/images/velora/story.jpg" },
+      { id: "story-hero", type: "HERO", eyebrow: "The story", heading: "Designed for composed movement.", body: "Technical pieces with quiet branding, warm-weather intelligence, and styling that works beyond training.", imageUrl: "/images/activewear-demo/active-neutral.jpg" },
       { id: "story-purpose", type: "TEXT", heading: "Built for movement in warm cities", body: "A considered wardrobe for training, travel, and the hours between. Every silhouette begins with function, then removes everything unnecessary." },
     ],
   },

@@ -27,7 +27,7 @@ export function AdminLoginForm({ callbackUrl = "/admin" }: { callbackUrl?: strin
       return;
     }
 
-    window.location.assign(result.url ?? callbackUrl);
+    window.location.assign(callbackUrl);
   }
 
   return (
@@ -73,4 +73,3 @@ export function AdminLoginForm({ callbackUrl = "/admin" }: { callbackUrl?: strin
     </form>
   );
 }
-

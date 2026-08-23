@@ -36,6 +36,6 @@ test.describe("search results", () => {
     await page.goto("/search?q=zzzznotfound", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "No products found" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Shop all" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Leggings" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Dresses" })).toBeVisible();
   });
 });

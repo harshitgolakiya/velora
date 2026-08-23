@@ -101,7 +101,7 @@ export async function sendReturnLifecycleNotification(input: {
     html: transactionalEmailShell({
       locale: normalizedLocale,
       heading: statusLabel,
-      body: `${content.guidance}${input.message ? `<br><span style="color:#5f646d">${input.message.replace(/[<>]/g, "")}</span>` : ""}`,
+      body: `${content.guidance}${input.message ? `<br><span style="color:#66777F">${input.message.replace(/[<>]/g, "")}</span>` : ""}`,
       ctaLabel: isArabic ? "عرض الطلب" : "View request",
       ctaHref: localizedSiteUrl(`/account/orders/${encodeURIComponent(input.orderNumber)}/return`, normalizedLocale),
     }),

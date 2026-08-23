@@ -58,6 +58,7 @@ const textareaClass =
 const panelClass = "border border-[var(--border)] bg-[var(--surface)]";
 const panelHeaderClass =
   "border-b border-[var(--border)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em]";
+const MAX_VIDEO_UPLOAD_BYTES = 100 * 1024 * 1024;
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -268,23 +269,35 @@ function productToColorGroups(product?: AdminProduct): ColorGroup[] {
   });
 }
 
-async function uploadFiles(files: File[]) {
+async function uploadFiles(files: File[], onProgress?: (percent: number) => void) {
   if (!files.length) return [];
 
   const body = new FormData();
   files.forEach((file) => body.append("files", file));
-
-  const response = await fetch("/api/admin/uploads", {
-    method: "POST",
-    body,
+  return new Promise<string[]>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", "/api/admin/uploads");
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress?.(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+    });
+    request.addEventListener("load", () => {
+      let result: { message?: string; files?: { url: string }[] } = {};
+      try {
+        result = JSON.parse(request.responseText);
+      } catch {
+        result = {};
+      }
+      if (request.status < 200 || request.status >= 300) {
+        reject(new Error(result.message ?? `Upload rejected (${request.status || "network error"}${request.statusText ? ` ${request.statusText}` : ""}).`));
+        return;
+      }
+      onProgress?.(100);
+      resolve((result.files ?? []).map((file) => file.url));
+    });
+    request.addEventListener("error", () => reject(new Error("The upload was interrupted. Check your connection and try again.")));
+    request.addEventListener("abort", () => reject(new Error("The upload was cancelled.")));
+    request.send(body);
   });
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message ?? "Unable to upload files");
-  }
-
-  return (result.files as { url: string }[]).map((file) => file.url);
 }
 
 export function ProductEditForm({
@@ -306,6 +319,7 @@ export function ProductEditForm({
   const [colorGroups, setColorGroups] = useState<ColorGroup[]>(() => productToColorGroups(product));
   const [imagePickerColorId, setImagePickerColorId] = useState<string | null>(null);
   const [videoPickerColorId, setVideoPickerColorId] = useState<string | null>(null);
+  const [videoUploadProgress, setVideoUploadProgress] = useState<Record<string, { percent: number; status: "ready" | "uploading" | "processing" | "complete" | "error"; message?: string }>>({});
   const [pendingRemoval, setPendingRemoval] = useState<PendingRemoval | null>(null);
   const [draggedGalleryItem, setDraggedGalleryItem] = useState<{ colorId: string; itemId: string } | null>(null);
   const selectedCollectionIds = useMemo(
@@ -337,7 +351,7 @@ export function ProductEditForm({
       {
         id: crypto.randomUUID(),
         name: "",
-        hex: "#C5A46D",
+        hex: "#BCE3F4",
         gallery: [],
         hoverGalleryId: "",
         primaryGalleryId: "",
@@ -507,7 +521,20 @@ export function ProductEditForm({
             url: item.url ?? (await uploadFiles(item.file ? [item.file] : []))[0],
           })),
         );
-        const videoUploads = await uploadFiles(color.videoFile ? [color.videoFile] : []);
+        let videoUploads: string[] = [];
+        if (color.videoFile) {
+          setVideoUploadProgress((prev) => ({ ...prev, [color.id]: { percent: 0, status: "uploading" } }));
+          try {
+            videoUploads = await uploadFiles([color.videoFile], (percent) => {
+              setVideoUploadProgress((prev) => ({ ...prev, [color.id]: { percent, status: percent === 100 ? "processing" : "uploading" } }));
+            });
+            setVideoUploadProgress((prev) => ({ ...prev, [color.id]: { percent: 100, status: "complete" } }));
+          } catch (error) {
+            const uploadMessage = error instanceof Error ? error.message : "Unable to upload video.";
+            setVideoUploadProgress((prev) => ({ ...prev, [color.id]: { percent: 0, status: "error", message: uploadMessage } }));
+            throw error;
+          }
+        }
         const images = uniqueValues(uploadedGallery.map((item) => item.url));
         const hoverImage = uploadedGallery.find((item) => item.id === color.hoverGalleryId)?.url || images[1] || images[0] || "";
         const primaryImage = uploadedGallery.find((item) => item.id === color.primaryGalleryId)?.url || "";
@@ -685,7 +712,7 @@ export function ProductEditForm({
         <button
           type="submit"
           disabled={saveState === "saving"}
-          className="inline-flex h-10 items-center gap-2 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#111315] disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex h-10 items-center gap-2 bg-[var(--accent)] px-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#17262D] disabled:cursor-wait disabled:opacity-70"
         >
           {saveState === "saving" ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
           Save
@@ -975,15 +1002,56 @@ export function ProductEditForm({
                   </Field>
                   <Field label="Product video">
                     <div className="grid gap-2">
+                      <input
+                        value={color.video}
+                        onChange={(event) => patchColor(color.id, { video: event.target.value.trim(), videoFile: undefined })}
+                        placeholder="https://pub-...r2.dev/Core-Legging-black.mp4"
+                        className={inputClass}
+                      />
                       <label className="flex h-10 cursor-pointer items-center justify-center border border-[var(--border)] bg-[var(--surface)] text-xs font-semibold uppercase tracking-[0.1em]">
                         {color.videoFile ? color.videoFile.name : color.video ? "Replace video" : "Upload video"}
                         <input
                           type="file"
                           accept="video/mp4,video/webm"
                           className="hidden"
-                          onChange={(event) => patchColor(color.id, { videoFile: event.target.files?.[0] })}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+                              patchColor(color.id, { videoFile: undefined });
+                              setVideoUploadProgress((prev) => ({
+                                ...prev,
+                                [color.id]: {
+                                  percent: 0,
+                                  status: "error",
+                                  message: `${formatBytes(file.size)} is too large. Videos must be 100 MB or smaller.`,
+                                },
+                              }));
+                              event.target.value = "";
+                              return;
+                            }
+                            patchColor(color.id, { videoFile: file, video: "" });
+                            setVideoUploadProgress((prev) => ({ ...prev, [color.id]: { percent: 0, status: "ready" } }));
+                          }}
                         />
                       </label>
+                      {videoUploadProgress[color.id] ? (
+                        <div className="grid gap-1.5" role="status" aria-live="polite">
+                          <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-[var(--muted)]">
+                            <span>
+                              {videoUploadProgress[color.id].status === "ready" ? "Ready — upload starts when you save"
+                                : videoUploadProgress[color.id].status === "processing" ? "Upload complete — processing"
+                                  : videoUploadProgress[color.id].status === "complete" ? "Video uploaded"
+                                    : videoUploadProgress[color.id].status === "error" ? (videoUploadProgress[color.id].message ?? "Upload failed")
+                                      : "Uploading video"}
+                            </span>
+                            <span>{videoUploadProgress[color.id].percent}%</span>
+                          </div>
+                          <div className="h-2 overflow-hidden rounded-full bg-[var(--card)]" aria-hidden="true">
+                            <div className={`h-full rounded-full transition-[width] duration-200 ${videoUploadProgress[color.id].status === "error" ? "bg-red-500" : "bg-[var(--accent)]"}`} style={{ width: `${videoUploadProgress[color.id].percent}%` }} />
+                          </div>
+                        </div>
+                      ) : null}
                       <button
                         type="button"
                         onClick={() => setVideoPickerColorId(color.id)}
@@ -992,6 +1060,15 @@ export function ProductEditForm({
                         <Film className="size-4" />
                         Choose existing video
                       </button>
+                      {color.video ? (
+                        <button
+                          type="button"
+                          onClick={() => patchColor(color.id, { video: "", videoFile: undefined })}
+                          className="h-9 border border-[var(--border)] text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)] transition hover:bg-[var(--hover)] hover:text-[var(--foreground)]"
+                        >
+                          Remove video URL
+                        </button>
+                      ) : null}
                     </div>
                   </Field>
                 </div>
@@ -1029,7 +1106,7 @@ export function ProductEditForm({
                             onClick={() => markPrimaryImage(color.id, item.id)}
                             className={`h-8 border px-2 text-[10px] font-semibold uppercase tracking-[0.08em] ${
                               color.primaryGalleryId === item.id
-                                ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
+                                ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
                                 : "border-[var(--border)] hover:bg-[var(--hover)]"
                             }`}
                           >
@@ -1041,7 +1118,7 @@ export function ProductEditForm({
                             onClick={() => patchColor(color.id, { hoverGalleryId: item.id })}
                             className={`h-8 border px-2 text-[10px] font-semibold uppercase tracking-[0.08em] ${
                               color.hoverGalleryId === item.id
-                                ? "border-[var(--accent)] bg-[var(--accent)] text-[#111315]"
+                                ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
                                 : "border-[var(--border)] hover:bg-[var(--hover)]"
                             }`}
                           >

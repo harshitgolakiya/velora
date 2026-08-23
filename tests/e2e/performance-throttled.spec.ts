@@ -19,7 +19,7 @@ type EventTimingEntry = PerformanceEntry & {
 const routes = [
   { path: "/", name: "home", maxLcp: 18_000, maxCls: 0.1, maxInteraction: 500 },
   { path: "/shop", name: "shop", maxLcp: 18_000, maxCls: 0.1, maxInteraction: 500 },
-  { path: "/product/flared-pants-7461", name: "product", maxLcp: 18_000, maxCls: 0.1, maxInteraction: 2_500 },
+  { path: "/product/airlift-full-length-legging", name: "product", maxLcp: 18_000, maxCls: 0.1, maxInteraction: 2_500 },
 ] as const;
 
 async function emulateThrottledMobile(page: Page) {

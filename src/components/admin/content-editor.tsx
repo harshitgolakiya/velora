@@ -52,7 +52,7 @@ export function ContentEditor({ initialPage }: { initialPage: EditablePage }) {
       <header className="sticky top-0 z-30 flex min-h-14 items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4">
         <button type="button" onClick={() => router.push("/admin/content")} className="grid size-9 place-items-center" aria-label="Back"><ArrowLeft className="size-4" /></button>
         <h1 className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.14em]">{page.title}</h1>
-        <div className="ml-auto flex items-center gap-2"><button type="button" onClick={() => window.open(`/admin/content/${page.id}/preview`, "_blank")} className="inline-flex h-9 items-center gap-2 border border-[var(--border)] px-3 text-xs font-semibold uppercase"><Eye className="size-4" /> Preview</button><button form="content-editor" disabled={saving} className="h-9 bg-[var(--accent)] px-4 text-xs font-semibold uppercase text-[#111315] disabled:opacity-50">{saving ? "Saving" : "Save"}</button></div>
+        <div className="ml-auto flex items-center gap-2"><button type="button" onClick={() => window.open(`/admin/content/${page.id}/preview`, "_blank")} className="inline-flex h-9 items-center gap-2 border border-[var(--border)] px-3 text-xs font-semibold uppercase"><Eye className="size-4" /> Preview</button><button form="content-editor" disabled={saving} className="h-9 bg-[var(--accent)] px-4 text-xs font-semibold uppercase text-[#17262D] disabled:opacity-50">{saving ? "Saving" : "Save"}</button></div>
       </header>
       <form id="content-editor" onSubmit={save} className="mx-auto grid max-w-360 gap-6 px-4 py-6 xl:grid-cols-[minmax(0,1fr)_330px]">
         <div className="space-y-5">

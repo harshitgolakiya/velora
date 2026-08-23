@@ -46,6 +46,17 @@ describe("homepage section publication validation", () => {
     ).toBe("Category media tile 1 needs a Cloudflare Stream ID before publishing.");
   });
 
+  it("blocks published direct video tiles with non-video URLs", () => {
+    expect(
+      getHomepagePublicationError({
+        status: "PUBLISHED",
+        settings: {
+          categoryMediaItems: [{ title: "Bras", href: "/shop?category=Sports%20Bras", mediaType: "VIDEO", videoUrl: "https://example.com/bras.jpg" }],
+        },
+      }),
+    ).toBe("Category media tile 1 needs an HTTPS or local .mp4/.webm video URL before publishing.");
+  });
+
   it("allows complete published category media tiles", () => {
     expect(
       getHomepagePublicationError({
@@ -55,6 +66,12 @@ describe("homepage section publication validation", () => {
             { title: "Leggings", href: "/shop?category=Leggings", mediaType: "IMAGE", imageUrl: "/images/leggings.jpg" },
             { title: "Tops", href: "/shop?category=Tops", mediaType: "CLOUDFLARE_STREAM", cloudflareStreamId: "stream-id" },
             { title: "Bras", href: "/shop?category=Sports%20Bras", mediaType: "VIDEO", videoUrl: "/uploads/bras.mp4" },
+            {
+              title: "Core",
+              href: "/shop?category=Leggings",
+              mediaType: "VIDEO",
+              videoUrl: "https://pub-912a38d4c1604d0086885c4ab8be284e.r2.dev/Core-Legging-black.mp4",
+            },
           ],
         },
       }),

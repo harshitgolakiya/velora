@@ -148,8 +148,8 @@ export default async function CheckoutSuccessPage({
   // ── Not found state ─────────────────────────────────────────────────────────
   if (!order) {
     return (
-      <section className="mx-auto max-w-xl px-4 py-24 text-center sm:px-6">
-        <div className="mx-auto grid size-16 place-items-center border border-[var(--border)]">
+      <section className="storefront-container-compact py-24 text-center">
+        <div className="storefront-action mx-auto grid size-16 place-items-center border border-[var(--border)]">
           <Clock3 className="size-7 text-[var(--accent)]" />
         </div>
         <h1 className="mt-6 text-2xl font-semibold sm:text-3xl">
@@ -162,13 +162,13 @@ export default async function CheckoutSuccessPage({
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/track-order"
-            className="border border-[var(--border)] px-6 py-3 text-sm font-semibold transition hover:bg-[var(--hover)] motion-reduce:transition-none"
+            className="storefront-action border border-[var(--border)] px-6 py-3 text-sm font-semibold transition hover:bg-[var(--hover)] motion-reduce:transition-none"
           >
             Track an order
           </Link>
           <Link
             href="/contact"
-            className="bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
+            className="storefront-action bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none"
           >
             Contact support
           </Link>
@@ -231,10 +231,10 @@ export default async function CheckoutSuccessPage({
   return (
     <>
       <CheckoutConfirmationClient clearCart={isConfirmed} />
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
+      <div className="storefront-container-compact py-10 sm:py-16">
         {/* ── Hero ──────────────────────────────────────────────────────── */}
         <div className="text-center">
-          <div className={`mx-auto grid size-20 place-items-center border-2 ${
+          <div className={`storefront-action mx-auto grid size-20 place-items-center border-2 ${
             isConfirmed ? "border-emerald-500/40 bg-emerald-500/8" : "border-[var(--border)]"
           }`}>
             {isConfirmed ? (
@@ -271,9 +271,9 @@ export default async function CheckoutSuccessPage({
             {nextSteps.map((step, i) => (
               <div
                 key={i}
-                className="flex gap-4 border border-[var(--border)] bg-[var(--surface)] p-5"
+                className="storefront-framed flex gap-4 p-5"
               >
-                <div className="mt-0.5 grid size-9 shrink-0 place-items-center bg-[var(--card)] text-[var(--accent)]">
+                <div className="storefront-action mt-0.5 grid size-9 shrink-0 place-items-center bg-[var(--card)] text-[var(--accent)]">
                   {step.icon}
                 </div>
                 <div>
@@ -286,7 +286,7 @@ export default async function CheckoutSuccessPage({
         </div>
 
         {/* ── Order summary ────────────────────────────────────────────── */}
-        <div className="mt-8 border border-[var(--border)] bg-[var(--surface)]">
+        <div className="storefront-framed mt-8">
           <div className="flex items-center gap-3 border-b border-[var(--border)] px-5 py-4">
             <Package className="size-5 text-[var(--accent)]" />
             <div>
@@ -343,7 +343,7 @@ export default async function CheckoutSuccessPage({
 
         {/* ── Delivery address ─────────────────────────────────────────── */}
         {order.shippingAddress ? (
-          <div className="mt-4 flex gap-4 border border-[var(--border)] bg-[var(--surface)] px-5 py-4">
+          <div className="storefront-framed mt-4 flex gap-4 px-5 py-4">
             <MapPin className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
             <div className="text-sm">
               <p className="font-semibold">Delivery address</p>
@@ -360,7 +360,7 @@ export default async function CheckoutSuccessPage({
 
         {/* ── Shipment tracking ─────────────────────────────────────────── */}
         {order.shipment?.trackingNo ? (
-          <div className="mt-4 flex items-center justify-between gap-4 border border-[var(--border)] bg-[var(--surface)] px-5 py-4">
+          <div className="storefront-framed mt-4 flex items-center justify-between gap-4 px-5 py-4">
             <div className="flex gap-3">
               <Truck className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
               <div>
@@ -380,7 +380,7 @@ export default async function CheckoutSuccessPage({
         ) : null}
 
         {/* ── Support strip ────────────────────────────────────────────── */}
-        <div className="mt-8 border border-[var(--border)] bg-[var(--surface)] p-5">
+        <div className="storefront-framed mt-8 p-5">
           <div className="flex items-center gap-3">
             <HeadphonesIcon className="size-5 shrink-0 text-[var(--accent)]" />
             <div className="min-w-0 flex-1">
@@ -391,7 +391,7 @@ export default async function CheckoutSuccessPage({
             </div>
             <Link
               href="/contact"
-              className="shrink-0 border border-[var(--border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
+              className="storefront-action shrink-0 border border-[var(--border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
             >
               Contact us
             </Link>
@@ -402,14 +402,14 @@ export default async function CheckoutSuccessPage({
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/track-order"
-            className="flex h-12 items-center justify-center gap-2 border border-[var(--border)] px-6 text-sm font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
+            className="storefront-action flex h-12 items-center justify-center gap-2 border border-[var(--border)] px-6 text-sm font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
           >
             <Truck className="size-4" />
             Track order
           </Link>
           <Link
             href="/shop"
-            className="flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
+            className="storefront-action flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none"
           >
             Continue shopping
             <ArrowRight className="size-4" />

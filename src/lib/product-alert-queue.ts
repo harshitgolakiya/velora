@@ -143,7 +143,7 @@ function alertMessage(delivery: {
     : `${productName} is now AED ${Number(triggerValue ?? 0).toFixed(0)}.`;
   return {
     subject,
-    html: `<div style="background:#f7f5f2;padding:32px;font-family:Arial,sans-serif;color:#111315"><div style="max-width:560px;margin:auto;background:#fff;padding:32px"><p style="letter-spacing:.22em;color:#c5a46d">VELORA</p><h1 style="font-size:28px">${isStock ? "Back in stock" : "Price drop"}</h1><p style="line-height:1.7">${detail}</p><a href="${clickUrl}" style="display:inline-block;margin-top:18px;background:#111315;color:#fff;padding:14px 22px;text-decoration:none">View product</a><p style="margin-top:24px;font-size:12px;color:#5f646d">You requested this alert on the product page.</p></div></div>`,
+    html: `<div style="background:#FAF9F6;padding:32px;font-family:Arial,sans-serif;color:#17262D"><div style="max-width:560px;margin:auto;background:#fff;padding:32px"><p style="letter-spacing:.22em;color:#BCE3F4">VELORA</p><h1 style="font-size:28px">${isStock ? "Back in stock" : "Price drop"}</h1><p style="line-height:1.7">${detail}</p><a href="${clickUrl}" style="display:inline-block;margin-top:18px;background:#17262D;color:#fff;padding:14px 22px;text-decoration:none">View product</a><p style="margin-top:24px;font-size:12px;color:#66777F">You requested this alert on the product page.</p></div></div>`,
   };
 }
 

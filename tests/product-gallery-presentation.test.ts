@@ -15,12 +15,21 @@ const product = {
       { type: "IMAGE", url: "/black-1.jpg", sortOrder: 0, isHoverImage: false, width: 1600, height: 2000 },
       { type: "VIDEO", url: "/black-video.mp4", sortOrder: 1, isHoverImage: false },
     ],
+    Blue: [
+      { type: "VIDEO", url: "/blue-video.mp4", sortOrder: 0, isHoverImage: false },
+      { type: "IMAGE", url: "/blue-1.jpg", sortOrder: 1, isHoverImage: false },
+      { type: "IMAGE", url: "/blue-2.jpg", sortOrder: 2, isHoverImage: true },
+    ],
   },
 } as Pick<Product, "images" | "variantMediaByColor">;
 
 describe("product gallery presentation", () => {
   it("uses selected color media when available", () => {
     expect(resolveProductGalleryMedia(product, "Black").map((item) => item.url)).toEqual(["/black-1.jpg", "/black-video.mp4"]);
+  });
+
+  it("keeps selected color media isolated and places video after images", () => {
+    expect(resolveProductGalleryMedia(product, "Blue").map((item) => item.url)).toEqual(["/blue-1.jpg", "/blue-2.jpg", "/blue-video.mp4"]);
   });
 
   it("falls back to product images for colors without a gallery", () => {

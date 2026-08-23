@@ -28,7 +28,7 @@ export default async function FaqsPage() {
     .flatMap((block) => block.items)
     .slice(0, 30);
   return (
-    <section className="mx-auto max-w-360 px-4 py-8 sm:px-6 lg:px-8">
+    <section className="storefront-container-narrow py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqItems)) }}

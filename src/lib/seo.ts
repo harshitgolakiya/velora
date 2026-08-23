@@ -24,7 +24,7 @@ export function localizedAlternates(path = "/") {
 }
 
 export function primaryImage(images?: string[]) {
-  return images?.find(Boolean) ?? "/images/velora/hero-sculpted-essentials.jpg";
+  return images?.find(Boolean) ?? "/images/activewear-demo/active-duo.jpg";
 }
 
 export function productJsonLd(product: Product) {
@@ -106,7 +106,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: "Velora",
     url: siteUrl(),
-    logo: absoluteUrl("/images/velora/hero-sculpted-essentials.jpg"),
+    logo: absoluteUrl("/images/activewear-demo/active-duo.jpg"),
     sameAs: [],
   };
 }

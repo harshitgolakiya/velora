@@ -5,7 +5,7 @@ Premium international activewear ecommerce built with Next.js App Router, TypeSc
 ## What Is Included
 
 - Home, shop, collection, product detail, cart, checkout, account, admin, support, policy, FAQ, fabric guide, and order tracking pages.
-- Product filtering, sorting, quick add, wishlist, persistent cart, cart drawer, free-shipping progress, newsletter modal, responsive mobile UX, skeleton loading, and SEO metadata.
+- Product filtering, sorting, wishlist, persistent cart, cart drawer, free-shipping progress, newsletter modal, responsive mobile UX, skeleton loading, and SEO metadata.
 - Prisma PostgreSQL schema covering users, admin roles, products, variants, images, categories, collections, carts, wishlist, orders, addresses, coupons, reviews, newsletter, content, payments, and shipments.
 - Admin dashboard surface for revenue, orders, products, stock, content, media, coupons, customers, and role-based operations.
 - API foundations for NextAuth credentials, checkout, newsletter, and Stripe webhook verification.

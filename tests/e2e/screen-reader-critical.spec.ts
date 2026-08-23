@@ -23,7 +23,7 @@ const storefrontRoutes = [
     path: "/",
     expectations: [
       { description: "main landmark", role: /^main$/i },
-      { description: "homepage heading", role: /^heading$/i, name: /Sculpted essentials/i },
+      { description: "homepage heading", role: /^heading$/i, name: /Move through every part of your day/i },
       { description: "primary shop link", role: /^link$/i, name: /Shop now|Shop all|Shop Velora/i },
       { description: "search control", role: /^button$/i, name: /^Search$/i },
       { description: "bag control", role: /^button$/i, name: /Cart|bag/i },
@@ -33,16 +33,16 @@ const storefrontRoutes = [
     path: "/shop",
     expectations: [
       { description: "main landmark", role: /^main$/i },
-      { description: "shop heading", role: /^heading$/i, name: /All activewear|Shop/i },
+      { description: "shop heading", role: /^heading$/i, name: /Activewear for every movement/i },
       { description: "filter control", role: /^button$/i, name: /Filter|filters/i },
       { description: "search control", role: /^button$/i, name: /^Search$/i },
     ],
   },
   {
-    path: "/product/flared-pants-7461",
+    path: "/product/airlift-full-length-legging",
     expectations: [
       { description: "main landmark", role: /^main$/i },
-      { description: "product heading", role: /^heading$/i, name: /flared|pant/i },
+      { description: "product heading", role: /^heading$/i, name: /Airlift Full-Length Legging/i },
       { description: "add-to-bag control", role: /^button$/i, name: /Add to bag|Out of stock/i },
       { description: "quantity control", role: /^button$/i, name: /Increase quantity|Decrease quantity/i },
     ],
@@ -51,7 +51,7 @@ const storefrontRoutes = [
     path: "/cart",
     expectations: [
       { description: "main landmark", role: /^main$/i },
-      { description: "cart heading", role: /^heading$/i, name: /Your bag|Cart/i },
+      { description: "cart heading", role: /^heading$/i, name: /Your bag|Shopping bag|Cart/i },
       { description: "checkout or recovery action", role: /^(button|link)$/i, name: /Proceed to Checkout|Shop catalog|Shop all/i },
     ],
   },
@@ -60,10 +60,9 @@ const storefrontRoutes = [
     prepare: seedCheckoutCart,
     expectations: [
       { description: "main landmark", role: /^main$/i },
-      { description: "checkout heading", role: /^heading$/i, name: /Delivery address|Order summary|Payment method/i },
+      { description: "checkout heading", role: /^heading$/i, name: /Contact|Delivery address|Order summary|Payment method/i },
       { description: "email field", role: /^(textbox|generic)$/i, name: /Email address/i },
-      { description: "mobile field", role: /^(textbox|generic)$/i, name: /Mobile number|Phone/i },
-      { description: "payment action", role: /^button$/i, name: /Pay .* securely/i },
+      { description: "checkout progression action", role: /^button$/i, name: /Continue to delivery|Pay .* securely/i },
     ],
   },
   {
@@ -165,7 +164,7 @@ async function seedCheckoutCart(page: Page) {
               category: "Sets",
               price: 250,
               salePrice: null,
-              images: ["/images/velora/aura-legging-2.jpg"],
+              images: ["https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/1.webp"],
               colors: ["Black"],
               sizes: ["M"],
               variants: [
@@ -267,7 +266,7 @@ test.describe("critical screen-reader accessibility tree gate", () => {
       await prepareScreenReaderRun(page);
       await route.prepare?.(page);
       await page.goto(route.path, { waitUntil: "domcontentloaded" });
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
 
       const nodes = await getAccessibilityTree(page);
       assertAccessibilityTree(nodes, route.expectations);

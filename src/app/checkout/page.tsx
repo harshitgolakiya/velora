@@ -4,6 +4,7 @@ import { CheckoutForm } from "@/components/store/checkout-form";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCheckoutSettings } from "@/lib/store-settings";
+import { ContextualSupport } from "@/components/store/contextual-support";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -28,7 +29,7 @@ export default async function CheckoutPage({
       : Promise.resolve([]),
   ]);
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <div className="storefront-container py-8 sm:py-12">
       <CheckoutForm
         cancelled={params.cancelled === "1"}
         checkoutSettings={checkoutSettings}
@@ -44,6 +45,7 @@ export default async function CheckoutPage({
           postalCode: address.postalCode,
         }))}
       />
+      <div className="mx-auto mt-8 max-w-3xl"><ContextualSupport context="checkout" /></div>
     </div>
   );
 }

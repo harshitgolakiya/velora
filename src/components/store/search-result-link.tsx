@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { trackSearchClick } from "@/lib/search-click-client";
+import { useLocalizedHref } from "@/lib/use-localized-href";
 
 type SearchResultLinkProps = Omit<ComponentProps<typeof Link>, "href" | "onClick"> & {
   children: ReactNode;
@@ -22,16 +23,18 @@ export function SearchResultLink({
   position,
   ...props
 }: SearchResultLinkProps) {
+  const localize = useLocalizedHref();
+  const localizedHref = localize(href);
   return (
     <Link
-      href={href}
+      href={localizedHref}
       onClick={() =>
         trackSearchClick({
           query,
           source: "results_page",
           resultType,
           resultId,
-          href,
+          href: localizedHref,
           position,
         })
       }

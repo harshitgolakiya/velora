@@ -20,7 +20,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { formatCartReservationError, getCartLineImage, isCartReservationExpired } from "@/lib/cart-ui";
-import { cartCopy, checkoutCopy, localeFromPathname } from "@/lib/i18n";
+import { cartCopy, checkoutCopy, localeFromPathname, localizedPath } from "@/lib/i18n";
 import { cartSubtotal, useStore, useStoreHydrated } from "@/lib/store";
 import { formatAed } from "@/lib/utils";
 import { getShippingMethodsForEmirate, getShippingQuote } from "@/lib/shipping-settings";
@@ -151,12 +151,27 @@ function SectionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden border border-[var(--border)] bg-[var(--surface)]">
+    <section className="overflow-hidden storefront-framed">
       <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.1em]">{title}</h2>
         {action}
       </div>
       <div className="p-5">{children}</div>
+    </section>
+  );
+}
+
+type CheckoutStage = "contact" | "delivery" | "payment" | "review";
+const checkoutStages: CheckoutStage[] = ["contact", "delivery", "payment", "review"];
+
+function StageSummary({ title, summary, editLabel, onEdit }: { title: string; summary: string; editLabel: string; onEdit: () => void }) {
+  return (
+    <section className="storefront-framed flex items-center justify-between gap-4 p-4 sm:p-5">
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{title}</p>
+        <p className="mt-1 truncate text-sm font-medium">{summary}</p>
+      </div>
+      <button type="button" onClick={onEdit} className="storefront-action shrink-0 text-xs font-semibold underline underline-offset-4">{editLabel}</button>
     </section>
   );
 }
@@ -200,10 +215,13 @@ export function CheckoutForm({
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [stage, setStage] = useState<CheckoutStage>("contact");
+  const [orderSummaryOpen, setOrderSummaryOpen] = useState(false);
 
   // Abandonment capture — store the email locally so we can show a
   // "Continue your checkout" hint if the user returns to the cart.
   const abandonmentSaved = useRef(false);
+  const skipInitialFormPersistence = useRef(true);
 
   const form = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema),
@@ -226,6 +244,11 @@ export function CheckoutForm({
   const selectedEmirate = useWatch({ control: form.control, name: "emirate" });
   const paymentMethod = useWatch({ control: form.control, name: "paymentMethod" });
   const emailValue = useWatch({ control: form.control, name: "email" });
+  const firstName = useWatch({ control: form.control, name: "firstName" });
+  const lastName = useWatch({ control: form.control, name: "lastName" });
+  const addressValue = useWatch({ control: form.control, name: "address" });
+  const cityValue = useWatch({ control: form.control, name: "city" });
+  const persistedValues = useWatch({ control: form.control });
 
   const availableShippingMethods = getShippingMethodsForEmirate(checkoutSettings, selectedEmirate);
   const useLocalAddressFallback =
@@ -254,6 +277,26 @@ export function CheckoutForm({
     ? formatCartReservationError(reservationError, cartLabels)
     : null;
   const expressCheckoutDisabled = checkoutBlocked || submitting || form.formState.isSubmitting;
+  const stageIndex = checkoutStages.indexOf(stage);
+  const stageLabels = locale === "ar"
+    ? { contact: "التواصل", delivery: "التوصيل", payment: "الدفع", review: "المراجعة" }
+    : { contact: "Contact", delivery: "Delivery", payment: "Payment", review: "Review" };
+  const stageActions = locale === "ar"
+    ? { edit: "تعديل", delivery: "المتابعة إلى التوصيل", payment: "المتابعة إلى الدفع", review: "مراجعة الطلب", show: "عرض", hide: "إخفاء" }
+    : { edit: "Edit", delivery: "Continue to delivery", payment: "Continue to payment", review: "Review order", show: "Show", hide: "Hide" };
+
+  async function continueFromContact() {
+    if (await form.trigger("email", { shouldFocus: true })) setStage("delivery");
+  }
+
+  async function continueFromDelivery() {
+    const valid = await form.trigger(["firstName", "lastName", "phone", "address", "emirate", "city", "shippingMethod"], { shouldFocus: true });
+    if (valid) setStage("payment");
+  }
+
+  async function continueFromPayment() {
+    if (await form.trigger("paymentMethod", { shouldFocus: true })) setStage("review");
+  }
 
   const submitExpressCheckout = () => {
     form.setValue("paymentMethod", "stripe", { shouldDirty: true, shouldValidate: true });
@@ -276,6 +319,23 @@ export function CheckoutForm({
     if (!customerEmail) return;
     form.setValue("email", customerEmail, { shouldValidate: true });
   }, [customerEmail, form]);
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("velora:checkout:form");
+      if (saved) form.reset({ ...form.getValues(), ...JSON.parse(saved) });
+    } catch {
+      // Keep server defaults when browser storage is unavailable or invalid.
+    }
+  }, [form]);
+
+  useEffect(() => {
+    if (skipInitialFormPersistence.current) {
+      skipInitialFormPersistence.current = false;
+      return;
+    }
+    try { sessionStorage.setItem("velora:checkout:form", JSON.stringify(persistedValues)); } catch { /* noop */ }
+  }, [persistedValues]);
 
   useEffect(() => {
     if (availableShippingMethods.some((method) => method.id === shippingMethod)) return;
@@ -356,7 +416,10 @@ export function CheckoutForm({
       }
       if (result.url || result.confirmationUrl) {
         // Clear abandonment email on successful submission
-        try { sessionStorage.removeItem("velora:checkout:email"); } catch { /* noop */ }
+        try {
+          sessionStorage.removeItem("velora:checkout:email");
+          sessionStorage.removeItem("velora:checkout:form");
+        } catch { /* noop */ }
         clearStoredSearchAttribution();
         window.location.assign(result.url ?? result.confirmationUrl);
         return;
@@ -395,11 +458,11 @@ export function CheckoutForm({
       const result = await response.json();
       if (!response.ok) {
         if (result.code === "MINIMUM_AMOUNT" && typeof result.remaining === "number") {
-          throw new Error(`${copy.addMoreForCoupon} ${formatAed(result.remaining)} ${copy.moreToUseCoupon}`);
+          throw new Error(`${copy.addMoreForCoupon} ${formatAed(result.remaining, locale)} ${copy.moreToUseCoupon}`);
         }
         if (result.code === "EXPIRED" && result.expiresAt) {
           throw new Error(
-            `${copy.couponExpiredOn} ${new Intl.DateTimeFormat("en-AE", {
+            `${copy.couponExpiredOn} ${new Intl.DateTimeFormat(locale === "ar" ? "ar-AE" : "en-AE", {
               dateStyle: "medium",
             }).format(new Date(result.expiresAt))}.`,
           );
@@ -411,16 +474,27 @@ export function CheckoutForm({
       }
       setDiscount(result.coupon.discount);
       setFreeShipping(result.coupon.freeShipping);
+      useStore.setState({
+        coupon: {
+          code: result.coupon.code,
+          discount: result.coupon.discount,
+          freeShipping: result.coupon.freeShipping,
+          type: result.coupon.type,
+          value: result.coupon.value,
+          minimumAmount: result.coupon.minimumAmount,
+        },
+        couponError: undefined,
+      });
       const benefit =
         result.coupon.freeShipping
           ? copy.freeShippingBenefit
           : result.coupon.discount > 0
-            ? `${formatAed(result.coupon.discount)} ${copy.offBenefit}`
+            ? `${formatAed(result.coupon.discount, locale)} ${copy.offBenefit}`
             : copy.discountBenefit;
       setCouponMessage(`${result.coupon.code} ${copy.couponApplied} · ${benefit}`);
     } catch (error) {
-      setDiscount(0);
-      setFreeShipping(false);
+      setDiscount(storeCoupon?.discount ?? 0);
+      setFreeShipping(storeCoupon?.freeShipping ?? false);
       setCouponMessage(error instanceof Error ? error.message : copy.unableToApplyCoupon);
     } finally {
       setApplyingCoupon(false);
@@ -443,7 +517,7 @@ export function CheckoutForm({
       if (!response.ok) throw new Error(result.message ?? copy.unableToApplyGiftCard);
       setGiftCardAmount(result.giftCard.appliedAmount);
       setGiftCardMessage(
-        `${copy.giftCardApplied} · ${formatAed(result.giftCard.appliedAmount)} · balance ${formatAed(result.giftCard.balance)}`,
+        `${copy.giftCardApplied} · ${formatAed(result.giftCard.appliedAmount, locale)} · ${copy.balance} ${formatAed(result.giftCard.balance, locale)}`,
       );
     } catch (error) {
       setGiftCardAmount(0);
@@ -454,31 +528,39 @@ export function CheckoutForm({
   };
 
   const inputClass =
-    "h-12 w-full border border-[var(--border)] bg-[var(--background)] px-3.5 text-sm outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--muted)] motion-reduce:transition-none";
+    "storefront-action h-12 w-full border border-[var(--border)] bg-[var(--background)] px-3.5 text-sm outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--muted)] motion-reduce:transition-none";
 
   if (!hydrated) {
     return (
-      <div className="mx-auto max-w-xl py-24 text-center" role="status">
-        <PackageCheck className="mx-auto size-10 text-[var(--accent)]" />
-        <h1 className="mt-6 text-3xl font-semibold">Loading checkout</h1>
+      <div className="mx-auto grid min-h-[42vh] max-w-xl place-items-center px-4 text-center" role="status">
+        <div>
+          <span className="mx-auto grid size-14 place-items-center rounded-full storefront-framed">
+            <PackageCheck className="size-6 text-[var(--accent)]" />
+          </span>
+          <h1 className="mt-5 text-2xl font-semibold">Loading checkout</h1>
+        </div>
       </div>
     );
   }
 
   if (!cart.length) {
     return (
-      <div className="mx-auto max-w-xl py-24 text-center">
-        <PackageCheck className="mx-auto size-10 text-[var(--accent)]" />
-        <h1 className="mt-6 text-3xl font-semibold">{copy.yourCartEmpty}</h1>
-        <p className="mt-3 text-sm text-[var(--muted)]">
-          {copy.emptyCartBody}
-        </p>
-        <Link
-          href="/shop"
-          className="storefront-action mt-8 inline-flex h-12 items-center border border-[var(--accent)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315]"
-        >
-          {copy.browseStore}
-        </Link>
+      <div className="mx-auto grid min-h-[42vh] max-w-xl place-items-center px-4 text-center">
+        <div>
+          <span className="mx-auto grid size-14 place-items-center rounded-full storefront-framed">
+            <PackageCheck className="size-6 text-[var(--accent)]" />
+          </span>
+          <h1 className="mt-5 text-2xl font-semibold sm:text-3xl">{copy.yourCartEmpty}</h1>
+          <p className="mt-3 text-sm text-[var(--muted)]">
+            {copy.emptyCartBody}
+          </p>
+          <Link
+            href={localizedPath("/shop", locale)}
+            className="storefront-action mt-7 inline-flex h-12 items-center border border-[var(--accent)] bg-[var(--accent)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[#17262D] transition hover:brightness-95"
+          >
+            {copy.browseStore}
+          </Link>
+        </div>
       </div>
     );
   }
@@ -488,14 +570,43 @@ export function CheckoutForm({
       {/* ── Left column: form ─────────────────────────────────── */}
       <form
         className="space-y-4"
-        onSubmit={form.handleSubmit(submitCheckout)}
+        onSubmit={form.handleSubmit(submitCheckout, (errors) => {
+          if (errors.email) setStage("contact");
+          else if (errors.firstName || errors.lastName || errors.phone || errors.address || errors.emirate || errors.city || errors.shippingMethod) setStage("delivery");
+          else if (errors.paymentMethod) setStage("payment");
+        })}
         noValidate
       >
+        <nav aria-label="Checkout progress" className="storefront-framed p-3 sm:p-4">
+          <ol className="grid grid-cols-4 gap-1 sm:gap-2">
+            {checkoutStages.map((item, index) => {
+              const completed = index < stageIndex;
+              const current = item === stage;
+              return (
+                <li key={item}>
+                  <button
+                    type="button"
+                    disabled={index > stageIndex}
+                    onClick={() => setStage(item)}
+                    aria-current={current ? "step" : undefined}
+                    className={`storefront-action flex min-h-12 w-full flex-col items-center justify-center gap-1 border px-1 text-[10px] font-semibold uppercase tracking-[0.08em] sm:flex-row sm:text-xs ${current ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]" : completed ? "border-[var(--accent)] bg-[var(--hover)]" : "border-[var(--border)] text-[var(--muted)]"}`}
+                  >
+                    <span className="grid size-5 place-items-center rounded-full border border-current text-[10px]">{completed ? <Check className="size-3" /> : index + 1}</span>
+                    {stageLabels[item]}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
+
         {/* Contact */}
+        {stageIndex > 0 ? <StageSummary title={stageLabels.contact} summary={emailValue || "—"} editLabel={stageActions.edit} onEdit={() => setStage("contact")} /> : null}
+        <div className={stage === "contact" ? "space-y-4" : "hidden"}>
         <SectionCard
           title={copy.contact}
           action={
-            <Link href="/account/sign-in" className="text-xs font-medium underline text-[var(--muted)] hover:text-[var(--foreground)]">
+            <Link href={localizedPath("/account", locale)} className="text-xs font-medium underline text-[var(--muted)] hover:text-[var(--foreground)]">
               {copy.signIn}
             </Link>
           }
@@ -524,8 +635,12 @@ export function CheckoutForm({
             </Field>
           </div>
         </SectionCard>
+          <Button type="button" onClick={continueFromContact} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.delivery}</Button>
+        </div>
 
         {/* Delivery address */}
+        {stageIndex > 1 ? <StageSummary title={stageLabels.delivery} summary={`${firstName} ${lastName} · ${addressValue}, ${cityValue}`} editLabel={stageActions.edit} onEdit={() => setStage("delivery")} /> : null}
+        <div className={stage === "delivery" ? "space-y-4" : "hidden"}>
         <SectionCard title={copy.deliveryAddress}>
           {savedAddresses.length ? (
             <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -564,7 +679,7 @@ export function CheckoutForm({
                 autoComplete="given-name"
                 aria-invalid={Boolean(form.formState.errors.firstName)}
                 aria-describedby={form.formState.errors.firstName ? "checkout-first-name-error" : undefined}
-                placeholder="Jane"
+                placeholder={copy.firstNamePlaceholder}
                 className={inputClass}
               />
             </Field>
@@ -575,7 +690,7 @@ export function CheckoutForm({
                 autoComplete="family-name"
                 aria-invalid={Boolean(form.formState.errors.lastName)}
                 aria-describedby={form.formState.errors.lastName ? "checkout-last-name-error" : undefined}
-                placeholder="Doe"
+                placeholder={copy.lastNamePlaceholder}
                 className={inputClass}
               />
             </Field>
@@ -596,7 +711,7 @@ export function CheckoutForm({
                   autoComplete="tel"
                   aria-invalid={Boolean(form.formState.errors.phone)}
                   aria-describedby={form.formState.errors.phone ? "checkout-phone-error" : "checkout-phone-hint"}
-                  placeholder="+971 50 123 4567"
+                  placeholder={copy.phonePlaceholder}
                   className={inputClass}
                 />
               </Field>
@@ -653,7 +768,7 @@ export function CheckoutForm({
                 autoComplete="address-level2"
                 aria-invalid={Boolean(form.formState.errors.city)}
                 aria-describedby={form.formState.errors.city ? "checkout-city-error" : undefined}
-                placeholder="Dubai Marina"
+                placeholder={copy.cityPlaceholder}
                 className={inputClass}
               />
             </Field>
@@ -696,15 +811,19 @@ export function CheckoutForm({
                     <span className="block text-xs text-[var(--muted)]">{option.estimate}</span>
                   </span>
                   <span className="text-sm font-semibold">
-                    {quote?.total === 0 ? copy.free : formatAed(quote?.total ?? option.price)}
+                    {quote?.total === 0 ? copy.free : formatAed(quote?.total ?? option.price, locale)}
                   </span>
                 </label>
               );
             })}
           </div>
         </SectionCard>
+          <Button type="button" onClick={continueFromDelivery} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.payment}</Button>
+        </div>
 
         {/* Payment method */}
+        {stageIndex > 2 ? <StageSummary title={stageLabels.payment} summary={availablePaymentMethods.find((method) => method.id === paymentMethod)?.label ?? paymentMethod} editLabel={stageActions.edit} onEdit={() => setStage("payment")} /> : null}
+        <div className={stage === "payment" ? "space-y-4" : "hidden"}>
         <SectionCard title={copy.paymentMethodTitle}>
           <div className="space-y-3">
             {availablePaymentMethods.map((method) => (
@@ -749,7 +868,7 @@ export function CheckoutForm({
                     type="button"
                     disabled={expressCheckoutDisabled}
                     onClick={submitExpressCheckout}
-                    className="flex h-12 items-center justify-center gap-2 border border-[var(--foreground)] bg-[var(--foreground)] px-4 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+                    className="flex h-12 items-center justify-center gap-2 border border-[var(--foreground)] bg-[var(--foreground)] px-4 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
                   >
                     <LockKeyhole className="size-4" />
                     {wallet === "apple_pay" ? copy.applePay : copy.googlePay}
@@ -759,8 +878,11 @@ export function CheckoutForm({
             </div>
           ) : null}
         </SectionCard>
+          <Button type="button" onClick={continueFromPayment} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.review}</Button>
+        </div>
 
         {/* Alerts */}
+        <div className={stage === "review" ? "space-y-4" : "hidden"}>
         {checkoutBlocked ? (
           <div
             className={`flex items-start gap-3 border p-4 text-sm ${
@@ -776,7 +898,7 @@ export function CheckoutForm({
               {reservationErrorLabel?.detail ? (
                 <p className="mt-1">{reservationErrorLabel.detail}</p>
               ) : null}
-              <Link href="/cart" className="mt-2 inline-block font-semibold underline">
+              <Link href={localizedPath("/cart", locale)} className="mt-2 inline-block font-semibold underline">
                 {copy.returnToCart}
               </Link>
             </div>
@@ -806,7 +928,7 @@ export function CheckoutForm({
               <p>{checkoutError}</p>
               <div className="mt-3 flex flex-wrap gap-3">
                 {["RESERVATION_EXPIRED", "EMPTY_CART", "CHECKOUT_EMAIL_CONFLICT"].includes(checkoutErrorCode ?? "") ? (
-                  <Link href="/cart" className="font-semibold underline">
+                  <Link href={localizedPath("/cart", locale)} className="font-semibold underline">
                     {copy.returnToCart}
                   </Link>
                 ) : null}
@@ -816,6 +938,7 @@ export function CheckoutForm({
                     onClick={() => {
                       setCheckoutError(null);
                       setCheckoutErrorCode(null);
+                      setStage(checkoutErrorCode === "PAYMENT_METHOD_UNAVAILABLE" ? "payment" : "delivery");
                     }}
                     className="font-semibold underline"
                   >
@@ -847,8 +970,8 @@ export function CheckoutForm({
                 ? copy.placingOrder
                 : copy.preparingPayment
               : paymentMethod === "cash_on_delivery"
-                ? `${copy.placeOrderCod} · ${formatAed(total)} ${copy.cod}`
-                : `${copy.paySecurely} ${formatAed(total)} ${copy.securely}`}
+                ? `${copy.placeOrderCod} · ${formatAed(total, locale)} ${copy.cod}`
+                : `${copy.paySecurely} ${formatAed(total, locale)} ${copy.securely}`}
           </Button>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-[var(--muted)]">
             <span className="flex items-center gap-1.5">
@@ -867,15 +990,21 @@ export function CheckoutForm({
             </span>
           </div>
         </div>
+        </div>
       </form>
 
       {/* ── Right column: order summary ───────────────────────── */}
       <aside className="order-first space-y-4 lg:order-none lg:sticky lg:top-28">
+        <button type="button" onClick={() => setOrderSummaryOpen((open) => !open)} aria-expanded={orderSummaryOpen} className="storefront-framed flex min-h-12 w-full items-center justify-between px-4 text-sm font-semibold lg:hidden">
+          <span>{copy.orderSummary}</span>
+          <span>{formatAed(total, locale)} · {orderSummaryOpen ? stageActions.hide : stageActions.show}</span>
+        </button>
+        <div className={orderSummaryOpen ? "space-y-4" : "hidden space-y-4 lg:block lg:space-y-4"}>
         {/* Cart items */}
-        <div className="border border-[var(--border)] bg-[var(--surface)]">
+        <div className="storefront-framed">
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
             <h2 className="text-sm font-semibold uppercase tracking-[0.1em]">{copy.orderSummary}</h2>
-            <Link href="/cart" className="text-xs font-medium underline text-[var(--muted)] hover:text-[var(--foreground)]">
+            <Link href={localizedPath("/cart", locale)} className="text-xs font-medium underline text-[var(--muted)] hover:text-[var(--foreground)]">
               {copy.editCart}
             </Link>
           </div>
@@ -885,7 +1014,7 @@ export function CheckoutForm({
                 key={`${line.product.slug}-${line.size}-${line.color}`}
                 className="flex items-start gap-3 p-4"
               >
-                <div className="relative size-16 shrink-0 overflow-hidden bg-[var(--card)]">
+                <div className="storefront-action relative size-16 shrink-0 overflow-hidden bg-[var(--card)]">
                   <Image
                     src={getCartLineImage(line)}
                     alt={line.product.name}
@@ -893,7 +1022,7 @@ export function CheckoutForm({
                     sizes="64px"
                     className="object-cover"
                   />
-                  <span className="absolute -right-1 -top-1 grid size-5 place-items-center bg-[var(--foreground)] text-[10px] font-semibold text-[var(--background)]">
+                  <span className="absolute right-1 top-1 grid size-5 place-items-center rounded-full bg-[var(--accent)] text-[10px] font-semibold text-[#17262D] shadow-sm">
                     {line.quantity}
                   </span>
                 </div>
@@ -904,7 +1033,7 @@ export function CheckoutForm({
                   </p>
                 </div>
                 <span className="text-sm font-medium">
-                  {formatAed((line.product.salePrice ?? line.product.price) * line.quantity)}
+                  {formatAed((line.product.salePrice ?? line.product.price) * line.quantity, locale)}
                 </span>
               </div>
             ))}
@@ -912,26 +1041,27 @@ export function CheckoutForm({
         </div>
 
         {/* Coupon */}
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-5">
+        <details className="storefront-framed p-5">
+          <summary className="storefront-action cursor-pointer text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{copy.couponCode}</summary>
           <label
             htmlFor="checkout-coupon"
-            className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]"
+            className="sr-only"
           >
             {copy.couponCode}
           </label>
-          <div className="mt-2.5 flex gap-2">
+          <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <input
               id="checkout-coupon"
               value={couponCode}
               onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
               placeholder={copy.couponPlaceholder}
-              className="h-11 min-w-0 flex-1 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--foreground)] placeholder:normal-case placeholder:text-[var(--muted)] motion-reduce:transition-none"
+              className="storefront-action h-11 min-w-0 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--foreground)] placeholder:normal-case placeholder:text-[var(--muted)] motion-reduce:transition-none"
             />
             <button
               type="button"
               disabled={!couponCode.trim() || applyingCoupon}
               onClick={applyCoupon}
-              className="h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
+              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
             >
               {applyingCoupon ? "..." : copy.apply}
             </button>
@@ -951,17 +1081,18 @@ export function CheckoutForm({
               {couponMessage}
             </p>
           ) : null}
-        </div>
+        </details>
 
         {/* Gift card */}
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-5">
+        <details className="storefront-framed p-5">
+          <summary className="storefront-action cursor-pointer text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{copy.giftCardCode}</summary>
           <label
             htmlFor="checkout-gift-card"
-            className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]"
+            className="sr-only"
           >
             {copy.giftCardCode}
           </label>
-          <div className="mt-2.5 flex gap-2">
+          <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <input
               id="checkout-gift-card"
               value={giftCardCode}
@@ -970,13 +1101,13 @@ export function CheckoutForm({
                 setGiftCardAmount(0);
               }}
               placeholder={copy.giftCardPlaceholder}
-              className="h-11 min-w-0 flex-1 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--foreground)] placeholder:normal-case placeholder:text-[var(--muted)] motion-reduce:transition-none"
+              className="storefront-action h-11 min-w-0 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--foreground)] placeholder:normal-case placeholder:text-[var(--muted)] motion-reduce:transition-none"
             />
             <button
               type="button"
               disabled={!giftCardCode.trim() || applyingGiftCard || payableBeforeGiftCard <= 0}
               onClick={applyGiftCard}
-              className="h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
+              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
             >
               {applyingGiftCard ? "..." : copy.apply}
             </button>
@@ -996,39 +1127,40 @@ export function CheckoutForm({
               {giftCardMessage}
             </p>
           ) : null}
-        </div>
+        </details>
 
         {/* Totals */}
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-5 space-y-2.5 text-sm">
+        <div className="storefront-framed p-5 space-y-2.5 text-sm">
           <div className="flex justify-between text-[var(--muted)]">
             <span>{copy.subtotal}</span>
-            <span className="text-[var(--foreground)]">{formatAed(subtotal)}</span>
+            <span className="text-[var(--foreground)]">{formatAed(subtotal, locale)}</span>
           </div>
           {discount > 0 ? (
             <div className="flex justify-between text-emerald-600">
               <span>{copy.discount}</span>
-              <span>-{formatAed(discount)}</span>
+              <span>-{formatAed(discount, locale)}</span>
             </div>
           ) : null}
           {appliedGiftCardAmount > 0 ? (
             <div className="flex justify-between text-emerald-600">
               <span>{copy.giftCard}</span>
-              <span>-{formatAed(appliedGiftCardAmount)}</span>
+              <span>-{formatAed(appliedGiftCardAmount, locale)}</span>
             </div>
           ) : null}
           <div className="flex justify-between text-[var(--muted)]">
             <span>{copy.shipping}</span>
             <span className="text-[var(--foreground)]">
-              {shipping === 0 ? copy.free : formatAed(shipping)}
+              {shipping === 0 ? copy.free : formatAed(shipping, locale)}
             </span>
           </div>
           <div className="flex justify-between border-t border-[var(--border)] pt-3 text-base font-semibold">
             <span>{copy.total}</span>
-            <span>{formatAed(total)}</span>
+            <span>{formatAed(total, locale)}</span>
           </div>
           <p className="text-[10px] text-[var(--muted)]">
             {copy.vatNote}
           </p>
+        </div>
         </div>
       </aside>
     </div>

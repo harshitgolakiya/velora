@@ -51,17 +51,17 @@ export async function GET(
   <meta charset="utf-8" />
   <title>Invoice ${escapeHtml(order.orderNumber)}</title>
   <style>
-    body { font-family: Arial, sans-serif; color: #111315; margin: 40px; }
-    .head { display: flex; justify-content: space-between; gap: 32px; border-bottom: 1px solid #ddd8cf; padding-bottom: 24px; }
+    body { font-family: Arial, sans-serif; color: #17262D; margin: 40px; }
+    .head { display: flex; justify-content: space-between; gap: 32px; border-bottom: 1px solid #DDE7EB; padding-bottom: 24px; }
     h1 { margin: 0; font-size: 32px; letter-spacing: 0.08em; }
     h2 { margin: 32px 0 12px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.12em; }
     table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-    th, td { border-bottom: 1px solid #ddd8cf; padding: 14px 0; text-align: left; vertical-align: top; }
+    th, td { border-bottom: 1px solid #DDE7EB; padding: 14px 0; text-align: left; vertical-align: top; }
     th:nth-child(n+2), td:nth-child(n+2) { text-align: right; }
-    small, .muted { color: #5f646d; }
+    small, .muted { color: #66777F; }
     .totals { margin-left: auto; width: 320px; margin-top: 24px; }
     .totals div { display: flex; justify-content: space-between; padding: 8px 0; }
-    .total { border-top: 1px solid #111315; font-weight: 700; font-size: 18px; }
+    .total { border-top: 1px solid #17262D; font-weight: 700; font-size: 18px; }
   </style>
 </head>
 <body>

@@ -13,6 +13,28 @@ export type StoreSearchResults = {
   pages: SearchablePage[];
 };
 
+export function suggestSearchQuery(
+  query: string,
+  products: Product[],
+  categories: string[],
+  collections: Collection[],
+) {
+  const normalizedQuery = normalize(query);
+  if (normalizedQuery.length < 3 || normalizedQuery.includes(" ")) return undefined;
+  const candidates = new Set<string>([
+    ...categories,
+    ...collections.map((collection) => collection.name),
+    ...products.flatMap((product) => [product.name, product.category, ...(product.tags ?? []), ...product.colors]),
+  ]);
+  const ranked = Array.from(candidates)
+    .flatMap((candidate) => normalize(candidate).split(" "))
+    .filter((candidate) => candidate.length >= 3 && candidate !== normalizedQuery)
+    .map((candidate) => ({ candidate, distance: editDistance(normalizedQuery, candidate) }))
+    .filter(({ candidate, distance }) => distance <= Math.max(1, Math.floor(candidate.length * 0.3)))
+    .sort((a, b) => a.distance - b.distance || a.candidate.localeCompare(b.candidate));
+  return ranked[0]?.candidate;
+}
+
 export type SearchablePage = {
   title: string;
   href: string;
@@ -94,12 +116,30 @@ export const searchablePages: SearchablePage[] = [
   },
 ];
 
+const arabicPageCopy: Record<string, { title: string; excerpt: string; keywords: string[] }> = {
+  "/shipping": { title: "الشحن", excerpt: "مواعيد ورسوم التوصيل داخل الإمارات.", keywords: ["توصيل", "شحن", "الإمارات", "سريع"] },
+  "/returns": { title: "الإرجاع", excerpt: "فترة الإرجاع والاسترداد والاستبدال.", keywords: ["إرجاع", "استرداد", "استبدال"] },
+  "/fabric-guide": { title: "دليل الخامات", excerpt: "إرشادات الخامات والضغط والعناية والمقاس.", keywords: ["خامة", "قماش", "ضغط", "مقاس"] },
+  "/size-guide": { title: "دليل المقاسات", excerpt: "قياسات الجسم واختيار المقاس المناسب.", keywords: ["مقاس", "قياسات", "صدر", "خصر"] },
+  "/care-guide": { title: "دليل العناية", excerpt: "غسل وتجفيف الأقمشة الرياضية.", keywords: ["عناية", "غسيل", "تجفيف"] },
+  "/faqs": { title: "الأسئلة الشائعة", excerpt: "إجابات عن الدفع والشحن والإرجاع والحساب.", keywords: ["أسئلة", "مساعدة", "دفع", "حساب"] },
+  "/contact": { title: "تواصلي معنا", excerpt: "مساعدة في الطلبات والمنتجات والإرجاع.", keywords: ["تواصل", "دعم", "مساعدة"] },
+  "/story": { title: "قصتنا", excerpt: "قصة Velora وفلسفة تصميم الملابس الرياضية.", keywords: ["قصة", "فيلورا", "عن العلامة"] },
+  "/privacy": { title: "الخصوصية", excerpt: "كيفية التعامل مع بياناتك ومعلومات حسابك.", keywords: ["خصوصية", "بيانات", "معلومات"] },
+  "/terms": { title: "الشروط", excerpt: "شروط الطلب والدفع والتوصيل والإرجاع.", keywords: ["شروط", "طلب", "دفع"] },
+};
+
+export function localizedSearchablePages(locale: "en" | "ar") {
+  if (locale === "en") return searchablePages;
+  return searchablePages.map((page) => ({ ...page, ...(arabicPageCopy[page.href] ?? {}) }));
+}
+
 function normalize(value: string) {
   return value
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
 

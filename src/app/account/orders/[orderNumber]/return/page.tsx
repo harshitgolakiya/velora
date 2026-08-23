@@ -6,6 +6,9 @@ import { ReturnRequestForm } from "@/components/auth/return-request-form";
 import { requireCustomerSession } from "@/lib/account-data";
 import { getAuthorizedAccountOrder } from "@/lib/account-orders";
 import { getReturnSettings } from "@/lib/store-settings";
+import { requestLocale } from "@/lib/cms";
+import { localizedPath } from "@/lib/i18n";
+import { ContextualSupport } from "@/components/store/contextual-support";
 
 export const metadata: Metadata = {
   title: "Return or Exchange",
@@ -17,11 +20,12 @@ export default async function ReturnOrderPage({
 }: {
   params: Promise<{ orderNumber: string }>;
 }) {
+  const locale = await requestLocale();
   const session = await requireCustomerSession();
-  if (!session) redirect("/account");
+  if (!session) redirect(localizedPath("/account", locale));
   const userId = session.user.id;
   const email = session.user.email;
-  if (!userId || !email) redirect("/account");
+  if (!userId || !email) redirect(localizedPath("/account", locale));
 
   const { orderNumber } = await params;
   const order = await getAuthorizedAccountOrder({ orderNumber, userId, email });
@@ -45,9 +49,9 @@ export default async function ReturnOrderPage({
     .some((tag) => ["return_requested", "refund_requested", "exchange_requested"].includes(tag));
 
   return (
-    <section className="mx-auto max-w-[1120px] px-4 py-10 sm:px-6 lg:px-8">
+    <section className="storefront-container-narrow py-10">
       <Link
-        href={`/account/orders/${order.orderNumber}`}
+        href={localizedPath(`/account/orders/${order.orderNumber}`, locale)}
         className="inline-flex items-center gap-2 text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
       >
         <ArrowLeft className="size-4" />
@@ -63,7 +67,7 @@ export default async function ReturnOrderPage({
       </div>
 
       {!existingRequest ? (
-        <section className="mb-6 border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6">
+        <section className="mb-6 storefront-framed p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
             <div>
@@ -165,10 +169,11 @@ export default async function ReturnOrderPage({
             })),
         }))}
       /> : (
-        <div className="border border-[var(--border)] bg-[var(--surface)] p-6 text-sm leading-6 text-[var(--muted)]">
+        <div className="storefront-framed p-6 text-sm leading-6 text-[var(--muted)]">
           A new return request cannot be started for this order yet. Review the policy guidance above or contact support for an exceptional issue.
         </div>
       )}
+      <div className="mt-6"><ContextualSupport context="return" orderNumber={order.orderNumber} /></div>
     </section>
   );
 }

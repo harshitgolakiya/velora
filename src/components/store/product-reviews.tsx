@@ -13,6 +13,7 @@ export function ProductReviews({ product }: { product: Product }) {
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [ownReview, setOwnReview] = useState<{ status: string; canEdit: boolean; editableUntil?: string; media: Array<{ id: string; status: string; originalName: string; url: string }> } | null>(null);
+  const [canReview, setCanReview] = useState(false);
   const [reportingReviewId, setReportingReviewId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("SPAM");
   const reviews = product.reviewItems ?? [];
@@ -26,7 +27,9 @@ export function ProductReviews({ product }: { product: Product }) {
     void fetch(`/api/products/${product.id}/reviews`)
       .then((response) => response.json())
       .then((result) => {
-        if (!active || !result.review) return;
+        if (!active) return;
+        setCanReview(Boolean(result.canReview));
+        if (!result.review) return;
         setRating(result.review.rating);
         setTitle(result.review.title);
         setBody(result.review.body);
@@ -35,6 +38,13 @@ export function ProductReviews({ product }: { product: Product }) {
       .catch(() => undefined);
     return () => { active = false; };
   }, [product.id]);
+
+  useEffect(() => {
+    if (window.location.hash !== "#reviews") return;
+    window.requestAnimationFrame(() => {
+      document.getElementById("reviews")?.scrollIntoView({ block: "start" });
+    });
+  }, []);
 
   async function submitReview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,7 +75,7 @@ export function ProductReviews({ product }: { product: Product }) {
 
   return (
     <section className="mt-20 border-t border-[var(--border)] pt-12" id="reviews">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className={`grid gap-10 ${canReview || ownReview ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Customer reviews</p>
           <h2 className="mt-2 text-3xl font-medium">
@@ -86,12 +96,12 @@ export function ProductReviews({ product }: { product: Product }) {
           )}
         </div>
 
-        <form onSubmit={submitReview} className="border border-[var(--border)] bg-[var(--surface)] p-5">
+        {canReview || ownReview ? <form onSubmit={submitReview} className="storefront-framed p-5">
           <h3 className="text-lg font-semibold">{ownReview ? "Edit your review" : "Write a review"}</h3>
           <p className="mt-2 text-xs leading-5 text-[var(--muted)]">Sign in with the account used for a delivered purchase. Submissions are moderated before publishing.</p>
           {ownReview ? (
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              <span className="bg-[var(--card)] px-2 py-1 font-semibold uppercase tracking-[0.08em]">{ownReview.status}</span>
+              <span className="storefront-panel-row border border-[var(--border)] px-2 py-1 font-semibold uppercase tracking-[0.08em]">{ownReview.status}</span>
               <span className="text-[var(--muted)]">
                 {ownReview.canEdit && ownReview.editableUntil
                   ? `Editable until ${new Intl.DateTimeFormat("en-AE", { dateStyle: "medium" }).format(new Date(ownReview.editableUntil))}`
@@ -102,14 +112,25 @@ export function ProductReviews({ product }: { product: Product }) {
           <div className="mt-4 flex gap-1" role="group" aria-label="Review rating">
             {Array.from({ length: 5 }).map((_, index) => {
               const value = index + 1;
-              return <button type="button" key={value} onClick={() => setRating(value)} aria-label={`${value} stars`} aria-pressed={rating === value}><Star className={`size-6 ${value <= rating ? "fill-current" : "opacity-20"}`} /></button>;
+              return (
+                <button
+                  type="button"
+                  key={value}
+                  onClick={() => setRating(value)}
+                  aria-label={`${value} stars`}
+                  aria-pressed={rating === value}
+                  className="storefront-action grid size-10 place-items-center text-[var(--accent-text)] outline-none hover:bg-[var(--hover)] focus-visible:ring-2 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 motion-reduce:transition-none"
+                >
+                  <Star className={`size-5 ${value <= rating ? "fill-current" : "opacity-25"}`} />
+                </button>
+              );
             })}
           </div>
           <label className="mt-4 grid gap-1.5 text-sm font-medium">Review title
-            <input required minLength={3} maxLength={100} value={title} onChange={(event) => setTitle(event.target.value)} className="h-11 border border-[var(--border)] bg-[var(--background)] px-3 outline-none focus:border-[var(--accent)]" />
+            <input required minLength={3} maxLength={100} value={title} onChange={(event) => setTitle(event.target.value)} className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-3 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
           <label className="mt-4 grid gap-1.5 text-sm font-medium">Your review
-            <textarea required minLength={20} maxLength={2000} rows={5} value={body} onChange={(event) => setBody(event.target.value)} className="resize-y border border-[var(--border)] bg-[var(--background)] p-3 outline-none focus:border-[var(--accent)]" />
+            <textarea required minLength={20} maxLength={2000} rows={5} value={body} onChange={(event) => setBody(event.target.value)} className="storefront-action resize-y border border-[var(--border)] bg-[var(--background)] p-3 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
           <label className="mt-4 grid gap-2 text-sm font-medium">
             <span className="inline-flex items-center gap-2"><ImagePlus className="size-4" /> Add photos <span className="font-normal text-[var(--muted)]">(up to 3)</span></span>
@@ -119,7 +140,7 @@ export function ProductReviews({ product }: { product: Product }) {
               multiple
               disabled={ownReview ? !ownReview.canEdit : false}
               onChange={(event) => setFiles(Array.from(event.target.files ?? []).slice(0, 3))}
-              className="block w-full text-xs file:me-3 file:border-0 file:bg-[var(--card)] file:px-3 file:py-2 file:font-semibold"
+              className="storefront-action block w-full border border-[var(--border)] bg-[var(--background)] p-2 text-xs file:me-3 file:border-0 file:bg-[var(--accent)] file:px-3 file:py-2 file:font-semibold file:text-[#17262D]"
             />
             {files.length ? <span className="text-xs font-normal text-[var(--muted)]">{files.map((file) => file.name).join(", ")}</span> : null}
           </label>
@@ -129,12 +150,12 @@ export function ProductReviews({ product }: { product: Product }) {
             </div>
           ) : null}
           {message ? <p role="status" className="mt-3 text-xs leading-5 text-[var(--muted)]">{message}</p> : null}
-          <button disabled={submitting || (ownReview ? !ownReview.canEdit : false)} className="mt-4 h-11 w-full bg-[var(--foreground)] text-sm font-semibold text-[var(--background)] disabled:opacity-50">{submitting ? "Submitting..." : ownReview ? "Update review" : "Submit review"}</button>
-        </form>
+          <button disabled={submitting || (ownReview ? !ownReview.canEdit : false)} className="storefront-action mt-4 h-12 w-full bg-[var(--accent)] text-sm font-semibold uppercase tracking-[0.12em] text-[#17262D] hover:brightness-95 disabled:opacity-50">{submitting ? "Submitting..." : ownReview ? "Update review" : "Submit review"}</button>
+        </form> : null}
       </div>
 
       {reviews.length ? (
-        <div className="mt-10 divide-y divide-[var(--border)] border-y border-[var(--border)]">
+        <div className="storefront-railed mt-10 divide-y divide-[var(--border)]">
           {reviews.map((review) => (
             <article key={review.id} className="grid gap-4 py-7 sm:grid-cols-[180px_1fr]">
               <div>
@@ -149,22 +170,22 @@ export function ProductReviews({ product }: { product: Product }) {
                 {review.media?.length ? (
                   <div className="mt-5 flex flex-wrap gap-3">
                     {review.media.map((media) => (
-                      <a key={media.id} href={media.url} target="_blank" rel="noreferrer" className="relative block aspect-square w-24 overflow-hidden bg-[var(--card)]">
+                      <a key={media.id} href={media.url} target="_blank" rel="noreferrer" className="storefront-action relative block aspect-square w-24 overflow-hidden bg-[var(--card)]">
                         <Image src={media.url} alt={media.altText ?? `Customer photo for ${product.name}`} fill sizes="96px" className="object-cover" />
                       </a>
                     ))}
                   </div>
                 ) : null}
                 {review.adminResponse ? (
-                  <div className="mt-5 border-s-2 border-[var(--accent)] ps-4">
+                  <div className="storefront-panel-row mt-5 border border-[var(--border)] border-s-[3px] border-s-[var(--accent)] p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.1em]">Response from the team</p>
                     <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{review.adminResponse}</p>
                   </div>
                 ) : null}
                 <div className="mt-5">
                   {reportingReviewId === review.id ? (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <select value={reportReason} onChange={(event) => setReportReason(event.target.value)} className="h-9 border border-[var(--border)] bg-[var(--background)] px-2 text-xs">
+                    <div className="storefront-expand-in flex flex-wrap items-center gap-2">
+                      <select value={reportReason} onChange={(event) => setReportReason(event.target.value)} className="storefront-action h-10 border border-[var(--border)] bg-[var(--background)] px-2 text-xs outline-none focus:border-[var(--accent)]">
                         <option value="SPAM">Spam</option><option value="OFFENSIVE">Offensive content</option><option value="PRIVACY">Privacy issue</option><option value="MISLEADING">Misleading</option><option value="OTHER">Other</option>
                       </select>
                       <button type="button" onClick={async () => {
@@ -172,11 +193,11 @@ export function ProductReviews({ product }: { product: Product }) {
                         const result = await response.json();
                         setMessage(result.message);
                         if (response.ok) setReportingReviewId(null);
-                      }} className="h-9 bg-[var(--foreground)] px-3 text-xs font-semibold text-[var(--background)]">Send report</button>
-                      <button type="button" onClick={() => setReportingReviewId(null)} className="text-xs underline">Cancel</button>
+                      }} className="storefront-action h-10 bg-[var(--accent)] px-3 text-xs font-semibold text-[#17262D] hover:brightness-95">Send report</button>
+                      <button type="button" onClick={() => setReportingReviewId(null)} className="storefront-action min-h-10 px-2 text-xs underline">Cancel</button>
                     </div>
                   ) : (
-                    <button type="button" onClick={() => setReportingReviewId(review.id)} className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)]"><Flag className="size-3.5" /> Report review</button>
+                    <button type="button" onClick={() => setReportingReviewId(review.id)} className="storefront-action inline-flex min-h-10 items-center gap-1.5 px-2 text-xs text-[var(--muted)] hover:text-[var(--foreground)]"><Flag className="size-3.5" /> Report review</button>
                   )}
                 </div>
               </div>

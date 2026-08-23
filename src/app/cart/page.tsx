@@ -15,6 +15,8 @@ import {
 import { cartCopy, localeFromPathname } from "@/lib/i18n";
 import { formatAed } from "@/lib/utils";
 import { CartRecoveryBanner, ReservationTimer } from "@/components/store/cart-status";
+import { useLocalizedHref } from "@/lib/use-localized-href";
+import { ContextualSupport } from "@/components/store/contextual-support";
 
 function useCartCopy() {
   const pathname = usePathname();
@@ -23,6 +25,7 @@ function useCartCopy() {
 
 function CartItemRow({ line }: { line: CartLine }) {
   const copy = useCartCopy();
+  const localize = useLocalizedHref();
   const [editing, setEditing] = useState(false);
   const updateQuantity = useStore((state) => state.updateQuantity);
   const removeFromCart = useStore((state) => state.removeFromCart);
@@ -42,7 +45,7 @@ function CartItemRow({ line }: { line: CartLine }) {
   return (
     <div className="flex min-w-0 flex-col border-b border-[var(--border)] pb-6 last:border-b-0 last:pb-0">
       <div className="flex min-w-0 gap-3 sm:gap-6">
-        <div className="relative size-20 shrink-0 overflow-hidden bg-[var(--card)] sm:size-24">
+        <div className="storefront-action relative size-20 shrink-0 overflow-hidden bg-[var(--card)] sm:size-24">
           <Image
             src={getCartLineImage(line)}
             alt={line.product.name}
@@ -55,7 +58,7 @@ function CartItemRow({ line }: { line: CartLine }) {
           <div className="flex min-w-0 items-start justify-between gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
               <Link
-                href={`/product/${line.product.slug}`}
+                href={localize(`/product/${line.product.slug}`)}
                 className="block overflow-hidden break-words text-base font-medium leading-6 hover:underline sm:text-lg sm:leading-7 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
               >
                 {line.product.name}
@@ -67,7 +70,7 @@ function CartItemRow({ line }: { line: CartLine }) {
             <button
               onClick={() => removeFromCart(line.product.slug, line.size, line.color)}
               aria-label={copy.removeItem}
-              className="grid size-8 shrink-0 place-items-center text-[var(--muted)] transition hover:text-[var(--foreground)] motion-reduce:transition-none"
+              className="storefront-action grid size-9 shrink-0 place-items-center text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--foreground)] motion-reduce:transition-none"
             >
               <X className="size-4" />
             </button>
@@ -75,10 +78,10 @@ function CartItemRow({ line }: { line: CartLine }) {
           
           <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-4">
-              <div className="flex h-9 items-center border border-[var(--border)]">
+              <div className="storefront-action flex h-9 items-center border border-[var(--border)]">
                 <button
                   type="button"
-                  className="px-3 py-1 text-[var(--muted)] hover:text-[var(--foreground)]"
+                  className="storefront-action grid h-9 w-9 place-items-center text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--foreground)]"
                   onClick={() =>
                     updateQuantity(line.product.slug, line.quantity - 1, line.size, line.color)
                   }
@@ -90,7 +93,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                 <button
                   type="button"
                   disabled={!availability.canIncrease}
-                  className="px-3 py-1 text-[var(--muted)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
+                  className="storefront-action grid h-9 w-9 place-items-center text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
                   onClick={() =>
                     updateQuantity(line.product.slug, line.quantity + 1, line.size, line.color)
                   }
@@ -103,7 +106,7 @@ function CartItemRow({ line }: { line: CartLine }) {
               {product.variants?.length ? (
                 <button
                   onClick={() => setEditing(!editing)}
-                  className="flex items-center gap-0.5 whitespace-nowrap text-xs font-medium text-[var(--muted)] underline transition hover:text-[var(--foreground)] motion-reduce:transition-none"
+                  className="storefront-action flex min-h-9 items-center gap-0.5 whitespace-nowrap text-xs font-medium text-[var(--muted)] underline hover:text-[var(--foreground)]"
                 >
                   {copy.editStyle}
                   {editing ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
@@ -123,7 +126,7 @@ function CartItemRow({ line }: { line: CartLine }) {
       </div>
 
       {editing && (
-        <div className="mt-4 max-w-md space-y-3 border border-[var(--border)] bg-[var(--card)] p-4">
+        <div className="storefront-expand-in storefront-stagger storefront-panel-row mt-4 max-w-md space-y-3 border border-[var(--border)] p-4">
           <div>
             <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[var(--muted)]">{copy.color}</span>
             <div className="flex flex-wrap gap-2.5">
@@ -132,7 +135,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                   key={c}
                   onClick={() => handleVariantChange(line.size, c)}
                   style={{ backgroundColor: product.colorHex?.[c] ?? "#888888" }}
-                  className={`size-6 border-2 transition hover:scale-105 motion-reduce:transition-none ${
+                  className={`storefront-action size-7 border-2 hover:scale-105 ${
                     line.color === c ? "border-[var(--foreground)] ring-1 ring-[var(--foreground)]" : "border-white shadow-sm"
                   }`}
                   title={c}
@@ -153,10 +156,10 @@ function CartItemRow({ line }: { line: CartLine }) {
                     key={s}
                     disabled={disabled}
                     onClick={() => handleVariantChange(s, line.color)}
-                    className={`h-8 px-3 text-xs border font-semibold transition ${
+                    className={`storefront-action h-9 px-3 text-xs border font-semibold ${
                       line.size === s
-                        ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
-                        : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--muted)]"
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
+                        : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)]"
                     } disabled:opacity-30 disabled:cursor-not-allowed`}
                   >
                     {s}
@@ -172,6 +175,7 @@ function CartItemRow({ line }: { line: CartLine }) {
 }
 
 function PageRecommendations() {
+  const localize = useLocalizedHref();
   const copy = useCartCopy();
   const [products, setProducts] = useState<CartRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -205,14 +209,14 @@ function PageRecommendations() {
   if (loading || !products.length) return null;
 
   return (
-    <div className="mt-16 border-t border-[var(--border)] pt-10">
+    <div className="mt-10 border-t border-[var(--border)] pt-8">
       <h2 className="font-serif text-3xl">{copy.completeTheLookTitle}</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">{copy.pairingsSubtitle}</p>
       
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-        {products.slice(0, 3).map((prod) => (
-          <div key={prod.id} className="group flex flex-col overflow-hidden border border-[var(--border)] bg-[var(--surface)] transition hover:shadow-md motion-reduce:transition-none">
-            <div className="relative aspect-square w-full overflow-hidden bg-[var(--card)]">
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {products.slice(0, 4).map((prod) => (
+          <div key={prod.id} className="storefront-framed storefront-action group flex flex-col hover:shadow-md">
+            <div className="storefront-product-media relative aspect-[4/3] w-full overflow-hidden">
               <Image
                 src={prod.image}
                 alt={prod.name}
@@ -228,8 +232,8 @@ function PageRecommendations() {
                 <p className="mt-1 text-sm text-[var(--muted)]">{formatAed(prod.price)}</p>
               </div>
               <Link
-                href={`/product/${prod.slug}`}
-                className="mt-4 block w-full border border-[var(--foreground)] py-2 text-center text-xs font-bold uppercase tracking-wider transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
+                href={localize(`/product/${prod.slug}`)}
+                className="storefront-action mt-4 flex min-h-10 w-full items-center justify-center border border-[var(--accent)] px-3 text-center text-xs font-bold uppercase tracking-wider text-[var(--accent-text)] hover:bg-[var(--accent)] hover:text-[#17262D]"
               >
                 {copy.viewDetails}
               </Link>
@@ -243,6 +247,7 @@ function PageRecommendations() {
 
 export default function CartPage() {
   const copy = useCartCopy();
+  const localize = useLocalizedHref();
   const hydrated = useStoreHydrated();
   const cart = useStore((state) => state.cart);
   const lastRemovedLine = useStore((state) => state.lastRemovedLine);
@@ -277,36 +282,46 @@ export default function CartPage() {
   };
 
   const emptyCartPanel = (
-    <div className="border border-dashed border-[var(--border)] bg-[var(--surface)] px-5 py-20 text-center">
-      <p className="font-serif text-3xl">{copy.yourCartEmpty}</p>
-      <Link
-        href="/shop"
-        className="storefront-action mt-6 inline-flex h-11 items-center border border-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[var(--accent-text)] transition hover:bg-[var(--accent)] hover:text-[#111315] motion-reduce:transition-none"
-      >
-        {copy.shopCatalog}
-      </Link>
+    <div className="storefront-framed grid gap-6 p-5 sm:grid-cols-[minmax(0,1fr)_240px] sm:items-center sm:p-7">
+      <div className="max-w-xl">
+        <p className="font-serif text-3xl leading-tight sm:text-4xl">{copy.yourCartEmpty}</p>
+        <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+          Build your first edit from sculpting leggings, breathable bras, and warm-weather layers.
+        </p>
+      </div>
+      <div className="grid gap-3 sm:justify-items-end">
+        <Link
+          href={localize("/shop")}
+          className="storefront-action inline-flex h-11 items-center justify-center border border-[var(--accent)] bg-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[#17262D] transition hover:brightness-95 motion-reduce:transition-none"
+        >
+          {copy.shopCatalog}
+        </Link>
+        <Link href={localize("/shop?sort=popular")} className="storefront-action -me-2 inline-flex min-h-10 items-center px-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] underline underline-offset-4 hover:text-[var(--foreground)]">
+          Best sellers
+        </Link>
+      </div>
     </div>
   );
 
   return (
-    <section className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 sm:flex-row sm:items-baseline sm:justify-between">
-        <h1 className="font-serif text-6xl sm:text-7xl">{copy.cartTitle}</h1>
+    <section className="storefront-container py-8 sm:py-10">
+      <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-baseline sm:justify-between">
+        <h1 className="font-serif text-5xl leading-none sm:text-6xl">{copy.cartTitle}</h1>
         <div className="w-full max-w-sm sm:w-auto">
           <ReservationTimer onExpiredChange={setReservationExpired} />
         </div>
       </div>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px]">
+      <div className={`mt-6 grid gap-10 ${hydrated && cart.length ? "lg:grid-cols-[1fr_380px]" : ""}`}>
         <div className="space-y-6">
           {lastRemovedLine && (
-            <div role="status" className="flex items-center justify-between border border-[var(--border)] bg-[var(--hover)] px-4 py-3 text-sm">
+            <div role="status" className="storefront-expand-in storefront-framed flex items-center justify-between px-4 py-3 text-sm">
               <span className="text-[var(--foreground)] font-medium">
                 {copy.removed} {lastRemovedLine.product.name} ({lastRemovedLine.color} / {lastRemovedLine.size})
               </span>
               <button
                 onClick={undoRemove}
-                className="flex items-center gap-1.5 font-bold text-[var(--accent)] underline transition hover:text-[var(--foreground)] motion-reduce:transition-none"
+                className="storefront-action flex min-h-9 items-center gap-1.5 font-bold text-[var(--accent-text)] underline hover:text-[var(--foreground)]"
               >
                 <RotateCcw className="size-4" />
                 {copy.undoRemove}
@@ -318,7 +333,7 @@ export default function CartPage() {
           {!hydrated || !cart.length ? (
             emptyCartPanel
           ) : (
-            <div className="space-y-6 border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6">
+            <div className="storefront-framed space-y-6 p-4 sm:p-6">
               <div className="border-b border-[var(--border)] pb-4">
                 <div className="flex justify-between text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
                   <span>
@@ -328,7 +343,7 @@ export default function CartPage() {
                   </span>
                   <span>{Math.round(progress)}%</span>
                 </div>
-                <div className="mt-3 h-2 overflow-hidden bg-[var(--card)]">
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--card)]">
                   <div
                     className="h-full bg-[var(--accent)] transition-[width] duration-500 ease-out motion-reduce:transition-none"
                     style={{ width: `${progress}%` }}
@@ -347,32 +362,32 @@ export default function CartPage() {
           {hydrated && cart.length ? (
             <div className="grid gap-6 sm:grid-cols-2">
               {/* Order Note */}
-              <div className="h-fit border border-[var(--border)] bg-[var(--surface)] p-5">
+              <div className="storefront-framed h-fit p-5">
                 <button
                   onClick={() => setShowNote(!showNote)}
-                  className="flex w-full items-center justify-between font-serif text-lg text-[var(--foreground)] transition hover:text-[var(--accent)] focus-visible:outline-none motion-reduce:transition-none"
+                  className="storefront-action flex w-full min-h-10 items-center justify-between font-serif text-lg text-[var(--foreground)] hover:text-[var(--accent-text)] focus-visible:outline-none"
                 >
                   <span>{copy.orderNoteGiftMessage}</span>
                   <span className="text-xs font-normal text-[var(--muted)]">{showNote ? `${copy.hide} -` : `${copy.add} +`}</span>
                 </button>
                 {showNote && (
-                  <div className="mt-3">
+                  <div className="storefront-expand-in mt-3">
                     <textarea
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                       placeholder={copy.deliveryGuidelinesPlaceholder}
                       rows={4}
-                      className="w-full border border-[var(--border)] bg-[var(--background)] p-2.5 text-xs outline-none focus:border-[var(--accent)]"
+                    className="storefront-action w-full border border-[var(--border)] bg-[var(--background)] p-3 text-xs outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
                     />
                   </div>
                 )}
               </div>
 
               {/* Coupon */}
-              <div className="h-fit border border-[var(--border)] bg-[var(--surface)] p-5">
+              <div className="storefront-framed h-fit p-5">
                 <h2 className="mb-3 font-serif text-lg text-[var(--foreground)]">{copy.promoCouponCode}</h2>
                 {coupon ? (
-                  <div role="status" className="flex items-center justify-between border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-700">
+                  <div role="status" className="storefront-action flex items-center justify-between border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-700">
                     <span className="font-semibold">{coupon.code} {copy.applied} (-{formatAed(coupon.discount)})</span>
                     <button onClick={removeCoupon} className="font-bold text-emerald-700 underline transition hover:text-[var(--foreground)] motion-reduce:transition-none">
                       {copy.remove}
@@ -380,17 +395,17 @@ export default function CartPage() {
                   </div>
                 ) : (
                   <div>
-                    <div className="flex gap-2">
+                    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                       <input
                         placeholder={copy.enterCouponCode}
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="min-w-0 flex-1 border border-[var(--border)] px-3 py-2 text-sm uppercase outline-none focus:border-[var(--accent)]"
+                        className="storefront-action h-11 min-w-0 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
                       />
                       <button
                         onClick={handleApplyCoupon}
                         disabled={loadingCoupon || !couponInput.trim()}
-                        className="border border-[var(--foreground)] bg-[var(--foreground)] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#111315] disabled:opacity-50 motion-reduce:transition-none"
+                        className="storefront-action h-11 border border-[var(--accent)] bg-[var(--accent)] px-5 text-xs font-bold uppercase tracking-wider text-[#17262D] hover:brightness-95 disabled:opacity-50"
                       >
                         {copy.apply}
                       </button>
@@ -404,7 +419,7 @@ export default function CartPage() {
         </div>
 
         {hydrated && cart.length ? (
-          <aside className="h-fit border border-[var(--border)] bg-[var(--surface)] p-6">
+          <aside className="storefront-framed h-fit p-6">
             <h2 className="font-serif text-3xl">{copy.summary}</h2>
             <div className="mt-6 space-y-3 border-b border-[var(--border)] pb-5 text-sm text-[var(--muted)]">
               <div className="flex justify-between">
@@ -423,6 +438,7 @@ export default function CartPage() {
                   {shipping === 0 ? copy.free : formatAed(shipping)}
                 </span>
               </div>
+              <p className="pt-1 text-xs leading-5 text-[var(--muted)]">{copy.shippingEstimateNote}</p>
             </div>
 
             <div className="mt-4 space-y-4">
@@ -436,7 +452,7 @@ export default function CartPage() {
                   {copy.inventoryCheckRequired}
                 </Button>
               ) : (
-                <Link href="/checkout" className="block">
+                <Link href={localize("/checkout")} className="block">
                   <Button className="h-12 w-full text-sm font-bold uppercase tracking-wider">
                     {copy.proceedToCheckout}
                   </Button>
@@ -447,11 +463,12 @@ export default function CartPage() {
                 {copy.checkoutDisclaimer}
               </p>
             </div>
+            <div className="mt-5"><ContextualSupport context="cart" compact /></div>
           </aside>
         ) : null}
       </div>
 
-      {hydrated && cart.length ? <PageRecommendations /> : null}
+      {hydrated ? <PageRecommendations /> : null}
     </section>
   );
 }

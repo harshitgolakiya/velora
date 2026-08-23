@@ -15,8 +15,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "No files uploaded" }, { status: 400 });
   }
 
-  const uploaded = await Promise.all(
-    files.map(async (file) => {
+  let uploaded;
+  try {
+    uploaded = await Promise.all(
+      files.map(async (file) => {
       const stored = await storeAdminMediaFile(file);
       const mediaType = file.type.startsWith("video/") ? "VIDEO" : "IMAGE";
       const optimization = stored.optimization;
@@ -61,8 +63,12 @@ export async function POST(request: Request) {
         focalPointY: asset.focalPointY,
         createdAt: asset.createdAt.toISOString(),
       };
-    }),
-  );
+      }),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to store the uploaded media.";
+    return NextResponse.json({ message }, { status: message.startsWith("Unsupported file type") ? 415 : 500 });
+  }
 
   await recordAdminActivity({
     action: `Uploaded ${uploaded.length} media asset${uploaded.length !== 1 ? "s" : ""}`,

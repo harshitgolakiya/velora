@@ -1,3 +1,5 @@
+import { isVideoUrl } from "./admin-validation";
+
 type HomepagePublicationInput = {
   status: string;
   settings?: Record<string, unknown>;
@@ -35,8 +37,13 @@ export function getHomepagePublicationError(input: HomepagePublicationInput) {
       return `Category media tile ${index + 1} needs a Cloudflare Stream ID before publishing.`;
     }
 
-    if (mediaType === "VIDEO" && !videoUrl) {
-      return `Category media tile ${index + 1} needs a video file before publishing.`;
+    if (mediaType === "VIDEO") {
+      if (!videoUrl) {
+        return `Category media tile ${index + 1} needs a video file before publishing.`;
+      }
+      if (!isVideoUrl(videoUrl)) {
+        return `Category media tile ${index + 1} needs an HTTPS or local .mp4/.webm video URL before publishing.`;
+      }
     }
 
     if (mediaType !== "VIDEO" && mediaType !== "CLOUDFLARE_STREAM" && !imageUrl && !posterUrl) {

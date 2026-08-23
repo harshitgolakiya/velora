@@ -10,17 +10,23 @@ const RecommendationRail = dynamic(() => import("./recommendation-rail").then((m
 const RecentlyViewedProducts = dynamic(() => import("./recently-viewed-products").then((mod) => mod.RecentlyViewedProducts), { ssr: false });
 
 function useDeferredProductSection() {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => (typeof window === "undefined" ? false : Boolean(window.location.hash)));
 
   useEffect(() => {
     const show = () => setReady(true);
+    if (window.location.hash) {
+      show();
+      return undefined;
+    }
     const timeout = window.setTimeout(show, 6000);
     window.addEventListener("scroll", show, { once: true, passive: true });
     window.addEventListener("pointerdown", show, { once: true });
+    window.addEventListener("hashchange", show, { once: true });
     return () => {
       window.clearTimeout(timeout);
       window.removeEventListener("scroll", show);
       window.removeEventListener("pointerdown", show);
+      window.removeEventListener("hashchange", show);
     };
   }, []);
 
