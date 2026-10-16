@@ -28,7 +28,7 @@ export function Breadcrumbs({ items, className }: { items: BreadcrumbItem[]; cla
             <li key={`${item.label}-${index}`} className="flex items-center gap-1.5">
               {index > 0 ? <Separator className="size-3 shrink-0" aria-hidden /> : null}
               {item.href && !isLast ? (
-                <Link href={localize(item.href)} className="storefront-action -mx-2 inline-flex min-h-10 shrink-0 items-center px-2 transition hover:text-[var(--accent)] motion-reduce:transition-none">
+                <Link href={localize(item.href)} className="storefront-action -mx-2 inline-flex min-h-10 shrink-0 items-center px-2 transition hover:text-[var(--accent-text)] motion-reduce:transition-none">
                   {item.label}
                 </Link>
               ) : (

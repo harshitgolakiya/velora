@@ -25,12 +25,12 @@ const navFeaturedProducts = [
   {
     href: "/shop?category=Leggings",
     name: "Performance leggings",
-    image: "/images/activewear-demo/active-duo.jpg",
+    image: "/images/campaign/legging-sage-back.webp",
   },
   {
     href: "/shop?category=Sports%20Bras",
     name: "Supportive sports bras",
-    image: "/images/activewear-demo/studio-yoga.jpg",
+    image: "/images/campaign/bra-sage-front.webp",
   },
 ];
 
@@ -191,7 +191,7 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
           "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-300",
           announcementVisible && "md:top-8",
           isOverlay
-            ? "border-white/15 bg-transparent text-white"
+            ? "border-[var(--paper)]/15 bg-transparent text-[var(--paper)]"
             : "border-[var(--border)] bg-[var(--background)]/96 text-[var(--foreground)] backdrop-blur-xl",
         )}
       >
@@ -206,15 +206,14 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
           </button>
           <Link
             href={localize("/")}
-            style={{ color: "#BCE3F4" }}
             className={cn(
-              "absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 font-serif text-3xl font-medium leading-none tracking-[0.08em]",
-              isOverlay && "drop-shadow-[0_1px_14px_rgba(0,0,0,0.65)]",
+              "absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 font-serif text-[2rem] font-medium leading-none tracking-[0.03em] md:text-[2.25rem]",
+              isOverlay ? "text-[var(--paper)] drop-shadow-[0_1px_14px_rgba(20,16,12,0.55)]" : "text-[var(--foreground)]",
             )}
           >
             Velora
           </Link>
-          <nav className="col-start-1 row-start-1 hidden h-full min-w-0 items-center justify-start gap-8 text-[11px] font-medium uppercase tracking-[0.14em] xl:flex">
+          <nav className="col-start-1 row-start-1 hidden h-full min-w-0 items-center justify-start gap-7 text-[11px] font-semibold uppercase tracking-[0.16em] xl:flex">
             <div
               className="flex h-full items-center"
               onMouseEnter={() => setShopOpen(true)}
@@ -224,20 +223,21 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
                 if (!event.currentTarget.contains(event.relatedTarget)) setShopOpen(false);
               }}
             >
-              <button
-                type="button"
+              <Link
+                href={localize("/shop")}
                 aria-expanded={shopOpen}
                 aria-controls="desktop-shop-menu"
+                aria-current={basePath === "/shop" ? "page" : undefined}
                 className={cn(
                   "relative py-2 uppercase after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:bg-current after:transition-transform",
                   basePath.startsWith("/shop") || basePath.startsWith("/collections")
                     ? "after:scale-x-100"
                     : "after:scale-x-0 hover:after:scale-x-100",
                 )}
-                onClick={() => setShopOpen((open) => !open)}
+                onClick={() => setShopOpen(false)}
               >
                 {copy.shop}
-              </button>
+              </Link>
               <div
                 id="desktop-shop-menu"
                 className={cn(
@@ -247,24 +247,24 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
               >
                 <div className="storefront-container grid grid-cols-[0.8fr_0.8fr_1.4fr] gap-12 py-10 normal-case tracking-normal">
                   <div>
-                    <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.categories}</p>
+                    <p className="eyebrow eyebrow-muted mb-4">{copy.categories}</p>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
                       {navCategories.map((category) => (
-                        <Link key={category} href={localize(`/shop?category=${encodeURIComponent(category)}`)} className="storefront-action flex min-h-10 items-center border-b border-transparent py-2 hover:border-[var(--border)] hover:text-[var(--accent)]">
+                        <Link key={category} href={localize(`/shop?category=${encodeURIComponent(category)}`)} className="flex min-h-10 items-center py-2 text-[var(--foreground)]/80 hover:text-[var(--foreground)]">
                           {categoryLabel(locale, category)}
                         </Link>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.collections}</p>
+                    <p className="eyebrow eyebrow-muted mb-4">{copy.collections}</p>
                     <div className="grid gap-1 text-sm">
                       {navCollections.map((collection) => (
-                        <Link key={collection.slug} href={localize(collection.href)} className="storefront-action flex min-h-10 items-center border-b border-transparent py-2 hover:border-[var(--border)] hover:text-[var(--accent)]">
+                        <Link key={collection.slug} href={localize(collection.href)} className="flex min-h-10 items-center py-2 text-[var(--foreground)]/80 hover:text-[var(--foreground)]">
                           {collectionLabel(locale, collection.slug, collection.name)}
                         </Link>
                       ))}
-                      <Link href={localize("/shop")} className="storefront-action mt-3 inline-flex w-fit items-center gap-2 border-b border-current pb-1 text-xs font-semibold uppercase tracking-[0.14em]">
+                      <Link href={localize("/shop")} className="btn btn-link btn-sm mt-4 w-fit self-start">
                         {copy.shopAll}
                         <span aria-hidden="true">+</span>
                       </Link>
@@ -273,11 +273,11 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
                   <div className="grid grid-cols-2 gap-5">
                     {navFeaturedProducts.map((product) => (
                       <Link key={product.href} href={localize(product.href)} className="group/card storefront-action">
-                        <div className="storefront-product-media relative aspect-[4/3] bg-[var(--card)]">
+                        <div className="storefront-product-media relative aspect-[4/5] bg-[var(--card)]">
                           <Image src={product.image} alt={product.name} fill sizes="280px" className="object-cover transition duration-700 group-hover/card:scale-[1.02]" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition duration-300 group-hover/card:opacity-100" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)]/30 via-transparent to-transparent opacity-0 transition duration-300 group-hover/card:opacity-100" />
                         </div>
-                        <p className="mt-3 text-sm font-semibold">{product.name}</p>
+                        <p className="mt-3 text-sm font-medium">{product.name}</p>
                         <p className="text-xs text-[var(--muted)]">{copy.bestsellerEdit}</p>
                       </Link>
                     ))}
@@ -317,7 +317,7 @@ export function Header({ globalContent }: { globalContent: GlobalContent }) {
             </button>
             {accountMounted ? <AccountDialog open={accountOpen} onOpenChange={handleAccountOpenChange} accountHref={localize("/account")} /> : null}
             <div className="hidden sm:block">
-              <ThemeToggle className={isOverlay ? "text-white" : "text-[var(--foreground)]"} />
+              <ThemeToggle className={isOverlay ? "text-[var(--paper)]" : "text-[var(--foreground)]"} />
             </div>
             <Link href={localize("/account/wishlist")} aria-label={String(copy.wishlist)} className="storefront-action storefront-icon-button relative hidden size-10 place-items-center sm:grid">
               <Heart className="size-5" />

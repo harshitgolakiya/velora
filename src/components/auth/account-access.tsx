@@ -45,8 +45,8 @@ export function AccountAccess({
             [Heart, copy.wishlist, copy.wishlistSyncSoon],
             [MapPin, copy.addresses, copy.addressesAppearSoon],
           ].map(([Icon, title, body]) => (
-            <section key={title as string} className="storefront-framed p-5 transition hover:-translate-y-0.5 hover:border-[var(--foreground)]/35 motion-reduce:transition-none">
-              <span className="grid size-10 place-items-center rounded-full bg-[var(--card)] text-[var(--accent)]">
+            <section key={title as string} className="card p-5 transition hover:-translate-y-0.5 hover:border-[var(--foreground)]/35 motion-reduce:transition-none">
+              <span className="grid size-10 place-items-center rounded-full bg-[var(--card)] text-[var(--accent-text)]">
                 <Icon className="size-5" />
               </span>
               <h2 className="mt-4 text-lg font-semibold">{title as string}</h2>
@@ -149,22 +149,22 @@ export function AccountAccess({
 
   if (mode === "verify") {
     return (
-      <div className={`${compact ? "" : "mt-8"} storefront-framed max-w-lg p-5 sm:p-6`}>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{copy.accountCreated}</p>
-        <h2 className="mt-3 text-2xl font-semibold">{copy.verifyYourEmail}</h2>
+      <div className={`${compact ? "" : "mt-8"} card max-w-lg p-5 sm:p-6`}>
+        <p className="eyebrow eyebrow-muted">{copy.accountCreated}</p>
+        <h2 className="display-md mt-3">{copy.verifyYourEmail}</h2>
         <p className="mt-4 text-sm leading-6 text-[var(--muted)]">{message}</p>
         <p className="mt-2 text-sm font-medium">{verificationEmail}</p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <button type="button" onClick={resendVerification} disabled={submitting} className="storefront-action h-11 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">{copy.resendEmail}</button>
-          <button type="button" onClick={() => setMode("signin")} className="storefront-action h-11 border border-[var(--border)] px-5 text-sm font-semibold hover:border-[var(--foreground)]/40 hover:bg-[var(--hover)] motion-reduce:transition-none">{copy.backToSignIn}</button>
+          <button type="button" onClick={resendVerification} disabled={submitting} className="btn btn-primary">{copy.resendEmail}</button>
+          <button type="button" onClick={() => setMode("signin")} className="btn btn-secondary">{copy.backToSignIn}</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`${compact ? "" : "mt-8"} storefront-framed max-w-lg p-5 sm:p-6`}>
-      <div className="storefront-framed grid grid-cols-2 bg-[var(--background)] p-1">
+    <div className={`${compact ? "" : "mt-8"} card max-w-lg p-5 sm:p-6`}>
+      <div className="card grid grid-cols-2 bg-[var(--background)] p-1">
         {(["signin", "register"] as const).map((value) => (
           <button
             key={value}
@@ -174,7 +174,7 @@ export function AccountAccess({
               setError(null);
               setMessage(null);
             }}
-            className={`storefront-action h-10 text-sm font-semibold transition motion-reduce:transition-none ${mode === value ? "bg-[var(--foreground)] text-[var(--background)]" : "hover:bg-[var(--hover)]"}`}
+            className={`storefront-action h-10 text-sm font-semibold transition motion-reduce:transition-none ${mode === value ? "bg-[var(--accent)] text-[var(--on-accent)]" : "hover:bg-[var(--hover)]"}`}
           >
             {value === "signin" ? copy.signIn : copy.createAccount}
           </button>
@@ -189,7 +189,7 @@ export function AccountAccess({
                 type="button"
                 disabled={submitting}
                 onClick={() => void signInWithProvider(provider.id)}
-                className="storefront-action inline-flex h-12 items-center justify-center gap-3 border border-[var(--border)] text-sm font-semibold hover:border-[var(--foreground)] hover:bg-[var(--hover)] disabled:opacity-60 motion-reduce:transition-none"
+                className="btn btn-secondary"
               >
                 <span className="grid size-6 place-items-center rounded-full border border-[var(--border)] text-xs uppercase">{provider.label[0]}</span>
                 {copy.signIn} / {provider.label}
@@ -214,9 +214,9 @@ export function AccountAccess({
             {mode === "register" ? <span className="text-xs text-[var(--muted)]">{copy.passwordHint}</span> : null}
           </label>
         ) : null}
-        {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
+        {error ? <p role="alert" className="text-sm text-[var(--sale)]">{error}</p> : null}
         {message ? <p role="status" className="text-sm leading-6 text-[var(--muted)]">{message}</p> : null}
-        <button disabled={submitting} className="storefront-action h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">
+        <button disabled={submitting} className="btn btn-primary">
           {submitting ? copy.pleaseWait : mode === "signin" ? copy.signIn : mode === "register" ? copy.createAccount : copy.sendResetLink}
         </button>
         {mode === "signin" ? (

@@ -47,7 +47,7 @@ export function ReorderButton({
         type="button"
         onClick={() => void reorder()}
         disabled={loading}
-        className="inline-flex h-11 w-full items-center justify-center gap-2 bg-[var(--foreground)] px-4 text-sm font-semibold text-[var(--background)] disabled:opacity-60"
+        className="btn btn-primary btn-block"
       >
         {loading ? "Checking availability" : children}
       </button>

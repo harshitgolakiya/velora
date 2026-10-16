@@ -13,7 +13,7 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
               key={block.id}
               className={`relative overflow-hidden ${
                 block.imageUrl
-                  ? "storefront-media-tile min-h-[min(70svh,720px)] bg-stone-950 text-white"
+                  ? "storefront-media-tile min-h-[min(70svh,720px)] bg-[var(--accent-strong)] text-[var(--paper)]"
                   : "storefront-railed bg-[var(--surface)]"
               }`}
             >
@@ -30,8 +30,8 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
                     quality={84}
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,6,8,.72),rgba(5,6,8,.24)_48%,rgba(5,6,8,.08))]" />
-                  <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(5,6,8,.56),transparent_58%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(28,24,20,.72),rgba(28,24,20,.24)_48%,rgba(28,24,20,.08))]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(28,24,20,.56),transparent_58%)]" />
                 </>
               ) : null}
               <div
@@ -40,18 +40,18 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
                 }`}
               >
                 {block.eyebrow ? (
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
+                  <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${block.imageUrl ? "text-[var(--paper)]/80" : "text-[var(--accent-text)]"}`}>
                     {block.eyebrow}
                   </p>
                 ) : null}
-                <h1 className="mt-4 max-w-4xl text-4xl font-medium leading-[1.02] sm:text-6xl lg:text-7xl">
+                <h1 className="display-xl mt-4 max-w-4xl">
                   {block.heading}
                 </h1>
                 {block.body ? <p className="storefront-body-copy mt-6 max-w-2xl opacity-82">{block.body}</p> : null}
                 {block.ctaHref && block.ctaLabel ? (
                   <Link
                     href={block.ctaHref}
-                    className="storefront-action mt-8 inline-flex h-11 w-fit items-center gap-2 border border-current px-5 text-xs font-semibold uppercase tracking-[0.12em]"
+                    className="btn btn-on-photo mt-8 w-fit"
                   >
                     {block.ctaLabel}
                     <ArrowRight className="size-4" />
@@ -66,7 +66,7 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
           return (
             <section key={block.id} className="storefront-section-rule grid gap-5 pt-6 lg:grid-cols-[0.68fr_1.32fr]">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">
                   {block.type === "POLICY" ? "Policy" : "Guide"}
                 </p>
                 <h2 className="mt-3 text-2xl font-medium leading-tight sm:text-4xl">{block.heading}</h2>
@@ -82,13 +82,13 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
           return (
             <section key={block.id} className="storefront-section-rule grid gap-5 pt-6 lg:grid-cols-[0.68fr_1.32fr]">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Answers</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">Answers</p>
                 <h2 className="mt-3 text-2xl font-medium leading-tight sm:text-3xl">{block.category}</h2>
               </div>
               <div className="storefront-railed divide-y divide-[var(--border)]">
                 {block.items.map((item) => (
                   <details key={item.question} className="group">
-                    <summary className="storefront-action flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-medium hover:text-[var(--accent)] sm:px-6">
+                    <summary className="storefront-action flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-medium hover:text-[var(--accent-text)] sm:px-6">
                       <span>{item.question}</span>
                       <ChevronDown className="size-4 shrink-0 transition group-open:rotate-180" />
                     </summary>
@@ -104,19 +104,19 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
           return (
             <section key={block.id} className="storefront-section-rule pt-6">
               <div className="mb-7 grid gap-4 lg:grid-cols-[0.68fr_1.32fr]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Service notes</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">Service notes</p>
                 <h2 className="max-w-3xl text-3xl font-medium leading-tight sm:text-4xl">{block.heading}</h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {block.items.map((item) => (
                   <div key={item.title} className="storefront-framed p-5 sm:p-6">
-                    <span className="mb-5 grid size-10 place-items-center rounded-[var(--radius-control)] bg-[var(--accent)] text-[#17262D]">
+                    <span className="mb-5 grid size-10 place-items-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)]">
                       <Sparkles className="size-4" />
                     </span>
                     <h3 className="text-lg font-semibold">{item.title}</h3>
                     <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{item.body}</p>
                     {item.href ? (
-                      <Link href={item.href} className="storefront-action mt-5 inline-flex min-h-10 items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em]">
+                      <Link href={item.href} className="btn btn-link btn-sm mt-5">
                         Learn more
                         <ArrowRight className="size-4" />
                       </Link>
@@ -131,7 +131,7 @@ export function ContentBlockRenderer({ blocks }: { blocks: ContentBlock[] }) {
         return (
           <section key={block.id} className="storefront-section-rule pt-6">
             <div className="mb-7 grid gap-4 lg:grid-cols-[0.68fr_1.32fr]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Compare</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-text)]">Compare</p>
               <h2 className="max-w-3xl text-3xl font-medium leading-tight sm:text-4xl">{block.heading}</h2>
             </div>
             <div className="grid gap-3 sm:hidden">

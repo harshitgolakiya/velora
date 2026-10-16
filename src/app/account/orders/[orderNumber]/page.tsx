@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 function statusClass(complete: boolean) {
   return complete
-    ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
+    ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
     : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)]";
 }
 
@@ -62,7 +62,7 @@ export default async function AccountOrderDetailPage({
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
           <div className="storefront-framed p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent-text)]">
               Order {order.orderNumber}
             </p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -88,7 +88,7 @@ export default async function AccountOrderDetailPage({
 
           <section className="storefront-framed">
             <div className="flex items-center gap-3 border-b border-[var(--border)] p-5">
-              <PackageCheck className="size-5 text-[var(--accent)]" />
+              <PackageCheck className="size-5 text-[var(--accent-text)]" />
               <h2 className="text-xl font-semibold">Items</h2>
             </div>
             <div className="divide-y divide-[var(--border)]">
@@ -111,7 +111,7 @@ export default async function AccountOrderDetailPage({
 
           <section className="storefront-framed p-5">
             <div className="flex items-center gap-3">
-              <Truck className="size-5 text-[var(--accent)]" />
+              <Truck className="size-5 text-[var(--accent-text)]" />
               <h2 className="text-xl font-semibold">Status timeline</h2>
             </div>
             <ol className="mt-6 grid gap-4">
@@ -147,7 +147,7 @@ export default async function AccountOrderDetailPage({
                       <p className="mt-1 text-xs text-[var(--muted)]">{new Intl.DateTimeFormat("en-AE", { dateStyle: "medium", timeStyle: "short" }).format(refund.createdAt)} · {refund.status.toLowerCase()}</p>
                       {refund.note ? <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{refund.note}</p> : null}
                     </div>
-                    <span className="font-semibold text-red-600">-{formatAed(Number(refund.amount))}</span>
+                    <span className="font-semibold text-[var(--sale)]">-{formatAed(Number(refund.amount))}</span>
                   </div>
                 ))}
               </div>
@@ -166,7 +166,7 @@ export default async function AccountOrderDetailPage({
                 <span className="text-[var(--foreground)]">{formatAed(Number(order.subtotal))}</span>
               </div>
               {Number(order.discountTotal) > 0 ? (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-[var(--accent-text)]">
                   <span>Discount</span>
                   <span>-{formatAed(Number(order.discountTotal))}</span>
                 </div>
@@ -182,7 +182,7 @@ export default async function AccountOrderDetailPage({
                 <span>{formatAed(Number(order.total))}</span>
               </div>
               {order.refundAmount ? (
-                <div className="flex justify-between text-red-600">
+                <div className="flex justify-between text-[var(--sale)]">
                   <span>Refunded</span>
                   <span>{formatAed(Number(order.refundAmount))}</span>
                 </div>

@@ -110,10 +110,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="mt-10 scroll-mt-28 sm:mt-14 lg:mt-16">
         {recommendationSettings.enabled ? (
           <>
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-              Complete the look
-            </p>
-            <h2 className="mt-2 text-center text-4xl font-medium">You may also like</h2>
+            <p className="eyebrow text-center">Complete the look</p>
+            <h2 className="display-lg mt-3 text-center">You may also like</h2>
             <DeferredRecommendationRail
               sourceProductId={product.id}
               products={

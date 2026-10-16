@@ -14,7 +14,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
   return (
     <Link
       href={localizedPath(pathname, nextLocale)}
-      className={`inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] transition hover:text-[var(--accent)] ${className}`}
+      className={`inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] transition hover:text-[var(--accent-text)] ${className}`}
       aria-label={locale === "ar" ? "Switch to English" : "Switch to Arabic"}
       hrefLang={nextLocale}
     >

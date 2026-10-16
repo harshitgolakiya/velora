@@ -17,12 +17,12 @@ export function AccountDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-[var(--scrim)] backdrop-blur-sm" />
         <Dialog.Content className="storefront-modal storefront-panel fixed left-1/2 top-1/2 z-[120] max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-xl overflow-y-auto bg-[var(--surface)] p-0 text-[var(--foreground)] outline-none">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4 sm:px-6">
             <div className="min-w-0">
-              <Dialog.Title className="flex items-center gap-2 font-serif text-2xl font-medium">
-                <UserRound className="size-5 text-[var(--accent)]" />
+              <Dialog.Title className="display-md flex items-center gap-2">
+                <UserRound className="size-5 text-[var(--accent-text)]" />
                 Account access
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-sm leading-6 text-[var(--muted)]">
@@ -44,7 +44,7 @@ export function AccountDialog({
             <Dialog.Close asChild>
               <Link
                 href={accountHref}
-                className="storefront-action mt-4 inline-flex min-h-10 items-center text-sm font-semibold underline underline-offset-4 hover:text-[var(--accent)]"
+                className="storefront-action mt-4 inline-flex min-h-10 items-center text-sm font-semibold underline underline-offset-4 hover:text-[var(--accent-text)]"
               >
                 Open full account page
               </Link>

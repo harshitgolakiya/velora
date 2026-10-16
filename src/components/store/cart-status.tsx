@@ -62,8 +62,8 @@ export function ReservationTimer({
       role={expired ? "alert" : "status"}
       className={`border-b px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider transition-colors motion-reduce:transition-none ${
         expired
-          ? "border-red-500/20 bg-red-500/10 text-red-600"
-          : "border-[var(--border)] bg-[var(--hover)] text-[var(--accent)]"
+          ? "border-red-500/20 bg-red-500/10 text-[var(--sale)]"
+          : "border-[var(--border)] bg-[var(--hover)] text-[var(--accent-text)]"
       }`}
     >
       {expired
@@ -88,8 +88,8 @@ export function CartRecoveryBanner() {
         role="alert"
         className={`border-b px-5 py-3 text-xs ${
           errorLabel.tone === "warning"
-            ? "border-amber-500/20 bg-amber-500/10 text-amber-700"
-            : "border-red-500/20 bg-red-500/10 text-red-600"
+            ? "border-[var(--sale)]/20 bg-amber-500/10 text-[var(--sale)]"
+            : "border-red-500/20 bg-red-500/10 text-[var(--sale)]"
         }`}
       >
         <p className="font-semibold">{errorLabel.title}</p>
@@ -114,7 +114,7 @@ export function CartRecoveryBanner() {
   }
 
   return (
-    <div role="status" className="border-b border-emerald-500/20 bg-emerald-500/10 px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-emerald-700">
+    <div role="status" className="border-b border-[var(--accent-soft)] bg-[var(--accent-soft)] px-5 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-[var(--accent-text)]">
       {copy.cartRecovered}
     </div>
   );

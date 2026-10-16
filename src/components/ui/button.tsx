@@ -1,22 +1,40 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+type ButtonVariant = "primary" | "secondary" | "soft" | "ghost" | "link" | "onPhoto";
+type ButtonSize = "sm" | "md" | "lg";
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost" | "dark";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  block?: boolean;
 };
 
-export function Button({ className, variant = "primary", ...props }: ButtonProps) {
-  return (
-    <button
-      className={cn(
-        "storefront-action inline-flex h-11 items-center justify-center gap-2 border px-5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none",
-        variant === "primary" && "border-[var(--accent)] bg-[var(--accent)] text-[#17262D] hover:bg-[var(--foreground)] hover:text-[var(--background)]",
-        variant === "secondary" && "border-[var(--border)] bg-transparent text-[var(--foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
-        variant === "ghost" && "border-transparent bg-transparent text-[var(--foreground)] hover:bg-[var(--hover)]",
-        variant === "dark" && "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D]",
-        className,
-      )}
-      {...props}
-    />
-  );
+const variantClass: Record<ButtonVariant, string> = {
+  primary: "btn-primary",
+  secondary: "btn-secondary",
+  soft: "btn-soft",
+  ghost: "btn-ghost",
+  link: "btn-link",
+  onPhoto: "btn-on-photo",
+};
+
+const sizeClass: Record<ButtonSize, string> = {
+  sm: "btn-sm",
+  md: "",
+  lg: "btn-lg",
+};
+
+/** Shared class builder so links can look exactly like buttons. */
+export function buttonClasses({
+  variant = "primary",
+  size = "md",
+  block = false,
+  className,
+}: { variant?: ButtonVariant; size?: ButtonSize; block?: boolean; className?: string } = {}) {
+  return cn("btn", variantClass[variant], sizeClass[size], block && "btn-block", className);
+}
+
+export function Button({ className, variant = "primary", size = "md", block = false, type = "button", ...props }: ButtonProps) {
+  return <button type={type} className={buttonClasses({ variant, size, block, className })} {...props} />;
 }

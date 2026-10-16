@@ -36,18 +36,15 @@ export function ProductGalleryViewer({
 }) {
   const locale = localeFromPathname(usePathname());
   const copy = catalogCopy[locale];
+  const PrevIcon = locale === "ar" ? ChevronRight : ChevronLeft;
+  const NextIcon = locale === "ar" ? ChevronLeft : ChevronRight;
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[100] bg-black/82 backdrop-blur-sm" />
-        <Dialog.Content
-          aria-label="Product media gallery"
-          className="storefront-gallery-viewer fixed inset-0 z-[120] overflow-auto bg-[var(--background)]/96"
-        >
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[100] bg-[var(--scrim)] backdrop-blur-sm" />
+        <Dialog.Content aria-label="Product media gallery" className="storefront-gallery-viewer fixed inset-0 z-[120] overflow-auto bg-[var(--background)]">
           <Dialog.Title className="sr-only">{productName} full-screen image</Dialog.Title>
-          <Dialog.Description className="sr-only">
-            Use the arrow controls or keyboard arrow keys to browse product images.
-          </Dialog.Description>
+          <Dialog.Description className="sr-only">Use the arrow controls or keyboard arrow keys to browse product images.</Dialog.Description>
           <div className="fixed end-4 top-4 z-[103] flex gap-2">
             <button
               type="button"
@@ -56,16 +53,12 @@ export function ProductGalleryViewer({
               }}
               aria-label={canSourceZoom ? (zoomed ? "Zoom out" : "Zoom in") : "Source image is not large enough to zoom"}
               disabled={!canSourceZoom}
-              className="storefront-action storefront-light-control grid size-11 place-items-center border shadow disabled:cursor-not-allowed disabled:opacity-45"
+              className="btn btn-soft btn-icon btn-round"
             >
               {zoomed ? <ZoomOut className="size-5" /> : <ZoomIn className="size-5" />}
             </button>
             <Dialog.Close asChild>
-              <button
-                type="button"
-                aria-label="Close full-screen image"
-                className="storefront-action storefront-light-control grid size-11 place-items-center border shadow"
-              >
+              <button type="button" aria-label="Close full-screen image" className="btn btn-soft btn-icon btn-round">
                 <X className="size-5" />
               </button>
             </Dialog.Close>
@@ -79,9 +72,8 @@ export function ProductGalleryViewer({
               if (canSourceZoom) setZoomed((value) => !value);
             }}
           >
-            <div className="absolute inset-4 bg-[#E6E4DE] shadow-[0_24px_80px_rgba(0,0,0,0.24)] sm:inset-8" aria-hidden="true" />
             <Image
-              src={activeMedia?.url ?? "/images/activewear-demo/active-duo.jpg"}
+              src={activeMedia?.url ?? "/images/campaign/hero-courtyard.webp"}
               alt={activeMedia?.altText ?? `${productName} full-screen`}
               fill
               sizes={activeImageWidth ? `${activeImageWidth}px` : zoomed ? "150vw" : "100vw"}
@@ -96,9 +88,9 @@ export function ProductGalleryViewer({
                 previous();
               }}
               aria-label={copy.previousMedia}
-              className="storefront-action storefront-light-control absolute left-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
+              className="btn btn-soft btn-icon btn-round absolute start-4 top-1/2 z-10 -translate-y-1/2"
             >
-              {locale === "ar" ? <ChevronRight className="size-5" /> : <ChevronLeft className="size-5" />}
+              <PrevIcon className="size-5" />
             </button>
             <button
               type="button"
@@ -107,16 +99,12 @@ export function ProductGalleryViewer({
                 next();
               }}
               aria-label={copy.nextMedia}
-              className="storefront-action storefront-light-control absolute right-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition motion-reduce:transition-none"
+              className="btn btn-soft btn-icon btn-round absolute end-4 top-1/2 z-10 -translate-y-1/2"
             >
-              {locale === "ar" ? <ChevronLeft className="size-5" /> : <ChevronRight className="size-5" />}
+              <NextIcon className="size-5" />
             </button>
           </div>
-          {resolutionLabel && !canSourceZoom ? (
-            <p className="storefront-light-chip fixed bottom-4 left-1/2 z-[103] -translate-x-1/2 px-4 py-2 text-center text-xs font-medium shadow">
-              {resolutionLabel}
-            </p>
-          ) : null}
+          {resolutionLabel && !canSourceZoom ? <p className="badge fixed bottom-4 left-1/2 z-[103] -translate-x-1/2">{resolutionLabel}</p> : null}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

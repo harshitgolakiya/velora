@@ -150,9 +150,9 @@ export default async function CheckoutSuccessPage({
     return (
       <section className="storefront-container-compact py-24 text-center">
         <div className="storefront-action mx-auto grid size-16 place-items-center border border-[var(--border)]">
-          <Clock3 className="size-7 text-[var(--accent)]" />
+          <Clock3 className="size-7 text-[var(--accent-text)]" />
         </div>
-        <h1 className="mt-6 text-2xl font-semibold sm:text-3xl">
+        <h1 className="display-md mt-6">
           Order not verified yet
         </h1>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[var(--muted)]">
@@ -162,13 +162,13 @@ export default async function CheckoutSuccessPage({
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/track-order"
-            className="storefront-action border border-[var(--border)] px-6 py-3 text-sm font-semibold transition hover:bg-[var(--hover)] motion-reduce:transition-none"
+            className="btn btn-secondary"
           >
             Track an order
           </Link>
           <Link
             href="/contact"
-            className="storefront-action bg-[var(--foreground)] px-6 py-3 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none"
+            className="btn btn-primary"
           >
             Contact support
           </Link>
@@ -240,13 +240,13 @@ export default async function CheckoutSuccessPage({
             {isConfirmed ? (
               <CheckCircle2 className="size-10 text-emerald-500" />
             ) : (
-              <Clock3 className="size-10 text-[var(--accent)]" />
+              <Clock3 className="size-10 text-[var(--accent-text)]" />
             )}
           </div>
-          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent-text)]">
             Order {order.orderNumber}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
+          <h1 className="display-lg mt-2">
             {paid
               ? "Payment confirmed!"
               : cashOnDelivery
@@ -271,9 +271,9 @@ export default async function CheckoutSuccessPage({
             {nextSteps.map((step, i) => (
               <div
                 key={i}
-                className="storefront-framed flex gap-4 p-5"
+                className="card flex gap-4 p-5"
               >
-                <div className="storefront-action mt-0.5 grid size-9 shrink-0 place-items-center bg-[var(--card)] text-[var(--accent)]">
+                <div className="storefront-action mt-0.5 grid size-9 shrink-0 place-items-center bg-[var(--card)] text-[var(--accent-text)]">
                   {step.icon}
                 </div>
                 <div>
@@ -286,9 +286,9 @@ export default async function CheckoutSuccessPage({
         </div>
 
         {/* ── Order summary ────────────────────────────────────────────── */}
-        <div className="storefront-framed mt-8">
+        <div className="card mt-8">
           <div className="flex items-center gap-3 border-b border-[var(--border)] px-5 py-4">
-            <Package className="size-5 text-[var(--accent)]" />
+            <Package className="size-5 text-[var(--accent-text)]" />
             <div>
               <p className="text-sm font-semibold">Order summary</p>
               <p className="text-xs text-[var(--muted)]">
@@ -317,13 +317,13 @@ export default async function CheckoutSuccessPage({
               <span className="text-[var(--foreground)]">{formatAed(Number(order.subtotal))}</span>
             </div>
             {Number(order.discountTotal) > 0 ? (
-              <div className="flex justify-between text-emerald-600">
+              <div className="flex justify-between text-[var(--accent-text)]">
                 <span>Discount</span>
                 <span>-{formatAed(Number(order.discountTotal))}</span>
               </div>
             ) : null}
             {Number(order.giftCardTotal) > 0 ? (
-              <div className="flex justify-between text-emerald-600">
+              <div className="flex justify-between text-[var(--accent-text)]">
                 <span>Gift card</span>
                 <span>-{formatAed(Number(order.giftCardTotal))}</span>
               </div>
@@ -343,8 +343,8 @@ export default async function CheckoutSuccessPage({
 
         {/* ── Delivery address ─────────────────────────────────────────── */}
         {order.shippingAddress ? (
-          <div className="storefront-framed mt-4 flex gap-4 px-5 py-4">
-            <MapPin className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
+          <div className="card mt-4 flex gap-4 px-5 py-4">
+            <MapPin className="mt-0.5 size-5 shrink-0 text-[var(--accent-text)]" />
             <div className="text-sm">
               <p className="font-semibold">Delivery address</p>
               <p className="mt-1.5 leading-6 text-[var(--muted)]">
@@ -360,9 +360,9 @@ export default async function CheckoutSuccessPage({
 
         {/* ── Shipment tracking ─────────────────────────────────────────── */}
         {order.shipment?.trackingNo ? (
-          <div className="storefront-framed mt-4 flex items-center justify-between gap-4 px-5 py-4">
+          <div className="card mt-4 flex items-center justify-between gap-4 px-5 py-4">
             <div className="flex gap-3">
-              <Truck className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
+              <Truck className="mt-0.5 size-5 shrink-0 text-[var(--accent-text)]" />
               <div>
                 <p className="text-sm font-semibold">Tracking number</p>
                 <p className="mt-0.5 font-mono text-xs text-[var(--muted)]">
@@ -380,9 +380,9 @@ export default async function CheckoutSuccessPage({
         ) : null}
 
         {/* ── Support strip ────────────────────────────────────────────── */}
-        <div className="storefront-framed mt-8 p-5">
+        <div className="card mt-8 p-5">
           <div className="flex items-center gap-3">
-            <HeadphonesIcon className="size-5 shrink-0 text-[var(--accent)]" />
+            <HeadphonesIcon className="size-5 shrink-0 text-[var(--accent-text)]" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">Need help with your order?</p>
               <p className="mt-0.5 text-xs text-[var(--muted)]">
@@ -402,14 +402,14 @@ export default async function CheckoutSuccessPage({
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/track-order"
-            className="storefront-action flex h-12 items-center justify-center gap-2 border border-[var(--border)] px-6 text-sm font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--hover)] motion-reduce:transition-none"
+            className="btn btn-secondary"
           >
             <Truck className="size-4" />
             Track order
           </Link>
           <Link
             href="/shop"
-            className="storefront-action flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none"
+            className="btn btn-primary"
           >
             Continue shopping
             <ArrowRight className="size-4" />

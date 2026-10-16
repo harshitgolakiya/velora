@@ -26,7 +26,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={() => reset()}
-            className="mt-8 inline-flex h-11 items-center justify-center bg-[var(--accent)] px-6 text-sm font-medium text-[var(--background)] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none"
+            className="btn btn-primary mt-8"
           >
             Try again
           </button>

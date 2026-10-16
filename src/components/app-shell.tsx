@@ -45,7 +45,7 @@ export function AppShell({
       { label: String(copy.payment), done: isSuccess, active: isSuccess },
     ];
     return (
-      <>
+      <div className="storefront-root">
         <LocaleDocument />
         <CartReservationSync />
         <header className="border-b border-[var(--border)] bg-[var(--surface)]">
@@ -61,7 +61,7 @@ export function AppShell({
                 {copy.cart}
               </Link>
             )}
-            <Link href={localize("/")} className="text-xl font-semibold tracking-[0.18em] text-[var(--accent)]">
+            <Link href={localize("/")} className="font-serif text-2xl font-medium tracking-[0.04em] text-[var(--foreground)]">
               Velora
             </Link>
             <span className="flex items-center gap-1.5 text-xs text-[var(--muted)]">
@@ -79,12 +79,12 @@ export function AppShell({
                     step.active
                       ? "text-[var(--foreground)]"
                       : step.done
-                        ? "text-[var(--accent)]"
+                        ? "text-[var(--accent-text)]"
                         : "text-[var(--muted)]"
                   }`}>
                     <span className={`grid size-5 shrink-0 place-items-center text-[10px] font-semibold transition-colors motion-reduce:transition-none ${
                       step.done && !step.active
-                        ? "bg-[var(--accent)] text-[var(--background)]"
+                        ? "bg-[var(--accent)] text-[var(--on-accent)]"
                         : step.active
                           ? "border-2 border-[var(--foreground)]"
                           : "border border-[var(--border)] text-[var(--muted)]"
@@ -104,12 +104,12 @@ export function AppShell({
         <main className="min-h-[calc(100dvh-5.5rem)] bg-[var(--background)]">
           <PageTransition>{children}</PageTransition>
         </main>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="storefront-root">
       <Header globalContent={globalContent} />
       <LocaleDocument />
       {syncCartImmediately ? <CartReservationSync /> : null}
@@ -118,6 +118,6 @@ export function AppShell({
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer globalContent={globalContent} />
-    </>
+    </div>
   );
 }

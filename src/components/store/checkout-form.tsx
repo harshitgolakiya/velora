@@ -130,7 +130,7 @@ function Field({
       </label>
       {children}
       {error ? (
-        <span id={errorId} className="flex items-center gap-1.5 text-xs text-red-500" role="alert">
+        <span id={errorId} className="flex items-center gap-1.5 text-xs text-[var(--sale)]" role="alert">
           <AlertCircle className="size-3.5 shrink-0" />
           {error}
         </span>
@@ -151,9 +151,9 @@ function SectionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden storefront-framed">
+    <section className="card overflow-hidden">
       <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.1em]">{title}</h2>
+        <h2 className="eyebrow eyebrow-muted">{title}</h2>
         {action}
       </div>
       <div className="p-5">{children}</div>
@@ -166,7 +166,7 @@ const checkoutStages: CheckoutStage[] = ["contact", "delivery", "payment", "revi
 
 function StageSummary({ title, summary, editLabel, onEdit }: { title: string; summary: string; editLabel: string; onEdit: () => void }) {
   return (
-    <section className="storefront-framed flex items-center justify-between gap-4 p-4 sm:p-5">
+    <section className="card flex items-center justify-between gap-4 p-4 sm:p-5">
       <div className="min-w-0">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">{title}</p>
         <p className="mt-1 truncate text-sm font-medium">{summary}</p>
@@ -527,15 +527,14 @@ export function CheckoutForm({
     }
   };
 
-  const inputClass =
-    "storefront-action h-12 w-full border border-[var(--border)] bg-[var(--background)] px-3.5 text-sm outline-none transition focus:border-[var(--foreground)] placeholder:text-[var(--muted)] motion-reduce:transition-none";
+  const inputClass = "field";
 
   if (!hydrated) {
     return (
       <div className="mx-auto grid min-h-[42vh] max-w-xl place-items-center px-4 text-center" role="status">
         <div>
-          <span className="mx-auto grid size-14 place-items-center rounded-full storefront-framed">
-            <PackageCheck className="size-6 text-[var(--accent)]" />
+          <span className="mx-auto grid size-14 place-items-center rounded-full card">
+            <PackageCheck className="size-6 text-[var(--accent-text)]" />
           </span>
           <h1 className="mt-5 text-2xl font-semibold">Loading checkout</h1>
         </div>
@@ -547,16 +546,16 @@ export function CheckoutForm({
     return (
       <div className="mx-auto grid min-h-[42vh] max-w-xl place-items-center px-4 text-center">
         <div>
-          <span className="mx-auto grid size-14 place-items-center rounded-full storefront-framed">
-            <PackageCheck className="size-6 text-[var(--accent)]" />
+          <span className="mx-auto grid size-14 place-items-center rounded-full card">
+            <PackageCheck className="size-6 text-[var(--accent-text)]" />
           </span>
-          <h1 className="mt-5 text-2xl font-semibold sm:text-3xl">{copy.yourCartEmpty}</h1>
+          <h1 className="display-md mt-5">{copy.yourCartEmpty}</h1>
           <p className="mt-3 text-sm text-[var(--muted)]">
             {copy.emptyCartBody}
           </p>
           <Link
             href={localizedPath("/shop", locale)}
-            className="storefront-action mt-7 inline-flex h-12 items-center border border-[var(--accent)] bg-[var(--accent)] px-8 text-sm font-semibold uppercase tracking-[0.1em] text-[#17262D] transition hover:brightness-95"
+            className="btn btn-primary mt-7"
           >
             {copy.browseStore}
           </Link>
@@ -577,7 +576,7 @@ export function CheckoutForm({
         })}
         noValidate
       >
-        <nav aria-label="Checkout progress" className="storefront-framed p-3 sm:p-4">
+        <nav aria-label="Checkout progress" className="card p-3 sm:p-4">
           <ol className="grid grid-cols-4 gap-1 sm:gap-2">
             {checkoutStages.map((item, index) => {
               const completed = index < stageIndex;
@@ -589,7 +588,7 @@ export function CheckoutForm({
                     disabled={index > stageIndex}
                     onClick={() => setStage(item)}
                     aria-current={current ? "step" : undefined}
-                    className={`storefront-action flex min-h-12 w-full flex-col items-center justify-center gap-1 border px-1 text-[10px] font-semibold uppercase tracking-[0.08em] sm:flex-row sm:text-xs ${current ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]" : completed ? "border-[var(--accent)] bg-[var(--hover)]" : "border-[var(--border)] text-[var(--muted)]"}`}
+                    className={`storefront-action flex min-h-12 w-full flex-col items-center justify-center gap-1 border px-1 text-[10px] font-semibold uppercase tracking-[0.08em] sm:flex-row sm:text-xs ${current ? "border-[var(--foreground)] bg-[var(--accent)] text-[var(--on-accent)]" : completed ? "border-[var(--accent)] bg-[var(--hover)]" : "border-[var(--border)] text-[var(--muted)]"}`}
                   >
                     <span className="grid size-5 place-items-center rounded-full border border-current text-[10px]">{completed ? <Check className="size-3" /> : index + 1}</span>
                     {stageLabels[item]}
@@ -635,7 +634,7 @@ export function CheckoutForm({
             </Field>
           </div>
         </SectionCard>
-          <Button type="button" onClick={continueFromContact} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.delivery}</Button>
+          <Button type="button" onClick={continueFromContact} size="lg" block>{stageActions.delivery}</Button>
         </div>
 
         {/* Delivery address */}
@@ -818,7 +817,7 @@ export function CheckoutForm({
             })}
           </div>
         </SectionCard>
-          <Button type="button" onClick={continueFromDelivery} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.payment}</Button>
+          <Button type="button" onClick={continueFromDelivery} size="lg" block>{stageActions.payment}</Button>
         </div>
 
         {/* Payment method */}
@@ -868,7 +867,7 @@ export function CheckoutForm({
                     type="button"
                     disabled={expressCheckoutDisabled}
                     onClick={submitExpressCheckout}
-                    className="flex h-12 items-center justify-center gap-2 border border-[var(--foreground)] bg-[var(--foreground)] px-4 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+                    className="btn btn-secondary btn-block normal-case tracking-normal"
                   >
                     <LockKeyhole className="size-4" />
                     {wallet === "apple_pay" ? copy.applePay : copy.googlePay}
@@ -878,7 +877,7 @@ export function CheckoutForm({
             </div>
           ) : null}
         </SectionCard>
-          <Button type="button" onClick={continueFromPayment} className="h-12 w-full text-sm font-semibold uppercase tracking-[0.1em]">{stageActions.review}</Button>
+          <Button type="button" onClick={continueFromPayment} size="lg" block>{stageActions.review}</Button>
         </div>
 
         {/* Alerts */}
@@ -887,8 +886,8 @@ export function CheckoutForm({
           <div
             className={`flex items-start gap-3 border p-4 text-sm ${
               reservationErrorLabel?.tone === "warning"
-                ? "border-amber-500/25 bg-amber-500/8 text-amber-800"
-                : "border-red-500/20 bg-red-500/8 text-red-600"
+                ? "border-[var(--sale)]/25 bg-amber-500/8 text-[var(--sale)]"
+                : "border-red-500/20 bg-red-500/8 text-[var(--sale)]"
             }`}
             role="alert"
           >
@@ -906,7 +905,7 @@ export function CheckoutForm({
         ) : null}
         {cancelled ? (
           <div
-            className="flex items-start gap-3 border border-amber-500/25 bg-amber-500/8 p-4 text-sm text-amber-800"
+            className="flex items-start gap-3 border border-[var(--sale)]/25 bg-amber-500/8 p-4 text-sm text-[var(--sale)]"
             role="status"
           >
             <RefreshCcw className="mt-0.5 size-4 shrink-0" />
@@ -920,7 +919,7 @@ export function CheckoutForm({
         ) : null}
         {checkoutError ? (
           <div
-            className="flex items-start gap-3 border border-red-500/20 bg-red-500/8 p-4 text-sm text-red-600"
+            className="flex items-start gap-3 border border-red-500/20 bg-red-500/8 p-4 text-sm text-[var(--sale)]"
             role="alert"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -955,7 +954,7 @@ export function CheckoutForm({
           </div>
         ) : null}
         {checkoutMessage ? (
-          <p className="text-sm text-[var(--accent)]" role="status">{checkoutMessage}</p>
+          <p className="text-sm text-[var(--accent-text)]" role="status">{checkoutMessage}</p>
         ) : null}
 
         {/* Submit CTA */}
@@ -995,7 +994,7 @@ export function CheckoutForm({
 
       {/* ── Right column: order summary ───────────────────────── */}
       <aside className="order-first space-y-4 lg:order-none lg:sticky lg:top-28">
-        <button type="button" onClick={() => setOrderSummaryOpen((open) => !open)} aria-expanded={orderSummaryOpen} className="storefront-framed flex min-h-12 w-full items-center justify-between px-4 text-sm font-semibold lg:hidden">
+        <button type="button" onClick={() => setOrderSummaryOpen((open) => !open)} aria-expanded={orderSummaryOpen} className="card flex min-h-12 w-full items-center justify-between px-4 text-sm font-semibold lg:hidden">
           <span>{copy.orderSummary}</span>
           <span>{formatAed(total, locale)} · {orderSummaryOpen ? stageActions.hide : stageActions.show}</span>
         </button>
@@ -1003,7 +1002,7 @@ export function CheckoutForm({
         {/* Cart items */}
         <div className="storefront-framed">
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.1em]">{copy.orderSummary}</h2>
+            <h2 className="eyebrow eyebrow-muted">{copy.orderSummary}</h2>
             <Link href={localizedPath("/cart", locale)} className="text-xs font-medium underline text-[var(--muted)] hover:text-[var(--foreground)]">
               {copy.editCart}
             </Link>
@@ -1022,7 +1021,7 @@ export function CheckoutForm({
                     sizes="64px"
                     className="object-cover"
                   />
-                  <span className="absolute right-1 top-1 grid size-5 place-items-center rounded-full bg-[var(--accent)] text-[10px] font-semibold text-[#17262D] shadow-sm">
+                  <span className="absolute right-1 top-1 grid size-5 place-items-center rounded-full bg-[var(--accent)] text-[10px] font-semibold text-[var(--on-accent)] shadow-sm">
                     {line.quantity}
                   </span>
                 </div>
@@ -1041,7 +1040,7 @@ export function CheckoutForm({
         </div>
 
         {/* Coupon */}
-        <details className="storefront-framed p-5">
+        <details className="card p-5">
           <summary className="storefront-action cursor-pointer text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{copy.couponCode}</summary>
           <label
             htmlFor="checkout-coupon"
@@ -1061,7 +1060,7 @@ export function CheckoutForm({
               type="button"
               disabled={!couponCode.trim() || applyingCoupon}
               onClick={applyCoupon}
-              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
+              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--accent-strong)] hover:text-[var(--on-accent)] disabled:opacity-40 motion-reduce:transition-none"
             >
               {applyingCoupon ? "..." : copy.apply}
             </button>
@@ -1070,7 +1069,7 @@ export function CheckoutForm({
             <p
               role={discount > 0 || freeShipping ? "status" : "alert"}
               className={`mt-2.5 flex items-center gap-1.5 text-xs ${
-                discount > 0 || freeShipping ? "text-emerald-600" : "text-red-500"
+                discount > 0 || freeShipping ? "text-[var(--accent-text)]" : "text-[var(--sale)]"
               }`}
             >
               {discount > 0 || freeShipping ? (
@@ -1084,7 +1083,7 @@ export function CheckoutForm({
         </details>
 
         {/* Gift card */}
-        <details className="storefront-framed p-5">
+        <details className="card p-5">
           <summary className="storefront-action cursor-pointer text-xs font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">{copy.giftCardCode}</summary>
           <label
             htmlFor="checkout-gift-card"
@@ -1107,7 +1106,7 @@ export function CheckoutForm({
               type="button"
               disabled={!giftCardCode.trim() || applyingGiftCard || payableBeforeGiftCard <= 0}
               onClick={applyGiftCard}
-              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] disabled:opacity-40 motion-reduce:transition-none"
+              className="storefront-action h-11 border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:bg-[var(--accent-strong)] hover:text-[var(--on-accent)] disabled:opacity-40 motion-reduce:transition-none"
             >
               {applyingGiftCard ? "..." : copy.apply}
             </button>
@@ -1116,7 +1115,7 @@ export function CheckoutForm({
             <p
               role={giftCardAmount > 0 ? "status" : "alert"}
               className={`mt-2.5 flex items-center gap-1.5 text-xs ${
-                giftCardAmount > 0 ? "text-emerald-600" : "text-red-500"
+                giftCardAmount > 0 ? "text-[var(--accent-text)]" : "text-[var(--sale)]"
               }`}
             >
               {appliedGiftCardAmount > 0 ? (
@@ -1130,19 +1129,19 @@ export function CheckoutForm({
         </details>
 
         {/* Totals */}
-        <div className="storefront-framed p-5 space-y-2.5 text-sm">
+        <div className="card p-5 space-y-2.5 text-sm">
           <div className="flex justify-between text-[var(--muted)]">
             <span>{copy.subtotal}</span>
             <span className="text-[var(--foreground)]">{formatAed(subtotal, locale)}</span>
           </div>
           {discount > 0 ? (
-            <div className="flex justify-between text-emerald-600">
+            <div className="flex justify-between text-[var(--accent-text)]">
               <span>{copy.discount}</span>
               <span>-{formatAed(discount, locale)}</span>
             </div>
           ) : null}
           {appliedGiftCardAmount > 0 ? (
-            <div className="flex justify-between text-emerald-600">
+            <div className="flex justify-between text-[var(--accent-text)]">
               <span>{copy.giftCard}</span>
               <span>-{formatAed(appliedGiftCardAmount, locale)}</span>
             </div>

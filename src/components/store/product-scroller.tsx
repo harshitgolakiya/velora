@@ -11,12 +11,14 @@ import { useLocalizedHref } from "@/lib/use-localized-href";
 export function ProductScroller({
   title,
   subtitle,
+  body,
   ctaHref,
   ctaLabel,
   children,
 }: {
   title: string;
   subtitle?: string;
+  body?: string;
   ctaHref: string;
   ctaLabel: string;
   children: ReactNode;
@@ -24,12 +26,13 @@ export function ProductScroller({
   const locale = localeFromPathname(usePathname());
   const copy = catalogCopy[locale];
   const localize = useLocalizedHref();
+  const rtl = locale === "ar";
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
-    direction: locale === "ar" ? "rtl" : "ltr",
+    direction: rtl ? "rtl" : "ltr",
     containScroll: "trimSnaps",
-    dragFree: false,
-    skipSnaps: false,
+    dragFree: true,
+    duration: 24,
   });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -45,16 +48,10 @@ export function ProductScroller({
   useEffect(() => {
     if (!emblaApi) return;
     const frame = window.requestAnimationFrame(updateScrollState);
-    emblaApi
-      .on("select", updateScrollState)
-      .on("scroll", updateScrollState)
-      .on("reInit", updateScrollState);
+    emblaApi.on("select", updateScrollState).on("scroll", updateScrollState).on("reInit", updateScrollState);
     return () => {
       window.cancelAnimationFrame(frame);
-      emblaApi
-        .off("select", updateScrollState)
-        .off("scroll", updateScrollState)
-        .off("reInit", updateScrollState);
+      emblaApi.off("select", updateScrollState).off("scroll", updateScrollState).off("reInit", updateScrollState);
     };
   }, [emblaApi, updateScrollState]);
 
@@ -67,61 +64,34 @@ export function ProductScroller({
     return () => window.cancelAnimationFrame(frame);
   }, [children, emblaApi, updateScrollState]);
 
-  function scrollProducts(direction: -1 | 1) {
-    if (!emblaApi) return;
-    if (direction < 0) emblaApi.scrollPrev();
-    else emblaApi.scrollNext();
-  }
+  const PrevIcon = rtl ? ChevronRight : ChevronLeft;
+  const NextIcon = rtl ? ChevronLeft : ChevronRight;
 
   return (
     <div>
-      <div className="mb-10 border-t border-[var(--border)] pt-6 sm:mb-14 sm:pt-7">
-        <div className="flex items-center justify-between gap-6">
-          {subtitle ? (
-            <p className="text-[10px] font-semibold uppercase leading-none tracking-[0.22em] text-[var(--muted)]">{subtitle}</p>
-          ) : null}
-          <Link href={localize(ctaHref)} className="storefront-action inline-flex min-h-10 items-center gap-2 text-xs font-semibold uppercase leading-none tracking-[0.14em]">
-            {ctaLabel} <ArrowRight className={`size-4 ${locale === "ar" ? "rotate-180" : ""}`} />
+      <div className="section-head">
+        <div className="max-w-2xl">
+          {subtitle ? <p className="eyebrow">{subtitle}</p> : null}
+          <h2 className="display-lg mt-3">{title}</h2>
+          {body ? <p className="mt-4 max-w-xl text-[15px] leading-7 text-[var(--muted)]">{body}</p> : null}
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href={localize(ctaHref)} className="btn btn-link btn-sm me-2">
+            {ctaLabel} <ArrowRight className="size-4 rtl:rotate-180" />
           </Link>
-        </div>
-        <div className="mt-4 grid gap-6 pb-2 sm:mt-5 sm:pb-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-8">
-          <h2 className="min-w-0 break-words pb-1 font-serif text-4xl leading-[1.08] sm:text-6xl sm:leading-[1.06]">{title}</h2>
-          <div className="flex shrink-0 justify-end gap-2">
-            <button
-              type="button"
-              aria-label={copy.previousProducts}
-              onClick={() => scrollProducts(-1)}
-              disabled={!canScrollPrev}
-              className="storefront-action grid size-11 place-items-center bg-[var(--surface)] text-[var(--foreground)] shadow-sm ring-1 ring-[var(--border)] transition hover:bg-[var(--hover)] disabled:cursor-default disabled:opacity-35 motion-reduce:transition-none"
-            >
-              {locale === "ar" ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
-            </button>
-            <button
-              type="button"
-              aria-label={copy.nextProducts}
-              onClick={() => scrollProducts(1)}
-              disabled={!canScrollNext}
-              className="storefront-action grid size-11 place-items-center bg-[var(--surface)] text-[var(--foreground)] shadow-sm ring-1 ring-[var(--border)] transition hover:bg-[var(--hover)] disabled:cursor-default disabled:opacity-35 motion-reduce:transition-none"
-            >
-              {locale === "ar" ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
-            </button>
-          </div>
+          <button type="button" aria-label={copy.previousProducts} onClick={() => emblaApi?.scrollPrev()} disabled={!canScrollPrev} className="btn btn-soft btn-icon btn-round">
+            <PrevIcon className="size-4" />
+          </button>
+          <button type="button" aria-label={copy.nextProducts} onClick={() => emblaApi?.scrollNext()} disabled={!canScrollNext} className="btn btn-soft btn-icon btn-round">
+            <NextIcon className="size-4" />
+          </button>
         </div>
       </div>
-      <div
-        ref={emblaRef}
-        className="homepage-product-grid overflow-hidden"
-        data-testid="product-carousel-viewport"
-      >
-        <div className="homepage-product-track flex cursor-grab gap-4 active:cursor-grabbing">
-          {children}
-        </div>
+      <div ref={emblaRef} className="homepage-product-grid overflow-hidden" data-testid="product-carousel-viewport">
+        <div className="homepage-product-track flex cursor-grab gap-4 active:cursor-grabbing">{children}</div>
       </div>
-      <div className="mt-5 h-px bg-[var(--border)]" aria-hidden="true">
-        <div
-          className="h-px bg-[var(--foreground)] transition-[width] duration-300"
-          style={{ width: `${Math.max(0.18, progress) * 100}%`, marginInlineStart: 0 }}
-        />
+      <div className="mt-6 h-px bg-[var(--border)]" aria-hidden="true">
+        <div className="h-px bg-[var(--foreground)] transition-[width] duration-300" style={{ width: `${Math.max(0.18, progress) * 100}%` }} />
       </div>
     </div>
   );

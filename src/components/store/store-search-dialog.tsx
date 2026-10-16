@@ -182,7 +182,7 @@ export function StoreSearchDialog({
         </Dialog.Trigger>
       ) : null}
       <Dialog.Portal>
-        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-[var(--scrim)] backdrop-blur-sm" />
         <Dialog.Content
           onOpenAutoFocus={(event) => {
             event.preventDefault();
@@ -258,7 +258,7 @@ export function StoreSearchDialog({
                         type="button"
                         key={term}
                         onClick={() => updateQuery(term)}
-                        className="storefront-action flex min-h-10 items-center gap-2 text-start text-sm hover:text-[var(--accent)]"
+                        className="storefront-action flex min-h-10 items-center gap-2 text-start text-sm hover:text-[var(--accent-text)]"
                       >
                         <Clock3 className="size-3.5" />
                         {term}
@@ -285,7 +285,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
+                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent-text)]"
                         >
                           {category}
                         </Link>
@@ -312,7 +312,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent)]"
+                          className="storefront-action flex min-h-10 items-center text-sm hover:text-[var(--accent-text)]"
                         >
                           {collection.name}
                         </Link>
@@ -339,7 +339,7 @@ export function StoreSearchDialog({
                               position: index,
                             });
                           }}
-                          className="storefront-action block min-h-11 rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent)]"
+                          className="storefront-action block min-h-11 rounded-none border border-transparent py-2 text-sm hover:text-[var(--accent-text)]"
                         >
                           <span className="block font-medium">{page.title}</span>
                           <span className="mt-0.5 block text-[11px] uppercase tracking-[0.12em] text-[var(--muted)]">

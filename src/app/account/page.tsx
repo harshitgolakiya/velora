@@ -36,7 +36,7 @@ export default async function AccountPage() {
     <section className="storefront-container py-10 sm:py-12">
       <div className="max-w-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">{copy.myAccount}</p>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-5xl">{session?.user ? `${copy.welcomeBack}${session.user.name ? `, ${session.user.name}` : ""}` : copy.accountTitle}</h1>
+        <h1 className="display-lg mt-3">{session?.user ? `${copy.welcomeBack}${session.user.name ? `, ${session.user.name}` : ""}` : copy.accountTitle}</h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">
           {session?.user ? copy.signedInDescription : copy.signedOutDescription}
         </p>
@@ -46,9 +46,9 @@ export default async function AccountPage() {
       ) : (
         <>
           <AccountAccess user={session?.user} socialProviders={socialProviders} />
-          <div className="storefront-framed mt-8 flex flex-col gap-5 border-[var(--border)] bg-[var(--surface)] p-5 text-[var(--foreground)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="card mt-8 flex flex-col gap-5 border-[var(--border)] bg-[var(--surface)] p-5 text-[var(--foreground)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div>
-              <p className="text-2xl font-semibold">{copy.orderTracking}</p>
+              <p className="display-md">{copy.orderTracking}</p>
               <p className="mt-2 text-sm text-[var(--muted)]">{copy.orderTrackingBody}</p>
             </div>
             <Link href={locale === "ar" ? "/ar/track-order" : "/track-order"} className="storefront-action inline-flex h-11 shrink-0 items-center justify-center border border-[var(--border)] bg-[var(--background)] px-5 text-sm font-medium text-[var(--foreground)] hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none">{copy.trackOrder}</Link>

@@ -118,9 +118,9 @@ function CartItemRow({ line }: { line: CartLine }) {
             </p>
           </div>
           {availability.allowsBackorder ? (
-            <p className="text-xs text-amber-700">{copy.availableOnBackorder}</p>
+            <p className="text-xs text-[var(--sale)]">{copy.availableOnBackorder}</p>
           ) : availability.isLowStock ? (
-            <p className="text-xs text-amber-700">{copy.onlyLeft} {availability.stock} {copy.left}</p>
+            <p className="text-xs text-[var(--sale)]">{copy.onlyLeft} {availability.stock} {copy.left}</p>
           ) : null}
         </div>
       </div>
@@ -136,7 +136,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                   onClick={() => handleVariantChange(line.size, c)}
                   style={{ backgroundColor: product.colorHex?.[c] ?? "#888888" }}
                   className={`storefront-action size-7 border-2 hover:scale-105 ${
-                    line.color === c ? "border-[var(--foreground)] ring-1 ring-[var(--foreground)]" : "border-white shadow-sm"
+                    line.color === c ? "border-[var(--foreground)] ring-1 ring-[var(--foreground)]" : "border-[var(--paper)] shadow-sm"
                   }`}
                   title={c}
                 />
@@ -158,7 +158,7 @@ function CartItemRow({ line }: { line: CartLine }) {
                     onClick={() => handleVariantChange(s, line.color)}
                     className={`storefront-action h-9 px-3 text-xs border font-semibold ${
                       line.size === s
-                        ? "border-[var(--accent)] bg-[var(--accent)] text-[#17262D]"
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
                         : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)]"
                     } disabled:opacity-30 disabled:cursor-not-allowed`}
                   >
@@ -210,13 +210,13 @@ function PageRecommendations() {
 
   return (
     <div className="mt-10 border-t border-[var(--border)] pt-8">
-      <h2 className="font-serif text-3xl">{copy.completeTheLookTitle}</h2>
+      <h2 className="display-md">{copy.completeTheLookTitle}</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">{copy.pairingsSubtitle}</p>
       
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {products.slice(0, 4).map((prod) => (
-          <div key={prod.id} className="storefront-framed storefront-action group flex flex-col hover:shadow-md">
-            <div className="storefront-product-media relative aspect-[4/3] w-full overflow-hidden">
+          <div key={prod.id} className="card storefront-action group flex flex-col hover:shadow-md">
+            <div className="storefront-product-media relative aspect-[3/4] w-full overflow-hidden">
               <Image
                 src={prod.image}
                 alt={prod.name}
@@ -225,7 +225,7 @@ function PageRecommendations() {
                 className="object-cover transition duration-300 group-hover:scale-105 motion-reduce:transition-none"
               />
             </div>
-            <div className="flex flex-1 flex-col justify-between p-4">
+            <div className="flex flex-1 flex-col justify-between pt-3">
               <div>
                 <p className="text-xs uppercase tracking-wider text-[var(--muted)]">{prod.category}</p>
                 <h3 className="mt-1 truncate font-semibold text-[var(--foreground)]">{prod.name}</h3>
@@ -233,7 +233,7 @@ function PageRecommendations() {
               </div>
               <Link
                 href={localize(`/product/${prod.slug}`)}
-                className="storefront-action mt-4 flex min-h-10 w-full items-center justify-center border border-[var(--accent)] px-3 text-center text-xs font-bold uppercase tracking-wider text-[var(--accent-text)] hover:bg-[var(--accent)] hover:text-[#17262D]"
+                className="btn btn-secondary btn-sm btn-block mt-4"
               >
                 {copy.viewDetails}
               </Link>
@@ -282,9 +282,9 @@ export default function CartPage() {
   };
 
   const emptyCartPanel = (
-    <div className="storefront-framed grid gap-6 p-5 sm:grid-cols-[minmax(0,1fr)_240px] sm:items-center sm:p-7">
+    <div className="card grid gap-6 p-5 sm:grid-cols-[minmax(0,1fr)_240px] sm:items-center sm:p-7">
       <div className="max-w-xl">
-        <p className="font-serif text-3xl leading-tight sm:text-4xl">{copy.yourCartEmpty}</p>
+        <p className="display-md">{copy.yourCartEmpty}</p>
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
           Build your first edit from sculpting leggings, breathable bras, and warm-weather layers.
         </p>
@@ -292,11 +292,11 @@ export default function CartPage() {
       <div className="grid gap-3 sm:justify-items-end">
         <Link
           href={localize("/shop")}
-          className="storefront-action inline-flex h-11 items-center justify-center border border-[var(--accent)] bg-[var(--accent)] px-6 text-sm font-semibold uppercase tracking-wider text-[#17262D] transition hover:brightness-95 motion-reduce:transition-none"
+          className="btn btn-primary"
         >
           {copy.shopCatalog}
         </Link>
-        <Link href={localize("/shop?sort=popular")} className="storefront-action -me-2 inline-flex min-h-10 items-center px-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)] underline underline-offset-4 hover:text-[var(--foreground)]">
+        <Link href={localize("/shop?sort=popular")} className="btn btn-link btn-sm">
           Best sellers
         </Link>
       </div>
@@ -306,7 +306,7 @@ export default function CartPage() {
   return (
     <section className="storefront-container py-8 sm:py-10">
       <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-baseline sm:justify-between">
-        <h1 className="font-serif text-5xl leading-none sm:text-6xl">{copy.cartTitle}</h1>
+        <h1 className="display-lg">{copy.cartTitle}</h1>
         <div className="w-full max-w-sm sm:w-auto">
           <ReservationTimer onExpiredChange={setReservationExpired} />
         </div>
@@ -333,7 +333,7 @@ export default function CartPage() {
           {!hydrated || !cart.length ? (
             emptyCartPanel
           ) : (
-            <div className="storefront-framed space-y-6 p-4 sm:p-6">
+            <div className="card space-y-6 p-4 sm:p-6">
               <div className="border-b border-[var(--border)] pb-4">
                 <div className="flex justify-between text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
                   <span>
@@ -362,10 +362,10 @@ export default function CartPage() {
           {hydrated && cart.length ? (
             <div className="grid gap-6 sm:grid-cols-2">
               {/* Order Note */}
-              <div className="storefront-framed h-fit p-5">
+              <div className="card h-fit p-5">
                 <button
                   onClick={() => setShowNote(!showNote)}
-                  className="storefront-action flex w-full min-h-10 items-center justify-between font-serif text-lg text-[var(--foreground)] hover:text-[var(--accent-text)] focus-visible:outline-none"
+                  className="flex min-h-10 w-full items-center justify-between text-base font-medium"
                 >
                   <span>{copy.orderNoteGiftMessage}</span>
                   <span className="text-xs font-normal text-[var(--muted)]">{showNote ? `${copy.hide} -` : `${copy.add} +`}</span>
@@ -377,19 +377,19 @@ export default function CartPage() {
                       onChange={(e) => setNote(e.target.value)}
                       placeholder={copy.deliveryGuidelinesPlaceholder}
                       rows={4}
-                    className="storefront-action w-full border border-[var(--border)] bg-[var(--background)] p-3 text-xs outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
+                    className="field text-sm"
                     />
                   </div>
                 )}
               </div>
 
               {/* Coupon */}
-              <div className="storefront-framed h-fit p-5">
-                <h2 className="mb-3 font-serif text-lg text-[var(--foreground)]">{copy.promoCouponCode}</h2>
+              <div className="card h-fit p-5">
+                <h2 className="mb-3 text-base font-medium">{copy.promoCouponCode}</h2>
                 {coupon ? (
-                  <div role="status" className="storefront-action flex items-center justify-between border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-700">
+                  <div role="status" className="storefront-action flex items-center justify-between border border-[var(--accent-soft)] bg-[var(--accent-soft)] px-4 py-2.5 text-sm text-[var(--accent-text)]">
                     <span className="font-semibold">{coupon.code} {copy.applied} (-{formatAed(coupon.discount)})</span>
-                    <button onClick={removeCoupon} className="font-bold text-emerald-700 underline transition hover:text-[var(--foreground)] motion-reduce:transition-none">
+                    <button onClick={removeCoupon} className="font-bold text-[var(--accent-text)] underline transition hover:text-[var(--foreground)] motion-reduce:transition-none">
                       {copy.remove}
                     </button>
                   </div>
@@ -400,17 +400,17 @@ export default function CartPage() {
                         placeholder={copy.enterCouponCode}
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="storefront-action h-11 min-w-0 border border-[var(--border)] bg-[var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none"
+                        className="field uppercase"
                       />
                       <button
                         onClick={handleApplyCoupon}
                         disabled={loadingCoupon || !couponInput.trim()}
-                        className="storefront-action h-11 border border-[var(--accent)] bg-[var(--accent)] px-5 text-xs font-bold uppercase tracking-wider text-[#17262D] hover:brightness-95 disabled:opacity-50"
+                        className="btn btn-primary"
                       >
                         {copy.apply}
                       </button>
                     </div>
-                    {couponError && <p role="alert" className="mt-2 text-xs font-medium text-red-600">{couponError}</p>}
+                    {couponError && <p role="alert" className="mt-2 text-xs font-medium text-[var(--sale)]">{couponError}</p>}
                   </div>
                 )}
               </div>
@@ -419,15 +419,15 @@ export default function CartPage() {
         </div>
 
         {hydrated && cart.length ? (
-          <aside className="storefront-framed h-fit p-6">
-            <h2 className="font-serif text-3xl">{copy.summary}</h2>
+          <aside className="card h-fit p-6">
+            <h2 className="display-md">{copy.summary}</h2>
             <div className="mt-6 space-y-3 border-b border-[var(--border)] pb-5 text-sm text-[var(--muted)]">
               <div className="flex justify-between">
                 <span>{copy.itemsSubtotal}</span>
                 <span className="font-medium text-[var(--foreground)]">{formatAed(subtotal)}</span>
               </div>
               {discount > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-[var(--accent-text)]">
                   <span>{copy.promoDiscount}</span>
                   <span className="font-medium">-{formatAed(discount)}</span>
                 </div>
@@ -448,12 +448,12 @@ export default function CartPage() {
               </div>
 
               {reservationExpired || reservationError ? (
-                <Button disabled className="h-12 w-full text-sm font-bold uppercase tracking-wider">
+                <Button disabled size="lg" block>
                   {copy.inventoryCheckRequired}
                 </Button>
               ) : (
                 <Link href={localize("/checkout")} className="block">
-                  <Button className="h-12 w-full text-sm font-bold uppercase tracking-wider">
+                  <Button size="lg" block>
                     {copy.proceedToCheckout}
                   </Button>
                 </Link>

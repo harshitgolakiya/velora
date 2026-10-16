@@ -76,7 +76,7 @@ export function NewsletterModal({ initialDelayMs = 8000 }: { initialDelayMs?: nu
   return (
     <Dialog.Root open={open} onOpenChange={(nextOpen) => (nextOpen ? setOpen(true) : dismiss())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-[var(--scrim)] backdrop-blur-sm" />
         <Dialog.Content
           className="storefront-modal storefront-panel fixed left-1/2 top-1/2 z-[110] grid max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-4xl overflow-y-auto bg-[var(--surface)] text-[var(--foreground)] outline-none sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:grid-cols-[0.9fr_1.1fr]"
           style={{ backgroundColor: "var(--surface)" }}
@@ -87,38 +87,38 @@ export function NewsletterModal({ initialDelayMs = 8000 }: { initialDelayMs?: nu
             Subscribe for collection previews, stories, and limited color releases.
           </Dialog.Description>
           <div className="relative hidden min-h-[560px] sm:block">
-            <Image src="/images/activewear-demo/court-pose.jpg" alt="" fill sizes="320px" className="object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/66 via-black/10 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/62">Members edit</p>
-              <p className="mt-3 text-3xl font-medium leading-none">First look, cleaner styling.</p>
+            <Image src="/images/campaign/campaign-sage-portrait.webp" alt="" fill sizes="320px" className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)]/66 via-[var(--ink)]/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-[var(--paper)]">
+              <p className="eyebrow eyebrow-light">Members edit</p>
+              <p className="display-md mt-3 text-[var(--paper)]">First look, cleaner styling.</p>
             </div>
           </div>
           <div className="flex flex-col justify-center p-5 pt-16 sm:p-10">
             <Dialog.Close
               aria-label="Close newsletter"
-              className="storefront-action storefront-icon-button absolute end-4 top-4 grid size-10 place-items-center border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--foreground)] hover:bg-[var(--hover)]"
+              className="btn btn-soft btn-icon btn-sm btn-round absolute end-4 top-4"
             >
               <X className="size-5" />
             </Dialog.Close>
-            <p className="storefront-panel-row inline-flex w-fit items-center gap-2 border border-[var(--border)] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
-              <TicketPercent className="size-3.5 text-[var(--accent)]" />
+            <p className="badge badge-outline gap-2 h-8">
+              <TicketPercent className="size-3.5 text-[var(--accent-text)]" />
               Private access
             </p>
-            <h2 className="mt-5 text-3xl font-semibold leading-tight sm:text-5xl sm:leading-[0.95]">The next movement, first.</h2>
+            <h2 className="display-lg mt-5">The next movement, first.</h2>
             <p className="storefront-body-copy mt-4 text-[var(--muted)] sm:mt-5">
               Collection previews, considered stories, and limited color before general release.
             </p>
             <div className="mt-5 grid gap-2 sm:mt-6">
               {benefits.map((benefit) => (
                 <div key={benefit} className="flex items-center gap-2 text-sm">
-                  <Sparkles className="size-3.5 text-[var(--accent)]" />
+                  <Sparkles className="size-3.5 text-[var(--accent-text)]" />
                   {benefit}
                 </div>
               ))}
             </div>
             {status === "success" ? (
-              <p role="status" className="mt-7 border border-[var(--border)] px-5 py-4 text-sm font-medium text-[var(--accent)]">
+              <p role="status" className="mt-7 border border-[var(--border)] px-5 py-4 text-sm font-medium text-[var(--accent-text)]">
                 {feedback}
               </p>
             ) : (
@@ -143,7 +143,7 @@ export function NewsletterModal({ initialDelayMs = 8000 }: { initialDelayMs?: nu
               </form>
             )}
             {status === "error" ? (
-              <p role="alert" className="mt-2 text-xs text-red-600">{feedback}</p>
+              <p role="alert" className="mt-2 text-xs text-[var(--sale)]">{feedback}</p>
             ) : null}
           </div>
         </Dialog.Content>

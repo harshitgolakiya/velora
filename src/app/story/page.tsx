@@ -8,7 +8,7 @@ export const metadata: Metadata = { alternates: localizedAlternates("/story") };
 
 export default async function StoryPage() {
   const page = await getPublishedPageContent("story");
-  const storyImage = "/images/activewear-demo/active-neutral.jpg";
+  const storyImage = "/images/campaign/hero-courtyard.webp";
   const fallbackBlocks = [
     {
       id: "story-hero",

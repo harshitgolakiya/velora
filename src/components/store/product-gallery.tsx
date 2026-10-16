@@ -2,17 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { motion, useDragControls, type PanInfo } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Expand,
-  Pause,
-  Play,
-  Share2,
-} from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronLeft, ChevronRight, Expand, Pause, Play, Share2 } from "lucide-react";
 import type { Product } from "@/lib/catalog";
 import { usePathname } from "next/navigation";
 import { catalogCopy, localeFromPathname } from "@/lib/i18n";
@@ -24,60 +16,63 @@ import {
   sourceResolutionLabel,
   type GalleryPresentationMedia,
 } from "@/lib/product-gallery-presentation";
+import { cn } from "@/lib/utils";
 
 const ProductGalleryViewer = dynamic(() => import("./product-gallery-viewer").then((mod) => mod.ProductGalleryViewer), {
   ssr: false,
 });
 
-export function ProductGallery({
-  product,
-  selectedColor,
-}: {
-  product: Product;
-  selectedColor?: string;
-}) {
+function mediaFit(media: GalleryPresentationMedia | undefined) {
+  if (!media || media.type !== "IMAGE" || !media.width || !media.height) return "object-cover";
+  const ratio = media.width / media.height;
+  return ratio < 0.72 || ratio > 1.1 ? "object-contain" : "object-cover";
+}
+
+export function ProductGallery({ product, selectedColor }: { product: Product; selectedColor?: string }) {
   const locale = localeFromPathname(usePathname());
   const copy = catalogCopy[locale];
-  const media = useMemo<GalleryPresentationMedia[]>(
-    () => resolveProductGalleryMedia(product, selectedColor),
-    [product, selectedColor],
-  );
+  const rtl = locale === "ar";
+  const media = useMemo<GalleryPresentationMedia[]>(() => resolveProductGalleryMedia(product, selectedColor), [product, selectedColor]);
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [dragging, setDragging] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const dragControls = useDragControls();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const activeIndex = active < media.length ? active : 0;
-  const activeMedia = media[activeIndex] ?? media[0];
+  const [viewportRef, embla] = useEmblaCarousel({
+    loop: media.length > 1,
+    align: "start",
+    direction: rtl ? "rtl" : "ltr",
+    skipSnaps: false,
+    duration: 22,
+    watchDrag: media.length > 1,
+  });
+
+  const activeMedia = media[active] ?? media[0];
   const activeImageWidth = activeMedia?.type === "IMAGE" ? activeMedia.width : undefined;
-  const activeImageRatio =
-    activeMedia?.type === "IMAGE" && activeMedia.width && activeMedia.height
-      ? activeMedia.width / activeMedia.height
-      : undefined;
-  const shouldEnlargePackshot = activeImageRatio !== undefined && activeImageRatio < 0.72;
-  const isAccessoryPackshot = product.category.toLowerCase().includes("tumbler");
   const canSourceZoom = canZoomSource(activeMedia);
   const viewerWidth = galleryViewerWidth(activeMedia, zoomed);
   const resolutionLabel = sourceResolutionLabel(activeMedia);
 
+  const onSelect = useCallback(() => {
+    if (!embla) return;
+    setActive(embla.selectedScrollSnap());
+    setZoomed(false);
+  }, [embla]);
+
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        setZoomed(false);
-        setActive((index) => (index + (locale === "ar" ? 1 : -1) + media.length) % media.length);
-      }
-      if (event.key === "ArrowRight") {
-        setZoomed(false);
-        setActive((index) => (index + (locale === "ar" ? -1 : 1) + media.length) % media.length);
-      }
+    if (!embla) return;
+    embla.on("select", onSelect).on("reInit", onSelect).on("init", onSelect);
+    return () => {
+      embla.off("select", onSelect).off("reInit", onSelect).off("init", onSelect);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [locale, media.length]);
+  }, [embla, onSelect]);
+
+  useEffect(() => {
+    embla?.reInit();
+    embla?.scrollTo(0, true);
+  }, [embla, media]);
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -87,15 +82,20 @@ export function ProductGallery({
     return () => query.removeEventListener("change", update);
   }, []);
 
-  const previous = () => {
-    setZoomed(false);
-    setActive((index) => (index - 1 + media.length) % media.length);
-  };
+  useEffect(() => {
+    if (!embla || media.length < 2) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+      if (event.key === "ArrowLeft") (rtl ? embla.scrollNext : embla.scrollPrev)();
+      if (event.key === "ArrowRight") (rtl ? embla.scrollPrev : embla.scrollNext)();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [embla, media.length, rtl]);
 
-  const next = () => {
-    setZoomed(false);
-    setActive((index) => (index + 1) % media.length);
-  };
+  const previous = () => embla?.scrollPrev();
+  const next = () => embla?.scrollNext();
 
   async function shareProduct() {
     const shareData = { title: product.name, url: window.location.href };
@@ -108,17 +108,6 @@ export function ProductGallery({
     window.setTimeout(() => setCopied(false), 1800);
   }
 
-  function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
-    setDragging(false);
-    const shouldChange = Math.abs(info.offset.x) > 54 || Math.abs(info.velocity.x) > 260;
-    if (!shouldChange) return;
-    if (info.offset.x > 0) {
-      if (locale === "ar") next();
-      else previous();
-    } else if (locale === "ar") previous();
-    else next();
-  }
-
   function toggleVideo() {
     const video = videoRef.current;
     if (!video) return;
@@ -126,152 +115,120 @@ export function ProductGallery({
     else video.pause();
   }
 
-  const controls = (
-    <>
-      {media.length > 1 ? (
-        <>
-          <button
-            type="button"
-            onClick={previous}
-            aria-label={copy.previousMedia}
-            className="storefront-action storefront-light-control absolute left-2 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition sm:left-3 sm:size-11 motion-reduce:transition-none"
-          >
-            {locale === "ar" ? <ChevronRight className="size-4 sm:size-5" /> : <ChevronLeft className="size-4 sm:size-5" />}
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            aria-label={copy.nextMedia}
-            className="storefront-action storefront-light-control absolute right-2 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center border shadow-sm transition sm:right-3 sm:size-11 motion-reduce:transition-none"
-          >
-            {locale === "ar" ? <ChevronLeft className="size-4 sm:size-5" /> : <ChevronRight className="size-4 sm:size-5" />}
-          </button>
-        </>
-      ) : null}
-    </>
-  );
+  const PrevIcon = rtl ? ChevronRight : ChevronLeft;
+  const NextIcon = rtl ? ChevronLeft : ChevronRight;
 
   return (
-    <div className="min-w-0">
-      <motion.div
-        drag={media.length > 1 ? "x" : false}
-        dragControls={dragControls}
-        dragListener={false}
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.18}
-        dragMomentum={false}
-        onDragStart={() => setDragging(true)}
-        onDragEnd={handleDragEnd}
-        onPointerDownCapture={(event) => {
-          if (media.length < 2) return;
-          if ((event.target as HTMLElement).closest("button")) return;
-          dragControls.start(event.nativeEvent);
-        }}
-        className={`storefront-product-media relative aspect-[4/3] overflow-hidden select-none sm:aspect-square ${
-          media.length > 1 ? dragging ? "cursor-grabbing" : "cursor-grab" : ""
-        }`}
-      >
-        {activeMedia?.type === "VIDEO" ? (
-          <>
-            <video
-              key={`${activeMedia.url}-${activeIndex}`}
-              ref={videoRef}
-              src={activeMedia.url}
-              poster={product.images[0]}
-              className="gallery-image-enter size-full object-cover"
-              autoPlay={!reduceMotion}
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              style={{ objectPosition: focalObjectPosition(activeMedia) }}
-            />
+    <div className="min-w-0 lg:grid lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4">
+      {media.length > 1 ? (
+        <div className="order-2 mt-3 flex gap-2 overflow-x-auto lg:order-1 lg:mt-0 lg:max-h-[min(80vh,760px)] lg:flex-col lg:overflow-y-auto lg:pe-1" role="tablist" aria-label="Product media">
+          {media.map((item, index) => (
             <button
               type="button"
-              onClick={toggleVideo}
-              className="storefront-action storefront-light-control absolute bottom-4 left-4 z-10 inline-flex h-10 items-center gap-2 border px-3 text-xs font-semibold uppercase tracking-[0.12em] shadow sm:h-11"
-              aria-label={playing ? "Pause video" : "Play video"}
+              key={`${item.url}-${index}`}
+              role="tab"
+              aria-selected={index === active}
+              aria-current={index === active}
+              aria-label={`View media ${index + 1}`}
+              onClick={() => embla?.scrollTo(index)}
+              className="gallery-thumb aspect-[3/4] w-16 shrink-0 lg:w-full"
             >
-              {playing ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
-              Motion
+              {item.type === "VIDEO" ? (
+                <span className="absolute inset-0 grid place-items-center bg-[var(--card)] text-[var(--foreground)]"><Play className="size-4 fill-current" /></span>
+              ) : (
+                <Image src={item.url} alt="" fill sizes="72px" quality={60} className="object-cover" style={{ objectPosition: focalObjectPosition(item) }} />
+              )}
             </button>
-            <span className="storefront-light-chip pointer-events-none absolute right-4 top-4 z-10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] shadow">
-              Video
-            </span>
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(0deg,rgba(0,0,0,.32),transparent)]" />
+          ))}
+        </div>
+      ) : null}
+
+      <div className="group/gallery relative order-1 lg:order-2">
+        <div ref={viewportRef} className="storefront-product-media relative overflow-hidden" dir={rtl ? "rtl" : "ltr"}>
+          <div className="flex touch-pan-y">
+            {media.map((item, index) => (
+              <div key={`${item.url}-${index}`} className="relative min-w-0 shrink-0 grow-0 basis-full">
+                <div className="relative aspect-[4/5] sm:aspect-[3/4]">
+                  {item.type === "VIDEO" ? (
+                    <video
+                      ref={index === active ? videoRef : undefined}
+                      src={item.url}
+                      poster={product.images[0]}
+                      className="absolute inset-0 size-full object-cover"
+                      autoPlay={!reduceMotion && index === active}
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      onPlay={() => setPlaying(true)}
+                      onPause={() => setPlaying(false)}
+                      style={{ objectPosition: focalObjectPosition(item) }}
+                    />
+                  ) : (
+                    <Image
+                      src={item.url}
+                      alt={item.altText ?? `${product.name}${selectedColor ? ` in ${selectedColor}` : ""}`}
+                      fill
+                      sizes="(min-width: 1440px) 680px, (min-width: 1024px) 52vw, 100vw"
+                      quality={80}
+                      priority={index === 0}
+                      fetchPriority={index === 0 ? "high" : "low"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      draggable={false}
+                      className={cn("select-none", mediaFit(item))}
+                      style={{ objectPosition: focalObjectPosition(item) }}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {media.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={previous}
+              aria-label={copy.previousMedia}
+              className="btn btn-on-photo btn-icon btn-round absolute start-3 top-1/2 z-10 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover/gallery:opacity-100 focus-visible:opacity-100 sm:grid"
+            >
+              <PrevIcon className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label={copy.nextMedia}
+              className="btn btn-on-photo btn-icon btn-round absolute end-3 top-1/2 z-10 hidden -translate-y-1/2 opacity-0 transition-opacity group-hover/gallery:opacity-100 focus-visible:opacity-100 sm:grid"
+            >
+              <NextIcon className="size-5" />
+            </button>
+            <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center gap-1.5 sm:hidden">
+              {media.map((item, index) => (
+                <span key={`${item.url}-dot-${index}`} aria-current={index === active} className="gallery-dot" />
+              ))}
+            </div>
           </>
-        ) : (
-          <Image
-            key={`${activeMedia?.url ?? "fallback"}-${activeIndex}`}
-            src={activeMedia?.url ?? product.images[0]}
-            alt={activeMedia?.altText ?? `${product.name}${selectedColor ? ` in ${selectedColor}` : ""}`}
-            fill
-            sizes="(min-width: 1440px) 620px, (min-width: 1024px) calc(50vw - 48px), 100vw"
-            quality={72}
-            decoding="sync"
-            className={
-              "gallery-image-enter " +
-              (shouldEnlargePackshot
-                ? isAccessoryPackshot
-                  ? "object-cover"
-                  : "object-contain scale-[1.08]"
-                : "object-contain")
-            }
-            draggable={false}
-            style={{ objectPosition: focalObjectPosition(activeMedia) }}
-            priority
-            fetchPriority="high"
-            loading="eager"
-          />
-        )}
+        ) : null}
 
-        {controls}
-
-        <div className="absolute left-2 right-2 top-2 z-10 flex justify-between sm:left-3 sm:right-3 sm:top-3">
-          <button
-            type="button"
-            onClick={shareProduct}
-            aria-label={copied ? `Product link copied for ${product.name}` : `Share ${product.name}`}
-            className="storefront-action storefront-light-control grid size-10 place-items-center border shadow-sm transition sm:size-11 motion-reduce:transition-none"
-          >
+        <div className="absolute end-3 top-3 z-10 flex gap-2">
+          <button type="button" onClick={shareProduct} aria-label={copied ? `Product link copied for ${product.name}` : `Share ${product.name}`} className="btn btn-on-photo btn-icon btn-sm btn-round">
             {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
           </button>
           {activeMedia?.type === "IMAGE" ? (
-            <button
-              type="button"
-              onClick={() => setViewerOpen(true)}
-              aria-label={`Open media gallery for ${product.name}`}
-              className="storefront-action storefront-light-control grid size-10 place-items-center border shadow-sm transition sm:size-11 motion-reduce:transition-none"
-            >
+            <button type="button" onClick={() => setViewerOpen(true)} aria-label={`Open media gallery for ${product.name}`} className="btn btn-on-photo btn-icon btn-sm btn-round">
               <Expand className="size-4" />
             </button>
           ) : null}
         </div>
 
-        {media.length > 1 ? (
-          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-0.5 rounded-full bg-black/10 px-1 py-0.5 backdrop-blur-sm sm:bottom-3">
-            {media.map((item, index) => (
-              <button
-                type="button"
-                key={`${item.url}-${index}`}
-                onClick={() => setActive(index)}
-                aria-label={`View media ${index + 1}`}
-                aria-current={index === activeIndex}
-                className="storefront-action grid size-10 place-items-center"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-1.5 rounded-full bg-[#fff] shadow transition-all motion-reduce:transition-none ${
-                    index === activeIndex ? "w-5 opacity-100" : "w-1.5 opacity-65"
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
+        {activeMedia?.type === "VIDEO" ? (
+          <button type="button" onClick={toggleVideo} className="btn btn-on-photo btn-sm absolute bottom-4 start-4 z-10" aria-label={playing ? "Pause video" : "Play video"}>
+            {playing ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
+            Motion
+          </button>
         ) : null}
-      </motion.div>
+      </div>
 
       {viewerOpen ? (
         <ProductGalleryViewer

@@ -81,8 +81,8 @@ export function RecommendationRail({
   return (
     <div className="mt-10">
       <div className="mb-4 flex justify-end gap-2">
-        <button type="button" aria-label="Previous recommendations" disabled={!canPrevious} onClick={() => carousel?.scrollPrev()} className="storefront-action grid size-10 place-items-center border border-[var(--border)] bg-[var(--surface)] disabled:opacity-35"><ChevronLeft className="size-4" /></button>
-        <button type="button" aria-label="Next recommendations" disabled={!canNext} onClick={() => carousel?.scrollNext()} className="storefront-action grid size-10 place-items-center border border-[var(--border)] bg-[var(--surface)] disabled:opacity-35"><ChevronRight className="size-4" /></button>
+        <button type="button" aria-label="Previous recommendations" disabled={!canPrevious} onClick={() => carousel?.scrollPrev()} className="btn btn-soft btn-icon btn-round"><ChevronLeft className="size-4" /></button>
+        <button type="button" aria-label="Next recommendations" disabled={!canNext} onClick={() => carousel?.scrollNext()} className="btn btn-soft btn-icon btn-round"><ChevronRight className="size-4" /></button>
       </div>
       <div ref={viewportRef} className="overflow-hidden">
         <div className="flex gap-4">

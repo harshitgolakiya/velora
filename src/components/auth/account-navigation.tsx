@@ -27,7 +27,7 @@ export function AccountNavigation({ section }: { section: AccountNavigationSecti
         aria-label={copy.accountSections}
         value={links.find((item) => item.id === section)?.href}
         onChange={(event) => router.push(event.currentTarget.value)}
-        className="h-11 w-full storefront-framed px-3 text-sm font-semibold outline-none transition focus:border-[var(--accent)] md:hidden motion-reduce:transition-none"
+        className="h-11 w-full card px-3 text-sm font-semibold outline-none transition focus:border-[var(--accent)] md:hidden motion-reduce:transition-none"
       >
         {links.map((item) => <option key={item.href} value={item.href}>{item.label}</option>)}
       </select>

@@ -18,7 +18,7 @@ export default async function TrackOrderPage() {
   return (
     <section className="storefront-container py-10 sm:py-12">
       <Breadcrumbs items={[{ label: "Track Order" }]} />
-      <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">{session?.user ? "Track your orders" : "Track order"}</h1>
+      <h1 className="display-lg">{session?.user ? "Track your orders" : "Track order"}</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-base">
         {session?.user
           ? activeOrders.length

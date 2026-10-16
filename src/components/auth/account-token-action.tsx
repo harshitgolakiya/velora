@@ -56,9 +56,9 @@ export function AccountTokenAction({ mode, token }: { mode: "verify" | "reset"; 
   }
 
   return (
-    <div className="storefront-framed mx-auto max-w-lg p-5 sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Account security</p>
-      <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">{mode === "verify" ? "Email verification" : "Choose a new password"}</h1>
+    <div className="card mx-auto max-w-lg p-5 sm:p-6">
+      <p className="eyebrow eyebrow-muted">Account security</p>
+      <h1 className="display-md mt-3">{mode === "verify" ? "Email verification" : "Choose a new password"}</h1>
       {mode === "reset" && status !== "success" ? (
         <form onSubmit={resetPassword} className="mt-6 grid gap-4">
           <label className="grid gap-2 text-sm font-medium">
@@ -70,13 +70,13 @@ export function AccountTokenAction({ mode, token }: { mode: "verify" | "reset"; 
             <input required name="confirmation" type="password" autoComplete="new-password" className="storefront-action h-12 border border-[var(--border)] bg-[var(--background)] px-4 outline-none transition focus:border-[var(--accent)] motion-reduce:transition-none" />
           </label>
           <p className="text-xs leading-5 text-[var(--muted)]">Use 12+ characters with uppercase, lowercase, number, and symbol.</p>
-          <button disabled={status === "loading"} className="storefront-action h-12 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-60 motion-reduce:transition-none">
+          <button disabled={status === "loading"} className="btn btn-primary">
             {status === "loading" ? "Updating" : "Update password"}
           </button>
         </form>
       ) : null}
-      {message ? <p role="status" className={`mt-6 text-sm leading-6 ${status === "error" ? "text-red-600" : "text-[var(--muted)]"}`}>{message}</p> : null}
-      {status === "success" ? <Link href="/account" className="storefront-action mt-6 inline-flex h-11 items-center bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] motion-reduce:transition-none">Go to sign in</Link> : null}
+      {message ? <p role="status" className={`mt-6 text-sm leading-6 ${status === "error" ? "text-[var(--sale)]" : "text-[var(--muted)]"}`}>{message}</p> : null}
+      {status === "success" ? <Link href="/account" className="btn btn-primary mt-6">Go to sign in</Link> : null}
     </div>
   );
 }

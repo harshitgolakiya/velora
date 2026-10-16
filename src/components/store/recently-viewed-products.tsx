@@ -66,19 +66,19 @@ export function RecentlyViewedProducts({
     <section className="mt-20 border-t border-[var(--border)] pt-14">
       <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
-          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-            <Clock3 className="size-3.5 text-[var(--accent)]" />
+          <p className="eyebrow eyebrow-muted inline-flex items-center gap-2">
+            <Clock3 className="size-3.5 text-[var(--accent-text)]" />
             Your edit
           </p>
-          <h2 className="mt-2 text-3xl font-medium">Recently viewed</h2>
+          <h2 className="display-md mt-3">Recently viewed</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--muted)]">
             Pick up where you left off, with the same color controls and saved preferences.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" aria-label="Previous recently viewed products" disabled={!canPrevious} onClick={() => carousel?.scrollPrev()} className="storefront-action grid size-11 place-items-center border border-[var(--border)] disabled:opacity-35"><ChevronLeft className="size-4" /></button>
-          <button type="button" aria-label="Next recently viewed products" disabled={!canNext} onClick={() => carousel?.scrollNext()} className="storefront-action grid size-11 place-items-center border border-[var(--border)] disabled:opacity-35"><ChevronRight className="size-4" /></button>
-          <Link href={localize("/shop")} className="storefront-action inline-flex h-11 w-fit items-center gap-2 border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.12em] hover:border-[var(--foreground)]">
+          <button type="button" aria-label="Previous recently viewed products" disabled={!canPrevious} onClick={() => carousel?.scrollPrev()} className="btn btn-soft btn-icon btn-round"><ChevronLeft className="size-4" /></button>
+          <button type="button" aria-label="Next recently viewed products" disabled={!canNext} onClick={() => carousel?.scrollNext()} className="btn btn-soft btn-icon btn-round"><ChevronRight className="size-4" /></button>
+          <Link href={localize("/shop")} className="btn btn-secondary btn-sm ms-2">
             Continue shopping
             <ArrowRight className="size-4" />
           </Link>

@@ -61,7 +61,7 @@ export function EmailPreferencesForm({ token }: { token: string }) {
 
   if (!state) {
     return (
-      <div role="alert" className="storefront-railed border-red-500/30 bg-red-500/5 px-5 py-8 text-sm leading-6 text-red-600">
+      <div role="alert" className="storefront-railed border-red-500/30 bg-red-500/5 px-5 py-8 text-sm leading-6 text-[var(--sale)]">
         {message || "This preference link is invalid or has expired."}
       </div>
     );
@@ -109,11 +109,11 @@ export function EmailPreferencesForm({ token }: { token: string }) {
       <div className="flex flex-col gap-3 px-5 py-6 sm:flex-row sm:px-6">
         {state.status === "SUBSCRIBED" ? (
           <>
-            <button disabled={saving} onClick={() => save("SUBSCRIBED")} className="storefront-action h-12 bg-[var(--foreground)] px-6 text-sm font-semibold text-[var(--background)] disabled:opacity-50">Save preferences</button>
-            <button disabled={saving} onClick={() => save("UNSUBSCRIBED")} className="storefront-action h-12 border border-[var(--border)] px-4 text-sm font-semibold disabled:opacity-50">Unsubscribe from all</button>
+            <button disabled={saving} onClick={() => save("SUBSCRIBED")} className="btn btn-primary">Save preferences</button>
+            <button disabled={saving} onClick={() => save("UNSUBSCRIBED")} className="btn btn-secondary">Unsubscribe from all</button>
           </>
         ) : (
-          <button disabled={saving} onClick={() => save("SUBSCRIBED")} className="storefront-action h-12 bg-[var(--foreground)] px-6 text-sm font-semibold text-[var(--background)] disabled:opacity-50">Resubscribe</button>
+          <button disabled={saving} onClick={() => save("SUBSCRIBED")} className="btn btn-primary">Resubscribe</button>
         )}
       </div>
       {message ? <p role="status" className="border-t border-[var(--border)] px-5 py-4 text-sm text-[var(--muted)] sm:px-6">{message}</p> : null}

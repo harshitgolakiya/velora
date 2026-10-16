@@ -62,10 +62,10 @@ export function AdminLoginForm({ callbackUrl = "/admin" }: { callbackUrl?: strin
           </button>
         </span>
       </label>
-      {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm text-[var(--sale)]">{error}</p> : null}
       <button
         disabled={submitting}
-        className="inline-flex h-12 items-center justify-center gap-2 bg-[var(--foreground)] px-5 text-sm font-semibold uppercase tracking-[0.14em] text-[var(--background)] disabled:opacity-60"
+        className="btn btn-primary"
       >
         <LockKeyhole className="size-4" />
         {submitting ? "Signing in" : "Sign in securely"}

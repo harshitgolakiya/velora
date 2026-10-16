@@ -44,18 +44,18 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
   };
 
   return (
-    <footer className="bg-[#17262D] text-white">
+    <footer className="border-t border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]">
       {globalContent.newsletter.enabled ? (
-        <div id="newsletter" className="storefront-container border-b border-white/12 py-9 lg:py-12">
-          <div className="grid gap-7 lg:grid-cols-[0.72fr_1fr] lg:items-end">
+        <div id="newsletter" className="storefront-container border-b border-[var(--border)] py-12 lg:py-16">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1fr] lg:items-end">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/58">{localText(globalContent.newsletter.eyebrow, locale)}</p>
-              <p className="mt-3 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">{localText(globalContent.newsletter.headline, locale)}</p>
+              <p className="eyebrow">{localText(globalContent.newsletter.eyebrow, locale)}</p>
+              <p className="display-lg mt-3 max-w-xl">{localText(globalContent.newsletter.headline, locale)}</p>
             </div>
             {status === "success" ? (
-              <p className="rounded-[var(--radius-control)] border border-white/15 bg-white/7 px-4 py-3 text-base text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">{feedback}</p>
+              <p className="rounded-[var(--radius-control)] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base">{feedback}</p>
             ) : (
-              <form className="rounded-[var(--radius-control)] border border-white/15 bg-white/7 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition focus-within:border-[color-mix(in_srgb,var(--accent)_78%,white_22%)] focus-within:bg-white/10 motion-reduce:transition-none" onSubmit={handleSubmit}>
+              <form className="rounded-[var(--radius-control)] border border-[var(--border)] bg-[var(--surface)] p-1.5 transition focus-within:border-[var(--accent)] motion-reduce:transition-none" onSubmit={handleSubmit}>
                 <label htmlFor="footer-email" className="sr-only">{localText(globalContent.newsletter.placeholder, locale)}</label>
                 <div className="flex items-center gap-3 sm:gap-4">
                   <input
@@ -66,28 +66,28 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder={localText(globalContent.newsletter.placeholder, locale)}
                     suppressHydrationWarning
-                    className="storefront-dark-input h-11 min-w-0 flex-1 border-0 px-3 text-sm outline-none placeholder:text-white/70"
+                    className="h-11 min-w-0 flex-1 border-0 bg-transparent px-3 text-sm outline-none placeholder:text-[var(--muted)]"
                   />
                   <button
                     type="submit"
                     disabled={status === "loading"}
                     aria-label={String(copy.joinNewsletter)}
-                    className="storefront-action grid size-11 place-items-center transition hover:text-[var(--accent)] disabled:opacity-50 motion-reduce:transition-none"
+                    className="btn btn-primary btn-icon"
                   >
                     <ArrowRight className="size-5" />
                   </button>
                 </div>
-                {status === "error" ? <p className="mt-2 text-xs text-red-400">{feedback}</p> : null}
+                {status === "error" ? <p className="mt-2 text-xs text-[var(--sale)]">{feedback}</p> : null}
               </form>
             )}
           </div>
         </div>
       ) : null}
 
-      <div className="storefront-container grid gap-10 py-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr] lg:gap-12 lg:py-12">
+      <div className="storefront-container grid gap-10 py-12 lg:grid-cols-[1.25fr_0.75fr_0.75fr] lg:gap-12 lg:py-16">
         <div>
-          <Link href={localize("/")} className="text-4xl font-medium tracking-[0.04em] text-[var(--accent)]">Velora</Link>
-          <p className="mt-4 max-w-sm text-sm leading-6 text-white/58">
+          <Link href={localize("/")} className="font-serif text-[2.75rem] leading-none tracking-[0.02em] text-[var(--foreground)]">Velora</Link>
+          <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--muted)]">
             {localText(globalContent.footer.body, locale)}
           </p>
         </div>
@@ -95,24 +95,24 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
         {/* Desktop: static columns */}
         {footerGroups.slice(0, 2).map((group) => (
           <div key={group.id} className="hidden lg:block">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">{group.titleText}</p>
-            <div className="mt-5 grid gap-3 text-sm text-white/72">
-              {group.links.map((link) => <Link key={link.href} href={localize(link.href)} className="hover:text-white">{link.label}</Link>)}
+            <p className="eyebrow eyebrow-muted">{group.titleText}</p>
+            <div className="mt-5 grid gap-3 text-sm text-[var(--foreground)]/80">
+              {group.links.map((link) => <Link key={link.href} href={localize(link.href)} className="hover:text-[var(--accent-text)]">{link.label}</Link>)}
             </div>
           </div>
         ))}
 
         {/* Mobile/tablet: collapsible accordions */}
-        <Accordion.Root type="multiple" className="divide-y divide-white/15 border-y border-white/15 lg:hidden">
+        <Accordion.Root type="multiple" className="divide-y divide-[var(--border)] border-y border-[var(--border)] lg:hidden">
           {footerGroups.map((group) => (
             <Accordion.Item key={group.id} value={group.id}>
-              <Accordion.Trigger className="group flex min-h-12 w-full items-center justify-between text-left text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">
+              <Accordion.Trigger className="eyebrow eyebrow-muted group flex min-h-12 w-full items-center justify-between text-left">
                 {group.titleText}
                 <Plus className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-45" />
               </Accordion.Trigger>
               <Accordion.Content>
-                <div className="grid gap-3 pb-5 text-sm text-white/72">
-                  {group.links.map((link) => <Link key={link.href} href={localize(link.href)} className="hover:text-white">{link.label}</Link>)}
+                <div className="grid gap-3 pb-5 text-sm text-[var(--foreground)]/80">
+                  {group.links.map((link) => <Link key={link.href} href={localize(link.href)} className="hover:text-[var(--accent-text)]">{link.label}</Link>)}
                 </div>
               </Accordion.Content>
             </Accordion.Item>
@@ -120,16 +120,16 @@ export function Footer({ globalContent }: { globalContent: GlobalContent }) {
         </Accordion.Root>
       </div>
 
-      <div className="border-t border-white/15">
-        <div className="storefront-container flex flex-col gap-4 py-5 text-[10px] uppercase tracking-[0.14em] text-white/45 md:flex-row md:items-center md:justify-between">
+      <div className="border-t border-[var(--border)]">
+        <div className="storefront-container flex flex-col gap-4 py-5 text-[10px] uppercase tracking-[0.14em] text-[var(--muted)] md:flex-row md:items-center md:justify-between">
           <p>{localText(globalContent.footer.location, locale)}</p>
           <div className="flex items-center gap-5 md:hidden">
             <LanguageSwitcher />
-            <ThemeToggle className="!size-9 text-white" />
+            <ThemeToggle className="!size-9 text-[var(--foreground)]" />
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link href={localize("/privacy")} className="hover:text-white">{copy.privacy}</Link>
-            <Link href={localize("/terms")} className="hover:text-white">{copy.terms}</Link>
+            <Link href={localize("/privacy")} className="hover:text-[var(--foreground)]">{copy.privacy}</Link>
+            <Link href={localize("/terms")} className="hover:text-[var(--foreground)]">{copy.terms}</Link>
             <span>{localText(globalContent.footer.copyright, locale)}</span>
           </div>
         </div>

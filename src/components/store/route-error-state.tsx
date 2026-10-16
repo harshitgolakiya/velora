@@ -42,19 +42,19 @@ export function RouteErrorState({
 
   return (
     <section className="storefront-container flex min-h-[58dvh] items-center justify-center py-16 sm:py-24">
-      <div className="storefront-framed w-full max-w-2xl p-6 text-center sm:p-10">
-        <span className="mx-auto grid size-12 place-items-center rounded-full bg-[var(--card)] text-[var(--accent)]">
+      <div className="card w-full max-w-2xl p-6 text-center sm:p-10">
+        <span className="mx-auto grid size-12 place-items-center rounded-full bg-[var(--card)] text-[var(--accent-text)]">
           <AlertCircle className="size-5" aria-hidden />
         </span>
         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">{content.eyebrow}</p>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-5xl">{content.title}</h1>
+        <h1 className="display-lg mt-3">{content.title}</h1>
         <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-[var(--muted)]">{content.body}</p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={reset} className="storefront-action inline-flex h-11 items-center gap-2 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--accent)] hover:text-[#17262D]">
+          <button type="button" onClick={reset} className="btn btn-primary">
             <RotateCcw className="size-4" aria-hidden />
             {content.retry}
           </button>
-          <Link href={localize(destinationHref)} className="storefront-action inline-flex h-11 items-center border border-[var(--border)] px-5 text-sm font-semibold hover:border-[var(--foreground)] hover:bg-[var(--hover)]">
+          <Link href={localize(destinationHref)} className="btn btn-secondary">
             {content.destination}
           </Link>
         </div>

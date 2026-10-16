@@ -36,8 +36,8 @@ export function AnnouncementBar({
         "fixed inset-x-0 top-0 z-40 hidden h-8 border-b text-[10px] font-medium uppercase tracking-[0.2em] transition-colors md:block",
         !messages.length && "md:hidden",
         isOverlay
-          ? "border-white/15 bg-black/15 text-white"
-          : "border-[var(--border)] bg-[var(--background)] text-[var(--accent)]",
+          ? "border-[var(--paper)]/15 bg-[var(--ink)]/15 text-[var(--paper)]"
+          : "border-[var(--border)] bg-[var(--background)] text-[var(--accent-text)]",
       )}
     >
       <div className="storefront-container grid h-full grid-cols-[96px_1fr_96px] items-center">

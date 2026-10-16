@@ -46,8 +46,8 @@ export default async function SearchPage({
     <main className="storefront-container py-8 sm:py-10">
       <Breadcrumbs items={[{ label: copy.search }]} />
       <header className="mb-6 border-b border-[var(--border)] pb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.search}</p>
-        <h1 className="mt-3 text-3xl font-medium leading-tight sm:text-5xl">
+        <p className="eyebrow">{copy.search}</p>
+        <h1 className="display-lg mt-3">
           {query ? `${copy.resultsFor} “${query}”` : copy.discover}
         </h1>
         <p className="mt-3 text-sm text-[var(--muted)]">
@@ -57,7 +57,7 @@ export default async function SearchPage({
 
       {query && (results.categories.length || results.collections.length || results.pages.length) ? (
         <section className="mb-6 border-b border-[var(--border)] pb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{copy.relatedDestinations}</p>
+          <p className="eyebrow eyebrow-muted">{copy.relatedDestinations}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {results.categories.map((category, index) => (
               <SearchResultLink
@@ -106,7 +106,7 @@ export default async function SearchPage({
         <ShopControls products={compactProductsForList(results.products)} categories={categories} collections={collections} preserveParams={["q"]} />
       ) : (
         <section className="storefront-railed px-5 py-14 text-center sm:px-6">
-          <h2 className="text-3xl font-medium">{copy.noProducts}</h2>
+          <h2 className="display-md">{copy.noProducts}</h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--muted)]">
             {copy.noProductsBody}
           </p>
@@ -129,7 +129,7 @@ export default async function SearchPage({
                 {category}
               </SearchResultLink>
             ))}
-            <Link href={localize("/shop")} className="storefront-action inline-flex min-h-10 items-center bg-[var(--foreground)] px-5 text-sm text-[var(--background)]">
+            <Link href={localize("/shop")} className="storefront-action inline-flex min-h-10 items-center bg-[var(--accent)] px-5 text-sm text-[var(--on-accent)]">
               {copy.shopAll}
             </Link>
             {results.pages.slice(0, 3).map((page, index) => (

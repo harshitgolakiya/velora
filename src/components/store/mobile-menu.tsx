@@ -61,23 +61,23 @@ export function MobileMenu({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-black/45 backdrop-blur-sm lg:hidden" />
+        <Dialog.Overlay className="storefront-overlay fixed inset-0 z-[110] bg-[var(--scrim)] backdrop-blur-sm lg:hidden" />
         <Dialog.Content
           aria-describedby={undefined}
           className="storefront-drawer-full fixed inset-0 z-[110] overflow-y-auto bg-[var(--background)] px-4 pb-5 pt-3 text-[var(--foreground)] outline-none sm:p-5 lg:hidden"
         >
           <div className="sticky top-0 z-10 -mx-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/92 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
             <Dialog.Title asChild>
-              <Link href={localize("/")} className="font-serif text-[1.7rem] font-medium tracking-[0.08em] text-[var(--accent)] sm:text-3xl">Velora</Link>
+              <Link href={localize("/")} className="font-serif text-[1.9rem] font-medium tracking-[0.03em] text-[var(--foreground)] sm:text-3xl">Velora</Link>
             </Dialog.Title>
-            <Dialog.Close aria-label="Close menu" className="storefront-action storefront-icon-button grid size-11 place-items-center border border-[var(--border)] bg-[var(--surface)]">
+            <Dialog.Close aria-label="Close menu" className="btn btn-soft btn-icon btn-round">
               <X className="size-6" />
             </Dialog.Close>
           </div>
           <Dialog.Close asChild>
             <Link href={localize("/collections/pilates-studio")} className="storefront-panel group mt-4 grid min-h-36 grid-cols-[1fr_0.82fr] overflow-hidden sm:mt-5 sm:min-h-44">
               <div className="flex min-w-0 flex-col justify-end p-3.5 sm:p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">Featured movement</p>
+                <p className="eyebrow">Featured movement</p>
                 <p className="mt-2 text-[1.35rem] font-medium leading-none sm:text-2xl">Pilates Studio</p>
                 <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] sm:mt-4">
                   Move in it
@@ -86,7 +86,7 @@ export function MobileMenu({
               </div>
               <div className="relative min-h-36 overflow-hidden bg-[var(--card)] sm:min-h-44">
                 <Image
-                  src="/images/activewear-demo/studio-yoga.jpg"
+                  src="/images/campaign/campaign-reformer.webp"
                   alt=""
                   fill
                   sizes="45vw"
@@ -103,7 +103,7 @@ export function MobileMenu({
                   aria-current={item.href !== "/shop?sort=latest" && isActive(item.href) ? "page" : undefined}
                   className={cn(
                     "storefront-action flex min-h-11 items-center border-b border-[var(--border)] py-1 sm:min-h-12",
-                    item.href !== "/shop?sort=latest" && isActive(item.href) && "text-[var(--accent)]",
+                    item.href !== "/shop?sort=latest" && isActive(item.href) && "text-[var(--accent-text)]",
                   )}
                 >
                   {item.label}
@@ -157,16 +157,16 @@ export function MobileMenu({
           </div>
           <div className="mt-6 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
             <div className="storefront-panel-row flex min-h-12 items-center justify-between gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
-              <span className="shrink-0 text-stone-500">{copy.theme}</span>
+              <span className="shrink-0 text-[var(--muted)]">{copy.theme}</span>
               <ThemeToggle className="!size-10 border-0" />
             </div>
             <div className="storefront-panel-row grid min-h-12 min-w-0 grid-cols-[auto_1fr] items-center gap-3 border border-[var(--border)] px-3 text-[11px] font-medium uppercase tracking-[0.14em]">
-              <span className="shrink-0 text-stone-500" aria-label={copy.language}>{copy.language}</span>
+              <span className="shrink-0 text-[var(--muted)]" aria-label={copy.language}>{copy.language}</span>
               <LanguageSwitcher className="-me-2 min-h-10 justify-end gap-1.5 whitespace-nowrap px-2 tracking-[0.08em]" />
             </div>
           </div>
           <div className="mt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.categories}</p>
+            <p className="eyebrow eyebrow-muted">{copy.categories}</p>
             <div className="mt-3 grid grid-cols-2 border-l border-t border-[var(--border)]">
               {navCategories.map((category) => (
                 <Dialog.Close key={category} asChild>
@@ -179,11 +179,11 @@ export function MobileMenu({
           </div>
           <div className="mt-7 grid gap-6 sm:grid-cols-2">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.collections}</p>
+              <p className="eyebrow eyebrow-muted">{copy.collections}</p>
               <div className="mt-3 grid gap-1 text-sm">
                 {navCollections.map((collection) => (
                   <Dialog.Close key={collection.slug} asChild>
-                    <Link href={localize(collection.href)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent)]">
+                    <Link href={localize(collection.href)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent-text)]">
                       {collectionLabel(locale, collection.slug, collection.name)}
                     </Link>
                   </Dialog.Close>
@@ -191,11 +191,11 @@ export function MobileMenu({
               </div>
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">{copy.clientServices}</p>
+              <p className="eyebrow eyebrow-muted">{copy.clientServices}</p>
               <div className="mt-3 grid gap-1 text-sm">
                 {serviceLinks.map((item) => (
                   <Dialog.Close key={item.href} asChild>
-                    <Link href={localize(item.href)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent)]">
+                    <Link href={localize(item.href)} className="storefront-action flex min-h-10 items-center border-b border-[var(--border)] hover:text-[var(--accent-text)]">
                       {item.label}
                     </Link>
                   </Dialog.Close>

@@ -25,10 +25,10 @@ export function ProductTabs({ product }: { product: Product }) {
             aria-selected={active === tab}
             key={tab}
             onClick={() => setActive(tab)}
-            className={`shrink-0 border-b-2 px-3 py-4 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors sm:px-5 sm:text-xs sm:tracking-widest ${
+            className={`eyebrow shrink-0 border-b-2 px-3 py-4 transition-colors sm:px-5 ${
               active === tab
-                ? "border-[var(--foreground)] text-[var(--foreground)]"
-                : "border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"
+                ? "border-[var(--foreground)] !text-[var(--foreground)]"
+                : "border-transparent !text-[var(--muted)] hover:!text-[var(--foreground)]"
             }`}
           >
             {tab}

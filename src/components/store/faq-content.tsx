@@ -43,7 +43,7 @@ export function FaqContent({ blocks }: { blocks: ContentBlock[] }) {
             <div className="storefront-railed divide-y divide-[var(--border)]">
               {group.items.map((item) => (
                 <details key={item.question} className="group px-5 sm:px-6">
-                  <summary className="storefront-action flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium hover:text-[var(--accent)]">
+                  <summary className="storefront-action flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium hover:text-[var(--accent-text)]">
                     <span>{item.question}</span>
                     <ChevronDown className="size-4 shrink-0 transition group-open:rotate-180 motion-reduce:transition-none" />
                   </summary>

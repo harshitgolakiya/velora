@@ -25,9 +25,9 @@ export function ContextualSupport({ context, orderNumber, product, compact = fal
   if (product) query.set("product", product);
 
   return (
-    <aside className={`storefront-framed ${compact ? "p-4" : "p-5 sm:p-6"}`} aria-label="Customer support">
+    <aside className={`card ${compact ? "p-4" : "p-5 sm:p-6"}`} aria-label="Customer support">
       <div className="flex gap-3">
-        <CircleHelp className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
+        <CircleHelp className="mt-0.5 size-5 shrink-0 text-[var(--accent-text)]" />
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold">{content.title}</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{content.body}</p>

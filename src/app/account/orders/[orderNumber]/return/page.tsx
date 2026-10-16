@@ -59,7 +59,7 @@ export default async function ReturnOrderPage({
       </Link>
 
       <div className="mb-8 mt-7 border-b border-[var(--border)] pb-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent)]">Order {order.orderNumber}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">Order {order.orderNumber}</p>
         <h1 className="mt-3 text-3xl font-semibold sm:text-5xl">Return or exchange</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted)]">
           Select the items and outcome you need. Replacement availability is checked against the same product and color.
@@ -69,7 +69,7 @@ export default async function ReturnOrderPage({
       {!existingRequest ? (
         <section className="mb-6 storefront-framed p-5 sm:p-6">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--accent)]" />
+            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-[var(--accent-text)]" />
             <div>
               <h2 className="font-semibold">Before you start</h2>
               <p className="mt-1 text-sm leading-6 text-[var(--muted)]">

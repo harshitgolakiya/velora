@@ -77,12 +77,12 @@ const fallbackHomepageSections: StorefrontHomepageSection[] = [
     key: "hero-drop",
     type: "HERO",
     status: "PUBLISHED",
-    title: "Modern occasion pieces",
-    subtitle: "New edit",
-    body: "Polished dresses, clean layers, and refined separates styled for day-to-evening dressing.",
+    title: "Move through every part of your day",
+    subtitle: "New season",
+    body: "Sculpting support, breathable layers, and everyday essentials made for training, Pilates, tennis, and the hours in between.",
     ctaLabel: "Shop now",
     ctaHref: "/shop",
-    imageUrl: "/images/activewear-demo/active-duo.jpg",
+    imageUrl: "/images/campaign/hero-courtyard.webp",
     productIds: [],
     settings: {},
     categoryMediaItems: [],
@@ -135,7 +135,7 @@ const fallbackHomepageSections: StorefrontHomepageSection[] = [
     body: "Compare drape, structure, stretch, and coverage before choosing your next Velora piece.",
     ctaLabel: "Open fit guide",
     ctaHref: "/fabric-guide",
-    imageUrl: "/images/activewear-demo/active-neutral.jpg",
+    imageUrl: "/images/campaign/campaign-sage-portrait.webp",
     productIds: [],
     settings: {},
     categoryMediaItems: [],
@@ -229,7 +229,7 @@ function mapProduct(row: ProductWithRelations, mediaMetadata: MediaMetadataByUrl
   const firstColorMedia = colorNames[0] ? variantMediaByColor[colorNames[0]] ?? [] : [];
   const mediaImages = firstColorMedia.filter((media) => media.type === "IMAGE").map((media) => media.url);
   const resolvedImages = mediaImages.length ? mediaImages : productImages;
-  const images = resolvedImages.length ? resolvedImages : ["/images/activewear-demo/active-duo.jpg"];
+  const images = resolvedImages.length ? resolvedImages : ["/images/campaign/hero-courtyard.webp"];
   const hoverImage =
     firstColorMedia.find((media) => media.isHoverImage && media.type === "IMAGE")?.url ??
     images[1] ??
@@ -261,7 +261,7 @@ function mapProduct(row: ProductWithRelations, mediaMetadata: MediaMetadataByUrl
       slug: collection.slug,
       name: findTranslation(collection.translations, locale)?.name || collection.name,
       summary: findTranslation(collection.translations, locale)?.summary || collection.summary,
-      image: collection.bannerImage ?? images[0] ?? "/images/activewear-demo/active-duo.jpg",
+      image: collection.bannerImage ?? images[0] ?? "/images/campaign/hero-courtyard.webp",
       seoTitle: findTranslation(collection.translations, locale)?.seoTitle ?? collection.seoTitle ?? undefined,
       seoDescription: findTranslation(collection.translations, locale)?.seoDescription ?? collection.seoDescription ?? undefined,
       socialImage: collection.socialImage ?? undefined,
@@ -433,7 +433,7 @@ export async function getDbCollections(locale: Locale = "en"): Promise<Collectio
             slug: collection.slug,
             name: translation?.name || collection.name,
             summary: translation?.summary || collection.summary,
-            image: collection.bannerImage ?? "/images/activewear-demo/active-duo.jpg",
+            image: collection.bannerImage ?? "/images/campaign/hero-courtyard.webp",
             status: collection.status,
             scheduledAt: collection.scheduledAt?.toISOString(),
             publishedAt: collection.publishedAt?.toISOString(),
@@ -493,7 +493,7 @@ export async function getDbHomepageSections(locale: Locale = "en"): Promise<Stor
               slug: section.collection.slug,
               name: collectionTranslation?.name || section.collection.name,
               summary: collectionTranslation?.summary || section.collection.summary,
-              image: section.collection.bannerImage ?? section.imageUrl ?? "/images/activewear-demo/active-duo.jpg",
+              image: section.collection.bannerImage ?? section.imageUrl ?? "/images/campaign/hero-courtyard.webp",
               seoTitle: collectionTranslation?.seoTitle ?? section.collection.seoTitle ?? undefined,
               seoDescription: collectionTranslation?.seoDescription ?? section.collection.seoDescription ?? undefined,
             }

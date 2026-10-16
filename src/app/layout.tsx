@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Poppins } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { DeferredRootEffects } from "@/components/store/deferred-root-effects";
 import { getPublishedGlobalContent } from "@/lib/global-content-store";
@@ -8,11 +8,19 @@ import { dirForLocale, type Locale } from "@/lib/i18n";
 import { localizedAlternates, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
-const poppins = Poppins({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-poppins",
+  variable: "--font-manrope",
   display: "swap",
-  weight: ["400", "600"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT", "WONK"],
 });
 
 const themeInitScript = `
@@ -43,7 +51,7 @@ export const metadata: Metadata = {
     locale: "en_AE",
     images: [
       {
-        url: "/images/activewear-demo/active-duo.jpg",
+        url: "/images/campaign/hero-courtyard.webp",
         width: 1440,
         height: 900,
         alt: "Velora premium activewear campaign",
@@ -54,7 +62,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Velora | Premium Activewear",
     description: "Premium activewear for workouts, studio sessions, active days, and everyday movement.",
-    images: ["/images/activewear-demo/active-duo.jpg"],
+    images: ["/images/campaign/hero-courtyard.webp"],
   },
 };
 
@@ -64,7 +72,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang={locale} dir={dirForLocale(locale)} suppressHydrationWarning data-scroll-behavior="smooth">
-      <body className={`${poppins.variable} antialiased`}>
+      <body className={`${manrope.variable} ${fraunces.variable} antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script
           type="application/ld+json"

@@ -231,7 +231,7 @@ export function ReturnRequestForm({
     return (
       <section className="border border-[var(--border)] bg-[var(--surface)]">
         <div className="flex items-start gap-3 border-b border-[var(--border)] px-5 py-5 sm:px-6">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--card)] text-[var(--accent)]">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--card)] text-[var(--accent-text)]">
             <CheckCircle2 className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -242,7 +242,7 @@ export function ReturnRequestForm({
                   {requestRecord.resolution.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())} / {requestRecord.reason}
                 </p>
               </div>
-              <span className="rounded-full border border-[var(--accent)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--accent)]">
+              <span className="rounded-full border border-[var(--accent)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--accent-text)]">
                 {requestRecord.status.replaceAll("_", " ")}
               </span>
             </div>
@@ -263,7 +263,7 @@ export function ReturnRequestForm({
                     <p className="mt-1 text-xs text-[var(--muted)]">{item.color} / {copy.size} {item.originalSize} / {copy.qty} {item.quantity}</p>
                   </div>
                   {item.requestedSize ? (
-                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">
+                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent-text)]">
                       {copy.replacement}: {item.requestedSize}
                     </span>
                   ) : null}
@@ -301,7 +301,7 @@ export function ReturnRequestForm({
                   </p>
                 </div>
                 {requestRecord.returnShipment.labelId ? (
-                  <a href={`/api/account/orders/${orderNumber}/return-request/label`} target="_blank" className="storefront-action inline-flex h-10 items-center justify-center border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] motion-reduce:transition-none">
+                  <a href={`/api/account/orders/${orderNumber}/return-request/label`} target="_blank" className="btn btn-secondary">
                     {copy.printReturnLabel}
                   </a>
                 ) : null}
@@ -326,7 +326,7 @@ export function ReturnRequestForm({
                   <h3 className="text-sm font-semibold">{copy.refundProgress}</h3>
                   <p className="mt-1 text-xs leading-5 text-[var(--muted)]">AED {requestRecord.refund.amount.toFixed(2)} / {requestRecord.refund.provider.replaceAll("_", " ")} / {requestRecord.refund.status.replaceAll("_", " ").toLowerCase()}</p>
                 </div>
-                <span className="rounded-full border border-[var(--accent)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent)]">{requestRecord.refund.status.replaceAll("_", " ")}</span>
+                <span className="rounded-full border border-[var(--accent)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent-text)]">{requestRecord.refund.status.replaceAll("_", " ")}</span>
               </div>
               {requestRecord.refund.note ? <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{requestRecord.refund.note}</p> : null}
             </div>
@@ -341,7 +341,7 @@ export function ReturnRequestForm({
                   {requestRecord.replacementOrder.trackingNo ? ` / ${requestRecord.replacementOrder.trackingNo}` : ""}
                 </p>
               </div>
-              <a href={localizedPath(`/account/orders/${requestRecord.replacementOrder.orderNumber}`, locale)} className="storefront-action mt-3 inline-flex h-10 items-center justify-center border border-[var(--foreground)] px-4 text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[var(--foreground)] hover:text-[var(--background)] sm:mt-0 motion-reduce:transition-none">
+              <a href={localizedPath(`/account/orders/${requestRecord.replacementOrder.orderNumber}`, locale)} className="btn btn-secondary mt-3 mt-0">
                 {copy.viewReplacement}
               </a>
             </div>
@@ -387,11 +387,11 @@ export function ReturnRequestForm({
               <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{copy.supportNeedsInfoBody}</p>
               <textarea required minLength={3} maxLength={1000} value={followUp} onChange={(event) => setFollowUp(event.target.value)} className="mt-3 min-h-24 w-full resize-y border border-[var(--border)] bg-[var(--background)] p-3 text-sm outline-none focus:border-[var(--accent)]" placeholder={copy.addRequestedDetails} />
               {followUpMessage ? <p className="mt-2 text-xs text-[var(--muted)]">{followUpMessage}</p> : null}
-              <button type="submit" disabled={sendingFollowUp} className="storefront-action mt-3 h-11 bg-[var(--foreground)] px-5 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:opacity-50 motion-reduce:transition-none">
+              <button type="submit" disabled={sendingFollowUp} className="btn btn-primary mt-3">
                 {sendingFollowUp ? copy.sending : copy.sendResponse}
               </button>
             </form>
-          ) : followUpMessage ? <p role="status" className="text-sm text-emerald-600">{followUpMessage}</p> : null}
+          ) : followUpMessage ? <p role="status" className="text-sm text-[var(--accent-text)]">{followUpMessage}</p> : null}
 
           {["PENDING", "AWAITING_CUSTOMER"].includes(requestRecord.status) && requestRecord.evidence.length < 5 ? (
             <label className="block border border-[var(--border)] bg-[var(--card)] p-4 text-sm transition hover:border-[var(--accent)] motion-reduce:transition-none">
@@ -405,7 +405,7 @@ export function ReturnRequestForm({
           {["PENDING", "AWAITING_CUSTOMER", "APPROVED"].includes(requestRecord.status) ? (
             <div className="flex flex-col gap-3 border-t border-[var(--border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-xl text-xs leading-5 text-[var(--muted)]">{copy.cancelOnlineHint}</p>
-              <button type="button" onClick={() => void cancelRequest()} disabled={cancelling} className="storefront-action h-10 shrink-0 border border-red-500 px-4 text-xs font-semibold uppercase tracking-[0.08em] text-red-600 transition hover:bg-red-500/10 disabled:opacity-50 motion-reduce:transition-none">
+              <button type="button" onClick={() => void cancelRequest()} disabled={cancelling} className="storefront-action h-10 shrink-0 border border-red-500 px-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--sale)] transition hover:bg-red-500/10 disabled:opacity-50 motion-reduce:transition-none">
                 {cancelling ? copy.cancelling : copy.cancelRequest}
               </button>
             </div>
@@ -500,7 +500,7 @@ export function ReturnRequestForm({
     <section className="border border-[var(--border)] bg-[var(--surface)]">
       <div className="border-b border-[var(--border)] px-5 py-5 sm:px-6">
         <div className="flex items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--card)] text-[var(--accent)]">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--card)] text-[var(--accent-text)]">
             <PackageCheck className="size-5" />
           </span>
           <div>
@@ -533,7 +533,7 @@ export function ReturnRequestForm({
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="font-semibold">{option.label}</span>
-                    {active ? <Check className="size-4 text-[var(--accent)]" /> : <Icon className="size-4 text-[var(--muted)]" />}
+                    {active ? <Check className="size-4 text-[var(--accent-text)]" /> : <Icon className="size-4 text-[var(--muted)]" />}
                   </span>
                   <span className="mt-1 block text-xs text-[var(--muted)]">{option.description}</span>
                 </button>
@@ -542,7 +542,7 @@ export function ReturnRequestForm({
           </div>
         </fieldset>
 
-        <label className="storefront-framed block bg-[var(--card)] p-4 text-sm transition hover:border-[var(--accent)] motion-reduce:transition-none">
+        <label className="card block bg-[var(--card)] p-4 text-sm transition hover:border-[var(--accent)] motion-reduce:transition-none">
           <span className="font-semibold">{copy.evidenceImages} <span className="font-normal text-[var(--muted)]">({copy.optional})</span></span>
           <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{copy.evidenceImagesBody}</span>
           <input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={submitted || loading} onChange={(event) => setEvidenceFiles(Array.from(event.target.files ?? []).slice(0, 5))} className="storefront-action mt-3 block w-full text-xs file:me-3 file:h-9 file:border file:border-[var(--border)] file:bg-[var(--surface)] file:px-3 file:text-xs file:font-semibold file:text-[var(--foreground)]" />
@@ -559,7 +559,7 @@ export function ReturnRequestForm({
               setIsError(false);
             }}
             disabled={submitted}
-            className="storefront-action h-12 w-full border border-[var(--border)] bg-[var(--background)] px-3 font-normal outline-none transition focus:border-[var(--accent)] disabled:opacity-60 motion-reduce:transition-none"
+            className="field"
           >
             {reasons[resolution].map((option) => <option key={option} value={option}>{returnReasonLabel(locale, option)}</option>)}
           </select>
@@ -625,7 +625,7 @@ export function ReturnRequestForm({
                                 onClick={() => setExchangeSelections((current) => ({ ...current, [item.id]: size.variantId }))}
                                 className={`min-w-12 border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-35 motion-reduce:transition-none ${
                                   active
-                                    ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
+                                    ? "border-[var(--foreground)] bg-[var(--accent)] text-[var(--on-accent)]"
                                     : "border-[var(--border)] hover:border-[var(--foreground)]"
                                 }`}
                                 aria-pressed={active}
@@ -661,7 +661,7 @@ export function ReturnRequestForm({
         </label>
 
         {message ? (
-          <p role={isError ? "alert" : "status"} className={`border px-3 py-2 text-sm leading-5 ${isError ? "border-red-500/40 bg-red-500/10 text-red-500" : "border-[var(--border)] text-[var(--muted)]"}`}>
+          <p role={isError ? "alert" : "status"} className={`border px-3 py-2 text-sm leading-5 ${isError ? "border-red-500/40 bg-red-500/10 text-[var(--sale)]" : "border-[var(--border)] text-[var(--muted)]"}`}>
             {message}
           </p>
         ) : null}
@@ -673,7 +673,7 @@ export function ReturnRequestForm({
           <button
             type="submit"
             disabled={loading || submitted || !selectedItems.length || missingSizeSelection}
-            className="storefront-action h-12 bg-[var(--foreground)] px-6 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+            className="btn btn-primary"
           >
             {loading ? copy.submitting : submitted ? copy.requestSubmitted : `${copy.submit} ${resolution === "refund" ? copy.refundLabel.toLowerCase() : resolution === "exchange" ? copy.exchangeLabel.toLowerCase() : copy.returnLabel.toLowerCase()}`}
           </button>

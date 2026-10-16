@@ -97,7 +97,7 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: process.env.PRODUCTION_BROWSER_SOURCE_MAPS === "true",
   images: {
     formats: ["image/avif", "image/webp"],
-    qualities: [72, 75, 84, 85, 92],
+    qualities: [60, 72, 75, 78, 80, 84, 85, 92],
     remotePatterns: [
       { protocol: "https", hostname: "cdn.dummyjson.com" },
       { protocol: "https", hostname: "fakestoreapi.com" },

@@ -28,7 +28,7 @@ export async function AccountSectionShell({
     <section className="storefront-container py-10 sm:py-12">
       <div className="max-w-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">{copy.myAccount}</p>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-5xl">{copy.welcomeBack}{session.user.name ? `, ${session.user.name}` : ""}</h1>
+        <h1 className="display-lg mt-3">{copy.welcomeBack}{session.user.name ? `, ${session.user.name}` : ""}</h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">{copy.signedInDescription}</p>
       </div>
       <SectionComponent {...mapAccountDashboardProps({ user: data.user, orders: data.orders }, products)} />

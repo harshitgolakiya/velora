@@ -117,8 +117,8 @@ const emptyAddress = {
 
 function statusClass(value: string) {
   const normalized = value.toLowerCase();
-  if (["paid", "delivered", "shipped"].includes(normalized)) return "bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20";
-  if (["cancelled", "refunded"].includes(normalized)) return "bg-red-500/10 text-red-700 ring-1 ring-red-500/20";
+  if (["paid", "delivered", "shipped"].includes(normalized)) return "bg-[var(--accent-soft)] text-[var(--accent-text)] ring-1 ring-emerald-500/20";
+  if (["cancelled", "refunded"].includes(normalized)) return "bg-red-500/10 text-[var(--sale)] ring-1 ring-red-500/20";
   if (["pending", "confirmed", "processing", "partially_fulfilled"].includes(normalized)) return "bg-sky-500/10 text-sky-700 ring-1 ring-sky-500/20 dark:text-sky-300";
   return "bg-[var(--hover)] text-[var(--muted)] ring-1 ring-[var(--border)]";
 }
@@ -455,13 +455,13 @@ export function AccountDashboard({
     <div className="mt-6">
       <AccountNavigation section={section} />
       {section !== "settings" ? <div className="mt-6 space-y-6">
-        {section === "overview" ? <><section aria-labelledby="account-next-title" className="storefront-framed overflow-hidden bg-[var(--surface)]">
+        {section === "overview" ? <><section aria-labelledby="account-next-title" className="card overflow-hidden bg-[var(--surface)]">
           <div className="grid md:grid-cols-[minmax(0,1.4fr)_minmax(240px,0.6fr)]">
             <div className="p-5 sm:p-7">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--accent-text)]">
                 {activeOrder ? copy.inProgress : copy.yourAccount}
               </p>
-              <h2 id="account-next-title" className="mt-3 text-2xl font-semibold sm:text-3xl">
+              <h2 id="account-next-title" className="display-md mt-3">
                 {activeOrder ? `${copy.order} ${activeOrder.orderNumber}` : copy.allCaughtUp}
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">
@@ -473,15 +473,15 @@ export function AccountDashboard({
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 {activeOrder ? (
-                  <Link href={localizedPath(`/account/orders/${activeOrder.orderNumber}`, locale)} className="storefront-action inline-flex h-11 items-center gap-2 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--accent)] hover:text-stone-950 motion-reduce:transition-none">
+                  <Link href={localizedPath(`/account/orders/${activeOrder.orderNumber}`, locale)} className="btn btn-primary">
                     {copy.viewOrder} <ArrowRight className="size-4 rtl:rotate-180" />
                   </Link>
                 ) : (
-                  <Link href={localizedPath("/shop", locale)} className="storefront-action inline-flex h-11 items-center gap-2 bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--accent)] hover:text-stone-950 motion-reduce:transition-none">
+                  <Link href={localizedPath("/shop", locale)} className="btn btn-primary">
                     {copy.shopNewArrivals} <ArrowRight className="size-4 rtl:rotate-180" />
                   </Link>
                 )}
-                <Link href={localizedPath("/account/wishlist", locale)} className="storefront-action inline-flex h-11 items-center gap-2 border border-[var(--border)] px-5 text-sm font-semibold hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none">
+                <Link href={localizedPath("/account/wishlist", locale)} className="btn btn-secondary">
                   <Heart className="size-4" /> {copy.wishlist}
                 </Link>
               </div>
@@ -489,11 +489,11 @@ export function AccountDashboard({
             <div className="grid grid-cols-2 border-t border-[var(--border)] md:grid-cols-1 md:border-l md:border-t-0">
               <Link href={localizedPath("/account/orders", locale)} className="group flex min-h-24 items-center justify-between gap-4 border-r border-[var(--border)] p-4 transition hover:bg-[var(--hover)] md:border-b md:border-r-0 sm:p-5 motion-reduce:transition-none">
                 <span><span className="block text-2xl font-semibold">{initialOrders.length}</span><span className="mt-1 block text-xs text-[var(--muted)]">{copy.orders}</span></span>
-                <ShoppingBag className="size-5 text-[var(--accent)] transition group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                <ShoppingBag className="size-5 text-[var(--accent-text)] transition group-hover:translate-x-0.5 motion-reduce:transition-none" />
               </Link>
               <Link href={localizedPath("/account/addresses", locale)} className="group flex min-h-24 items-center justify-between gap-4 p-4 transition hover:bg-[var(--hover)] sm:p-5 motion-reduce:transition-none">
                 <span><span className="block text-2xl font-semibold">{addresses.length}</span><span className="mt-1 block text-xs text-[var(--muted)]">{copy.savedAddresses}</span></span>
-                <MapPin className="size-5 text-[var(--accent)] transition group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                <MapPin className="size-5 text-[var(--accent-text)] transition group-hover:translate-x-0.5 motion-reduce:transition-none" />
               </Link>
             </div>
           </div>
@@ -505,19 +505,19 @@ export function AccountDashboard({
             [copy.wishlist, String(wishlist.length), localizedPath("/account/wishlist", locale), Heart],
             [copy.settings, initialUser.name ? copy.ready : copy.review, localizedPath("/account/settings", locale), UserRound],
           ].map(([label, value, href, Icon], index) => (
-            <Link key={String(label)} href={String(href)} className={`group min-h-24 storefront-framed p-4 transition hover:-translate-y-0.5 hover:border-[var(--foreground)]/30 hover:bg-[var(--hover)] motion-reduce:transition-none ${index === 2 ? "col-span-2 sm:col-span-1" : ""}`}>
+            <Link key={String(label)} href={String(href)} className={`group min-h-24 card p-4 transition hover:-translate-y-0.5 hover:border-[var(--foreground)]/30 hover:bg-[var(--hover)] motion-reduce:transition-none ${index === 2 ? "col-span-2 sm:col-span-1" : ""}`}>
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[11px] font-semibold uppercase text-[var(--muted)]">{String(label)}</p>
-                <Icon className="size-4 text-[var(--accent)]" />
+                <Icon className="size-4 text-[var(--accent-text)]" />
               </div>
               <p className="mt-2 text-xl font-semibold sm:text-2xl">{String(value)}</p>
             </Link>
           ))}
         </div></> : null}
 
-        {section === "orders" ? <section className="storefront-framed">
+        {section === "orders" ? <section className="card">
           <div className="flex items-center gap-3 border-b border-[var(--border)] p-4 sm:p-5">
-            <Truck className="size-5 text-[var(--accent)]" />
+            <Truck className="size-5 text-[var(--accent-text)]" />
             <div>
               <h2 className="text-xl font-semibold">{copy.orderHistory}</h2>
               <p className="mt-1 text-xs text-[var(--muted)]">{copy.orderHistorySubtitle}</p>
@@ -559,13 +559,13 @@ export function AccountDashboard({
                         <div className="mt-5 flex flex-wrap gap-3">
                           <Link
                             href={localizedPath(`/account/orders/${order.orderNumber}`, locale)}
-                            className="storefront-action inline-flex h-10 items-center border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--foreground)] transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none"
+                            className="btn btn-secondary"
                           >
                             {copy.viewDetails}
                           </Link>
                           <a
                             href={`/api/account/orders/${order.orderNumber}/invoice`}
-                            className="storefront-action inline-flex h-10 items-center border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--foreground)] transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none"
+                            className="btn btn-secondary"
                           >
                             {copy.invoice}
                           </a>
@@ -583,10 +583,10 @@ export function AccountDashboard({
           )}
         </section> : null}
 
-        {section === "returns" ? <section className="storefront-framed">
+        {section === "returns" ? <section className="card">
           <div className="flex flex-col gap-3 border-b border-[var(--border)] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex items-center gap-3">
-              <RotateCcw className="size-5 text-[var(--accent)]" />
+              <RotateCcw className="size-5 text-[var(--accent-text)]" />
               <div>
                 <h2 className="text-xl font-semibold">{copy.returnsAndExchanges}</h2>
                 <p className="mt-1 text-xs text-[var(--muted)]">{copy.returnsSubtitle}</p>
@@ -603,11 +603,11 @@ export function AccountDashboard({
                   <article key={request.id} className="p-4 sm:p-5">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">{readableStatus(request.resolution)}</p>
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-text)]">{readableStatus(request.resolution)}</p>
                         <h3 className="mt-1 font-semibold">{copy.order} {request.orderNumber}</h3>
                         <p className="mt-1 text-xs text-[var(--muted)]">{request.reason} / {copy.submitted} {new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium" }).format(new Date(request.createdAt))}</p>
                       </div>
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase ${request.status === "REJECTED" ? "bg-red-500/10 text-red-700 ring-1 ring-red-500/20" : "bg-[var(--hover)] text-[var(--foreground)] ring-1 ring-[var(--border)]"}`}>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase ${request.status === "REJECTED" ? "bg-red-500/10 text-[var(--sale)] ring-1 ring-red-500/20" : "bg-[var(--hover)] text-[var(--foreground)] ring-1 ring-[var(--border)]"}`}>
                         {readableStatus(request.status)}
                       </span>
                     </div>
@@ -618,7 +618,7 @@ export function AccountDashboard({
                           {index > 0 ? <span className={`absolute start-0 end-1/2 top-2 h-px ${step.complete ? "bg-[var(--accent)]" : "bg-[var(--border)]"}`} /> : null}
                           {index < progress.length - 1 ? <span className={`absolute start-1/2 end-0 top-2 h-px ${progress[index + 1]?.complete ? "bg-[var(--accent)]" : "bg-[var(--border)]"}`} /> : null}
                           <span className={`relative mx-auto block size-4 rounded-full border-2 ${step.rejected ? "border-red-600 bg-red-600" : step.complete ? "border-[var(--accent)] bg-[var(--accent)]" : "border-[var(--border)] bg-[var(--surface)]"}`} />
-                          <span className={`mt-2 block text-[10px] font-semibold uppercase tracking-[0.05em] ${step.rejected ? "text-red-700" : step.complete ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{step.label}</span>
+                          <span className={`mt-2 block text-[10px] font-semibold uppercase tracking-[0.05em] ${step.rejected ? "text-[var(--sale)]" : step.complete ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{step.label}</span>
                         </li>
                       ))}
                     </ol>
@@ -634,7 +634,7 @@ export function AccountDashboard({
                       ))}
                     </div>
 
-                    <Link href={localizedPath(`/account/orders/${request.orderNumber}/return`, locale)} className="storefront-action mt-5 inline-flex h-10 items-center border border-[var(--border)] px-4 text-xs font-semibold uppercase tracking-[0.1em] transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none">
+                    <Link href={localizedPath(`/account/orders/${request.orderNumber}/return`, locale)} className="btn btn-secondary mt-5">
                       {copy.viewRequest}
                     </Link>
                   </article>
@@ -643,16 +643,16 @@ export function AccountDashboard({
             </div>
           ) : (
             <div className="grid gap-3 p-8 text-sm text-[var(--muted)] sm:grid-cols-[auto_1fr] sm:items-center">
-              <ClipboardList className="size-6 text-[var(--accent)]" />
+              <ClipboardList className="size-6 text-[var(--accent-text)]" />
               <p>{copy.noReturnsYet}</p>
             </div>
           )}
         </section> : null}
 
-        {section === "wishlist" ? <section className="storefront-framed">
+        {section === "wishlist" ? <section className="card">
           <div className="flex flex-col gap-3 border-b border-[var(--border)] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex items-center gap-3">
-              <Heart className="size-5 text-[var(--accent)]" />
+              <Heart className="size-5 text-[var(--accent-text)]" />
               <div>
                 <h2 className="text-xl font-semibold">{copy.wishlist}</h2>
                 <p className="mt-1 text-xs text-[var(--muted)]">
@@ -678,10 +678,10 @@ export function AccountDashboard({
           )}
         </section> : null}
 
-        {section === "addresses" ? <section className="storefront-framed">
+        {section === "addresses" ? <section className="card">
           <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <MapPin className="size-5 text-[var(--accent)]" />
+              <MapPin className="size-5 text-[var(--accent-text)]" />
               <h2 className="text-xl font-semibold">{copy.savedAddresses}</h2>
             </div>
             <button
@@ -691,7 +691,7 @@ export function AccountDashboard({
                 setAddressMessage(null);
                 requestAnimationFrame(() => document.querySelector<HTMLInputElement>("#account-address-name")?.focus());
               }}
-              className="storefront-action flex h-10 items-center gap-1.5 border border-[var(--border)] px-3 text-xs font-semibold uppercase tracking-[0.1em] transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none"
+              className="btn btn-secondary"
             >
               <Plus className="size-4" />
               {copy.newAddress}
@@ -711,7 +711,7 @@ export function AccountDashboard({
                     <button type="button" onClick={() => setEditingAddress(address)} className="storefront-action flex h-8 items-center gap-1 border border-[var(--border)] px-2 text-xs font-semibold transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none">
                       <Pencil className="size-3.5" /> {copy.edit}
                     </button>
-                    <button type="button" onClick={() => void deleteAddress(address.id)} className="storefront-action flex h-8 items-center gap-1 border border-red-500/30 px-2 text-xs font-semibold text-red-600 transition hover:bg-red-500/10 motion-reduce:transition-none">
+                    <button type="button" onClick={() => void deleteAddress(address.id)} className="storefront-action flex h-8 items-center gap-1 border border-red-500/30 px-2 text-xs font-semibold text-[var(--sale)] transition hover:bg-red-500/10 motion-reduce:transition-none">
                       <Trash2 className="size-3.5" /> {copy.delete}
                     </button>
                   </div>
@@ -753,7 +753,7 @@ export function AccountDashboard({
                 </label>
               ))}
               {addressMessage ? <p className="text-xs text-[var(--muted)]" role="status">{addressMessage}</p> : null}
-              <button disabled={pendingAction === "address"} className="h-11 bg-[var(--foreground)] text-sm font-semibold uppercase tracking-[0.12em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-stone-950 disabled:cursor-wait disabled:opacity-60 motion-reduce:transition-none">
+              <button disabled={pendingAction === "address"} className="btn btn-primary">
                 {editingAddress.id ? copy.updateAddress : copy.saveAddress}
               </button>
             </form>
@@ -763,8 +763,8 @@ export function AccountDashboard({
       : null}
 
       {section === "settings" ? <aside className="mt-6 grid items-start gap-5 lg:grid-cols-2">
-        <section className="storefront-framed p-4 sm:p-5">
-          <UserRound className="size-5 text-[var(--accent)]" />
+        <section className="card p-4 sm:p-5">
+          <UserRound className="size-5 text-[var(--accent-text)]" />
           <h2 className="mt-4 text-xl font-semibold">{copy.profile}</h2>
           <p className="mt-1 text-sm text-[var(--muted)]">{initialUser.email}</p>
           <form onSubmit={(event) => void saveProfile(event)} className="mt-5 grid gap-3">
@@ -785,7 +785,7 @@ export function AccountDashboard({
             </button>
           </form>
         </section>
-        <section className="storefront-framed p-4 sm:p-5">
+        <section className="card p-4 sm:p-5">
           <h2 className="text-xl font-semibold">{copy.communication}</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.communicationBody}</p>
           <form onSubmit={(event) => void savePreferences(event)} className="mt-5 grid gap-4">
@@ -811,7 +811,7 @@ export function AccountDashboard({
             <button disabled={pendingAction === "preferences"} className={`${secondaryActionClass} disabled:cursor-wait disabled:opacity-60`}>{copy.savePreferences}</button>
           </form>
         </section>
-        <section className="storefront-framed p-4 sm:p-5">
+        <section className="card p-4 sm:p-5">
           <h2 className="text-xl font-semibold">{copy.fitPreferencesTitle}</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.fitPreferencesBody}</p>
           <form onSubmit={(event) => void saveFitPreferences(event)} className="mt-5 grid gap-3">
@@ -832,13 +832,13 @@ export function AccountDashboard({
             <button disabled={pendingAction === "fit"} className={`${secondaryActionClass} disabled:cursor-wait disabled:opacity-60`}>{copy.saveFitPreferences}</button>
           </form>
         </section>
-        <section className="storefront-framed p-4 sm:p-5">
-          <ShieldAlert className="size-5 text-[var(--accent)]" />
+        <section className="card p-4 sm:p-5">
+          <ShieldAlert className="size-5 text-[var(--accent-text)]" />
           <h2 className="mt-4 text-xl font-semibold">{copy.privacyAndAccount}</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{copy.privacyAndAccountBody}</p>
           <div className="mt-5 border border-[var(--border)] bg-[var(--background)] p-3">
             <div className="flex items-center gap-2">
-              <MonitorSmartphone className="size-4 text-[var(--accent)]" />
+              <MonitorSmartphone className="size-4 text-[var(--accent-text)]" />
               <h3 className="text-sm font-semibold">{copy.devices}</h3>
             </div>
             <div className="mt-3 space-y-3">
@@ -853,13 +853,13 @@ export function AccountDashboard({
                         {copy.lastActive} {new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.lastSeenAt))}
                         {item.ipAddress ? ` / ${item.ipAddress}` : ""}
                       </p>
-                      {item.revokedAt ? <p className="mt-1 text-xs text-red-600">{copy.revoked} {new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium" }).format(new Date(item.revokedAt))}</p> : null}
+                      {item.revokedAt ? <p className="mt-1 text-xs text-[var(--sale)]">{copy.revoked} {new Intl.DateTimeFormat(dateLocale, { dateStyle: "medium" }).format(new Date(item.revokedAt))}</p> : null}
                     </div>
                     <button
                       type="button"
                       disabled={Boolean(item.revokedAt)}
                       onClick={() => void revokeSession(item.sessionToken)}
-                      className="storefront-action h-8 shrink-0 border border-red-500/30 px-2 text-xs font-semibold uppercase text-red-600 transition hover:bg-red-500/10 disabled:border-[var(--border)] disabled:text-[var(--muted)] disabled:no-underline motion-reduce:transition-none"
+                      className="storefront-action h-8 shrink-0 border border-red-500/30 px-2 text-xs font-semibold uppercase text-[var(--sale)] transition hover:bg-red-500/10 disabled:border-[var(--border)] disabled:text-[var(--muted)] disabled:no-underline motion-reduce:transition-none"
                     >
                       {copy.revoke}
                     </button>
@@ -871,12 +871,12 @@ export function AccountDashboard({
             </div>
             {sessionsMessage ? <p className="mt-3 text-xs text-[var(--muted)]" role="status">{sessionsMessage}</p> : null}
           </div>
-          <a href="/api/account/privacy/export" className="storefront-action mt-5 flex h-11 items-center justify-center gap-2 border border-[var(--border)] text-sm font-semibold transition hover:border-[var(--foreground)] hover:bg-[var(--hover)] motion-reduce:transition-none">
+          <a href="/api/account/privacy/export" className="btn btn-secondary mt-5">
             <Download className="size-4" />
             {copy.downloadMyData}
           </a>
           {initialUser.hasPassword ? <details className="group mt-5 border-t border-[var(--border)] pt-5">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-red-700">{copy.deleteAccount}</summary>
+            <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--sale)]">{copy.deleteAccount}</summary>
             <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out group-open:grid-rows-[1fr] motion-reduce:transition-none">
               <div className="min-h-0 overflow-hidden">
                 <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{copy.deleteAccountWarning}</p>
@@ -889,8 +889,8 @@ export function AccountDashboard({
                     {copy.typeToConfirm}
                     <input required value={deletionConfirmation} onChange={(event) => setDeletionConfirmation(event.target.value)} className={`${formFieldClass} focus:border-red-600`} />
                   </label>
-                  {privacyMessage ? <p role="alert" className="text-xs text-red-600">{privacyMessage}</p> : null}
-                  <button disabled={deletingAccount || deletionConfirmation !== "DELETE"} className="storefront-action h-11 bg-red-700 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none">
+                  {privacyMessage ? <p role="alert" className="text-xs text-[var(--sale)]">{privacyMessage}</p> : null}
+                  <button disabled={deletingAccount || deletionConfirmation !== "DELETE"} className="storefront-action h-11 bg-red-700 text-sm font-semibold text-[var(--paper)] transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none">
                     {deletingAccount ? copy.deletingAccount : copy.permanentlyDeleteAccount}
                   </button>
                 </form>
@@ -898,9 +898,9 @@ export function AccountDashboard({
             </div>
           </details> : (
             <div className="mt-5 border-t border-[var(--border)] pt-5">
-              <p className="text-sm font-semibold text-red-700">{copy.deleteAccount}</p>
+              <p className="text-sm font-semibold text-[var(--sale)]">{copy.deleteAccount}</p>
               <p className="mt-2 text-xs leading-5 text-[var(--muted)]">{copy.socialDeletionHelp}</p>
-              <Link href={localizedPath("/contact", locale)} className="storefront-action mt-3 inline-flex min-h-10 items-center text-sm font-semibold underline underline-offset-4 hover:text-[var(--accent)]">
+              <Link href={localizedPath("/contact", locale)} className="storefront-action mt-3 inline-flex min-h-10 items-center text-sm font-semibold underline underline-offset-4 hover:text-[var(--accent-text)]">
                 {copy.contactSupport}
               </Link>
             </div>

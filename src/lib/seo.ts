@@ -24,7 +24,7 @@ export function localizedAlternates(path = "/") {
 }
 
 export function primaryImage(images?: string[]) {
-  return images?.find(Boolean) ?? "/images/activewear-demo/active-duo.jpg";
+  return images?.find(Boolean) ?? "/images/campaign/hero-courtyard.webp";
 }
 
 export function productJsonLd(product: Product) {
@@ -106,7 +106,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: "Velora",
     url: siteUrl(),
-    logo: absoluteUrl("/images/activewear-demo/active-duo.jpg"),
+    logo: absoluteUrl("/images/campaign/hero-courtyard.webp"),
     sameAs: [],
   };
 }

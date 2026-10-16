@@ -108,7 +108,7 @@ export function WishlistProductCard({ product }: { product: Product }) {
           type="button"
           onClick={moveToBag}
           disabled={unavailable}
-          className="storefront-action inline-flex h-11 items-center justify-center gap-2 bg-[var(--foreground)] px-4 text-sm font-semibold uppercase tracking-[0.1em] text-[var(--background)] transition hover:bg-[var(--accent)] hover:text-[#17262D] disabled:opacity-45 motion-reduce:transition-none"
+          className="btn btn-primary"
         >
           {added ? <Check className="size-4" /> : <ShoppingBag className="size-4" />}
           {added ? "Added" : "Move to bag"}
